@@ -72,7 +72,7 @@ namespace CooperativeMapping
 
             // Show map
             //textBoxConsole.Text = Matrix.ToString<int>(enviroment.Map.MapMatrix);
-            mapImageBox.BackgroundImage = MapDrawer.Drawer(enviroment.Map);
+            mapImageBox.BackgroundImage = enviroment.Drawer.Draw(enviroment.Map);
 
             // Initialize robot and timer
             Platform robot1 = new Platform(enviroment);
@@ -152,14 +152,14 @@ namespace CooperativeMapping
                     if (platformState == PlatformState.Destroy)
                     {
                         textBoxConsole.Text += System.Environment.NewLine +  "Collision with obstacle or other platform";
-                        mapImageBox.BackgroundImage = MapDrawer.Drawer(controller.Platform, enviroment);
+                        mapImageBox.BackgroundImage = enviroment.Drawer.Drawer(controller.Platform, enviroment);
                     }
 
                     robotTimer.Stop();
                     return;
                 }
 
-                mapImageBox.BackgroundImage = MapDrawer.Drawer(controller.Platform, enviroment);
+                mapImageBox.BackgroundImage = enviroment.Drawer.Drawer(controller.Platform, enviroment);
             }
 
 
@@ -201,6 +201,20 @@ namespace CooperativeMapping
         {
             robotTimer.Stop();
             StartSimulation();
+        }
+
+        private void createEnviromentToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Enviroment env = new Enviroment(10, 10);
+            env.Map.SetAllPlace(MapPlaceIndicator.Discovered);
+            CreateOrModifyEnviromentForm createOrModifyEnviromentForm = new CreateOrModifyEnviromentForm(env);
+            createOrModifyEnviromentForm.ShowDialog();
+        }
+
+        private void mapToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SettingsForm settings = new SettingsForm(enviroment.Drawer);
+            settings.ShowDialog();
         }
     }
 }
