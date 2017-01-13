@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 
 namespace CooperativeMapping
 {
+
+    [Serializable]
     public enum PlatformState
     {
         Healthy = 1,
@@ -14,6 +16,7 @@ namespace CooperativeMapping
         OutOfBounderies = 3
     }
 
+    [Serializable]
     public class Enviroment
     {
         public MapObject Map { get; set; }

@@ -9,13 +9,14 @@ using System.Threading.Tasks;
 namespace CooperativeMapping
 {
     [TypeConverter(typeof(ExpandableObjectConverter))]
+    [Serializable]
     public class MapDrawer
     {
         [ReadOnly(false)]                            
         [Description("The square size of a bin on the map")]   
         [Category("Bin")]                      
         [DisplayName("Square Size")]
-        public int SquareSize { get; set; }
+        public int BinSize { get; set; }
 
         [Browsable(false)]
         public int StartX { get; set; }
@@ -42,10 +43,10 @@ namespace CooperativeMapping
         public Color ColorObstacle { get; set; }
 
         [ReadOnly(false)]
-        [Description("Color of the robot bin")]
+        [Description("Color of the platform bin")]
         [Category("Colors")]
-        [DisplayName("Robot Color")]
-        public Color ColorRobot { get; set; }
+        [DisplayName("Platform Color")]
+        public Color ColorPlatform { get; set; }
 
         [ReadOnly(false)]
         [Description("Color of the unknown bin")]
@@ -55,20 +56,20 @@ namespace CooperativeMapping
 
         public MapDrawer()
         {
-            SquareSize = 10;
+            BinSize = 10;
             StartX = 0;
             StartY = 0;
 
             ColorUndiscovered = Color.FromArgb(100, Color.Gray);
             ColorDiscovered = Color.FromArgb(10, Color.Gray);
             ColorObstacle = Color.Black;
-            ColorRobot = Color.Blue;
+            ColorPlatform = Color.Blue;
             ColorUnknown = Color.Red;
     }
 
         public Bitmap Draw(MapObject map)
         {
-            Bitmap bitmap = new Bitmap(map.Columns * SquareSize, map.Rows * SquareSize);
+            Bitmap bitmap = new Bitmap(map.Columns * BinSize, map.Rows * BinSize);
             Graphics g = Graphics.FromImage(bitmap);
 
             Pen blackPen = new Pen(Color.Black, 1);
@@ -79,7 +80,7 @@ namespace CooperativeMapping
             {
                 for (int j = 0; j < map.Columns; j++)
                 {
-                    Rectangle rect = new Rectangle(StartX + j * SquareSize, StartY + i * SquareSize, SquareSize, SquareSize);
+                    Rectangle rect = new Rectangle(StartX + j * BinSize, StartY + i * BinSize, BinSize, BinSize);
 
                     SolidBrush brush;
                     switch (map.MapMatrix[i, j])
@@ -97,7 +98,7 @@ namespace CooperativeMapping
                             break;
 
                         case (int)MapPlaceIndicator.Platform:
-                            brush = new SolidBrush(ColorRobot);
+                            brush = new SolidBrush(ColorPlatform);
                             break;
 
                         case (int)MapPlaceIndicator.NoBackVisist:
@@ -114,26 +115,32 @@ namespace CooperativeMapping
                 }
             }
             blackPen = new Pen(Color.Black, 2);
-            g.DrawRectangle(blackPen, StartX, StartY, map.Columns * SquareSize, map.Rows * SquareSize);
+            g.DrawRectangle(blackPen, StartX, StartY, map.Columns * BinSize, map.Rows * BinSize);
 
             return bitmap;
         }
 
-        public Bitmap Drawer(Platform platform)
+        public Bitmap Draw(Platform platform)
         {
             MapObject mapCopy = (MapObject)platform.Map.Clone();
             mapCopy.MapMatrix[platform.Pose.X, platform.Pose.Y] = (int)MapPlaceIndicator.Platform;
-            return Draw(mapCopy);
-        }
-
-        public Bitmap Drawer(Platform platform, Enviroment env)
-        {
-            MapObject mapCopy = (MapObject)platform.Map.Clone();
-            mapCopy.RemovePlatforms();
-            foreach (Platform p in env.Platforms)
+            foreach (Platform p in platform.ObservedPlatforms)
             {
                 mapCopy.MapMatrix[p.Pose.X, p.Pose.Y] = (int)MapPlaceIndicator.Platform;
             }
+
+            return Draw(mapCopy);
+        }      
+
+        public Bitmap Draw(Enviroment enviroment)
+        {
+            MapObject mapCopy = (MapObject)enviroment.Map.Clone();
+
+            foreach (Platform p in enviroment.Platforms)
+            {
+                mapCopy.MapMatrix[p.Pose.X, p.Pose.Y] = (int)MapPlaceIndicator.Platform;
+            }
+
             return Draw(mapCopy);
         }
     }

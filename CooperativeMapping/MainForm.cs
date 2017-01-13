@@ -8,6 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CooperativeMapping.Controllers;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace CooperativeMapping
 {
@@ -15,11 +18,12 @@ namespace CooperativeMapping
     {
         private Timer robotTimer = new Timer();
         private Enviroment enviroment;
-        private List<Controller> controllers;
+        private Platform selectedPlatform;
         
         public MainForm()
         {
             InitializeComponent();
+            updateUI();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -27,6 +31,24 @@ namespace CooperativeMapping
             robotTimer.Interval = 100;
             robotTimer.Tick += RobotTimer_Tick;
             StartSimulation();
+        }
+
+        private void updateUI()
+        {
+            toolStripComboBoxMaps.Items.Clear();
+            if (enviroment != null)
+            {
+                foreach (Platform ptf in enviroment.Platforms)
+                {
+                    toolStripComboBoxMaps.Items.Add(ptf);
+                }
+                toolStripComboBoxMaps.SelectedItem = selectedPlatform;
+            }
+
+            if (selectedPlatform != null)
+            {
+                mapImageBox.BackgroundImage = enviroment.Drawer.Draw(selectedPlatform);
+            }
         }
 
         private void StartSimulation()
@@ -45,7 +67,6 @@ namespace CooperativeMapping
             //}
 
             // Initializing new enviroment
-            controllers = new List<Controller>();
             enviroment = new Enviroment(50, 60);
 
             for (int l = 0; l < 3 * 12; l = l + 11)
@@ -75,52 +96,47 @@ namespace CooperativeMapping
             mapImageBox.BackgroundImage = enviroment.Drawer.Draw(enviroment.Map);
 
             // Initialize robot and timer
-            Platform robot1 = new Platform(enviroment);
-            robot1.Pose = new Pose(0, 0);
-            Controller controller1 = new RasterPathPlanningStrategy(robot1);
-            controllers.Add(controller1);
+            Controller rasterPlanningController = new RasterPathPlanningStrategy();
+            Controller naiveController = new NaiveStrategyController();
+
+            Platform robot1 = new Platform(enviroment, rasterPlanningController);
+            robot1.Pose = new Pose(0, 0);            
             robot1.Measure();
             robot1.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot2 = new Platform(enviroment);
+
+            Platform robot2 = new Platform(enviroment, rasterPlanningController);
             robot2.Pose = new Pose(0, 1);
             robot2.Measure();
-            Controller controller2 = new RasterPathPlanningStrategy(robot2);
-            controllers.Add(controller2);
-            robot2.Map = robot1.Map;
+            robot2.Map = (MapObject)robot1.Map.Clone();
             robot2.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot3 = new Platform(enviroment);
+            Platform robot3 = new Platform(enviroment, naiveController);
             robot3.Pose = new Pose(0, 2);
             robot3.Measure();
-            Controller controller3 = new RasterPathPlanningStrategy(robot3);
-            controllers.Add(controller3);
             robot3.Map = robot1.Map;
             robot3.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot4 = new Platform(enviroment);
+            Platform robot4 = new Platform(enviroment, rasterPlanningController);
             robot4.Pose = new Pose(1, 0);
             robot4.Measure();
-            Controller controller4 = new RasterPathPlanningStrategy(robot4);
-            controllers.Add(controller4);
             robot4.Map = robot1.Map;
             robot4.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot5 = new Platform(enviroment);
+            Platform robot5 = new Platform(enviroment, rasterPlanningController);
             robot5.Pose = new Pose(1, 1);
             robot5.Measure();
-            Controller controller5 = new RasterPathPlanningStrategy(robot5);
-            controllers.Add(controller5);
             robot5.Map = robot1.Map;
             robot5.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot6 = new Platform(enviroment);
+            Platform robot6 = new Platform(enviroment, rasterPlanningController);
             robot6.Pose = new Pose(1, 2);
             robot6.Measure();
-            Controller controller6 = new RasterPathPlanningStrategy(robot6);
-            controllers.Add(controller6);
             robot6.Map = robot1.Map;
             robot6.PlatformLogEvent += PlatformLogEvent;
+
+            selectedPlatform = robot1;
+            updateUI();
 
             robotTimer.Start();
         }
@@ -133,13 +149,13 @@ namespace CooperativeMapping
 
         private void RobotTimer_Tick(object sender, EventArgs e)
         {
-            foreach (Controller controller in controllers)
+            foreach (Platform plt in enviroment.Platforms)
             {
                 //robot.Move(1, 1);
-                controller.Next();
+                plt.Next();
 
                 // Check whether the platform is at the right position
-                PlatformState platformState = enviroment.CheckPlatformState(controller.Platform);
+                PlatformState platformState = enviroment.CheckPlatformState(plt);
                 if (platformState != PlatformState.Healthy)
                 {
                     textBoxConsole.Text += System.Environment.NewLine + "Robot destroyed! Cause: ";
@@ -152,16 +168,18 @@ namespace CooperativeMapping
                     if (platformState == PlatformState.Destroy)
                     {
                         textBoxConsole.Text += System.Environment.NewLine +  "Collision with obstacle or other platform";
-                        mapImageBox.BackgroundImage = enviroment.Drawer.Drawer(controller.Platform, enviroment);
+                        mapImageBox.BackgroundImage = enviroment.Drawer.Draw(enviroment);
                     }
 
                     robotTimer.Stop();
                     return;
                 }
-
-                mapImageBox.BackgroundImage = enviroment.Drawer.Drawer(controller.Platform, enviroment);
             }
 
+            if (selectedPlatform != null)
+            {
+                mapImageBox.BackgroundImage = enviroment.Drawer.Draw(selectedPlatform);
+            }
 
         }
 
@@ -206,15 +224,51 @@ namespace CooperativeMapping
         private void createEnviromentToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Enviroment env = new Enviroment(10, 10);
-            env.Map.SetAllPlace(MapPlaceIndicator.Discovered);
+            env.Map.SetAllPlace(MapPlaceIndicator.Undiscovered);
             CreateOrModifyEnviromentForm createOrModifyEnviromentForm = new CreateOrModifyEnviromentForm(env);
             createOrModifyEnviromentForm.ShowDialog();
+            updateUI();
+
         }
 
         private void mapToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SettingsForm settings = new SettingsForm(enviroment.Drawer);
             settings.ShowDialog();
+        }
+
+        private void modifyEnviromentToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CreateOrModifyEnviromentForm createOrModifyEnviromentForm = new CreateOrModifyEnviromentForm(this.enviroment);
+            createOrModifyEnviromentForm.ShowDialog();
+            updateUI();
+        }
+
+        private void toolStripComboBoxMaps_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void toolStripComboBoxMaps_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            selectedPlatform = (Platform)toolStripComboBoxMaps.SelectedItem;
+            if (selectedPlatform != null)
+            {
+                mapImageBox.BackgroundImage = enviroment.Drawer.Draw(selectedPlatform);
+            }
+        }
+
+        private void loadEnviromentToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                FileStream stream = new FileStream(openFileDialog.FileName, FileMode.Open);
+                BinaryFormatter formatter = new BinaryFormatter();
+                this.enviroment = (Enviroment)formatter.Deserialize(stream);
+                stream.Close();
+                updateUI();
+            }
         }
     }
 }

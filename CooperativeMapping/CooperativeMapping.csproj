@@ -75,13 +75,13 @@
     </Compile>
     <Compile Include="MapObject.cs" />
     <Compile Include="MapDrawer.cs" />
-    <Compile Include="NaiveStrategy.cs" />
+    <Compile Include="Controllers\NaiveStrategyController.cs" />
     <Compile Include="Platform.cs" />
     <Compile Include="Pose.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Controller.cs" />
-    <Compile Include="RasterPathPlanningStrategy.cs" />
+    <Compile Include="Controllers\Controller.cs" />
+    <Compile Include="Controllers\RasterPathPlanningStrategyController.cs" />
     <Compile Include="SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
