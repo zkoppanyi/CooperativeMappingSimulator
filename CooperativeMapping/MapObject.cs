@@ -79,6 +79,26 @@ namespace CooperativeMapping
 
             this.MapMatrix = nobj.MapMatrix;
         }
+
+        public void UpdateFromAnotherMap(MapObject map)
+        {
+            int nrow = map.Rows;
+            int ncol = map.Columns;
+
+            int rowl = nrow > this.Rows ? this.Rows : nrow;
+            int coll = ncol > this.Columns ? this.Columns : ncol;
+
+            for (int i = 0; i < rowl; i++)
+            {
+                for (int j = 0; j < coll; j++)
+                {
+                    if (map.MapMatrix[i, j] != (int)MapPlaceIndicator.Undiscovered)
+                    {
+                        this.MapMatrix[i, j] = map.MapMatrix[i, j];
+                    }
+                }
+            }
+        }
                 
         public object Clone()
         {

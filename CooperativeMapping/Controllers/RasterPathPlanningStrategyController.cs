@@ -18,6 +18,9 @@ namespace CooperativeMapping.Controllers
         public override void Next(Platform platform)
         {
             platform.Measure();
+            platform.Communicate();
+
+            if (platform.Map.IsDiscovered()) return;
 
             RegionLimits limits = platform.Map.CalculateLimits(platform.Pose, 1);
             List<Pose> poses = limits.GetPosesWithinLimits();
@@ -108,6 +111,11 @@ namespace CooperativeMapping.Controllers
 
             return int.MaxValue;
         }
-    
+
+        public override string ToString()
+        {
+            return "Raster Path Planning Strategy Controller";
+        }
+
     }
 }

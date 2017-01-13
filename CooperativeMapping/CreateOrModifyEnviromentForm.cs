@@ -1,4 +1,5 @@
-﻿using CooperativeMapping.Controllers;
+﻿using CooperativeMapping.Communication;
+using CooperativeMapping.Controllers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -118,9 +119,16 @@ namespace CooperativeMapping
             if (selectedBinType == MapPlaceIndicator.Platform)
             {
                 Controller cnt = new RasterPathPlanningStrategy();
-                Platform robot1 = new Platform(enviroment, cnt);
-                robot1.FieldOfViewRadius = 5;
-                robot1.Pose = new Pose(i, j);
+                CommunicationModel comm = new GlobalCommunicationModel();
+                Platform platform = new Platform(enviroment, cnt, comm);
+                platform.FieldOfViewRadius = 5;
+                platform.Pose = new Pose(i, j);
+
+                PlatformSettings platformSettings = new PlatformSettings(platform, enviroment);
+                if (platformSettings.ShowDialog() != DialogResult.OK)
+                {
+                    // TODO
+                }
             }
             else
             {
@@ -166,7 +174,7 @@ namespace CooperativeMapping
             SaveFileDialog saveFileDialog = new SaveFileDialog();
 
             saveFileDialog.Filter = "bin files (*.bin)|*.bin|All files (*.*)|*.*";
-            saveFileDialog.FilterIndex = 2;
+            saveFileDialog.FilterIndex = 1;
             saveFileDialog.RestoreDirectory = true;
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
@@ -182,12 +190,17 @@ namespace CooperativeMapping
 
         private void textToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Bitmap bmp = new Bitmap(150, 50);
+            Bitmap bmp = new Bitmap(enviroment.Map.Columns, enviroment.Map.Rows);
 
             RectangleF rectf = new RectangleF(1, 1, bmp.Width, bmp.Height);
 
             Graphics g = Graphics.FromImage(bmp);
-            g.DrawString("I  l o v e  y o u \n L u c i a !", new Font("Tahoma", 10), Brushes.Black, rectf);
+            StringFormat stringFormat = new StringFormat();
+            stringFormat.Alignment = StringAlignment.Center;
+            stringFormat.LineAlignment = StringAlignment.Center;
+
+            Font font = new Font("Arial", 12, FontStyle.Bold, GraphicsUnit.Point);
+            g.DrawString("T h a n k  y o u   f o r  \nt h e  a t t e n t i o n !", font, Brushes.Black, rectf, stringFormat);
             g.Flush();
 
             Enviroment env = new Enviroment(bmp.Height, bmp.Width);
@@ -207,6 +220,12 @@ namespace CooperativeMapping
 
             this.enviroment = env;
             propertyGridEnviroment.SelectedObject = enviroment;
+            updateUI();
+        }
+
+        private void clearMapToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            enviroment.Map.SetAllPlace(MapPlaceIndicator.Undiscovered);
             updateUI();
         }
     }

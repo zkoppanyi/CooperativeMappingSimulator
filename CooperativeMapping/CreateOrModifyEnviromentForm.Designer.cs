@@ -32,6 +32,7 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.parametersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.limitsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.textToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mapImageBox = new System.Windows.Forms.PictureBox();
             this.propertyGridEnviroment = new System.Windows.Forms.PropertyGrid();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -43,7 +44,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabelSelectedBinType = new System.Windows.Forms.ToolStripStatusLabel();
-            this.textToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mapImageBox)).BeginInit();
             this.toolStrip1.SuspendLayout();
@@ -65,7 +66,8 @@
             // 
             this.parametersToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.limitsToolStripMenuItem,
-            this.textToolStripMenuItem});
+            this.textToolStripMenuItem,
+            this.clearMapToolStripMenuItem});
             this.parametersToolStripMenuItem.Name = "parametersToolStripMenuItem";
             this.parametersToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.parametersToolStripMenuItem.Text = "File";
@@ -76,6 +78,13 @@
             this.limitsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.limitsToolStripMenuItem.Text = "Save...";
             this.limitsToolStripMenuItem.Click += new System.EventHandler(this.limitsToolStripMenuItem_Click);
+            // 
+            // textToolStripMenuItem
+            // 
+            this.textToolStripMenuItem.Name = "textToolStripMenuItem";
+            this.textToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.textToolStripMenuItem.Text = "Text";
+            this.textToolStripMenuItem.Click += new System.EventHandler(this.textToolStripMenuItem_Click);
             // 
             // mapImageBox
             // 
@@ -195,12 +204,12 @@
             this.toolStripStatusLabelSelectedBinType.Size = new System.Drawing.Size(53, 17);
             this.toolStripStatusLabelSelectedBinType.Text = "Bin type:";
             // 
-            // textToolStripMenuItem
+            // clearMapToolStripMenuItem
             // 
-            this.textToolStripMenuItem.Name = "textToolStripMenuItem";
-            this.textToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.textToolStripMenuItem.Text = "Text";
-            this.textToolStripMenuItem.Click += new System.EventHandler(this.textToolStripMenuItem_Click);
+            this.clearMapToolStripMenuItem.Name = "clearMapToolStripMenuItem";
+            this.clearMapToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.clearMapToolStripMenuItem.Text = "Clear Map";
+            this.clearMapToolStripMenuItem.Click += new System.EventHandler(this.clearMapToolStripMenuItem_Click);
             // 
             // CreateOrModifyEnviromentForm
             // 
@@ -245,5 +254,6 @@
         private System.Windows.Forms.ToolStripButton toolStripButtonDiscovered;
         private System.Windows.Forms.ToolStripButton toolStripButtonPlatform;
         private System.Windows.Forms.ToolStripMenuItem textToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem clearMapToolStripMenuItem;
     }
 }

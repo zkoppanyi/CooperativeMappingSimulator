@@ -13,11 +13,12 @@ namespace CooperativeMapping.Controllers
         public NaiveStrategyController() 
         {
 
-        }
-
+        }      
+        
         public override void Next(Platform platform)
         {
             platform.Measure();
+            platform.Communicate();
 
             RegionLimits limits = platform.Map.CalculateLimits(platform.Pose, 1);
             List<Pose> poses = limits.GetPosesWithinLimits();
@@ -87,6 +88,11 @@ namespace CooperativeMapping.Controllers
             }
 
             platform.Move(minPose.X - platform.Pose.X, minPose.Y - platform.Pose.Y);
+        }
+
+        public override string ToString()
+        {
+            return "Naive Strategy Controller";
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using Accord.Math;
+using CooperativeMapping.Communication;
 using CooperativeMapping.Controllers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -23,25 +25,56 @@ namespace CooperativeMapping
     [Serializable]
     public class Platform
     {
-        public MapObject Map { get; set; }
+            
+        [ReadOnly(false)]
+        [Description("Pose of the platform")]
+        [Category("Platform")]
+        [DisplayName("Pose")]
         public Pose Pose { get; set; }
+
+        [ReadOnly(false)]
+        [Description("Radius of field of view")]
+        [Category("Field of view")]
+        [DisplayName("Radius")]
         public int FieldOfViewRadius { get; set; }
+
+        [ReadOnly(true)]
+        [Description("Unique ID of the platform")]
+        [Category("Platform")]
+        [DisplayName("ID")]
         public int ID { get; }
+
+        [ReadOnly(false)]
+        [Description("Display color of the platform")]
+        [Category("Display")]
+        [DisplayName("Color")]
         public Color Color { get; set; }
-        public Controller Controller { get; }
+
+        [Browsable(false)]
+        public MapObject Map { get; set; }
+
+        [Browsable(false)]
         public List<Platform> ObservedPlatforms = new List<Platform>();
 
         [field: NonSerialized]
         public event PlatformLogHandler PlatformLogEvent;
 
-        public int step = 0;
+        [ReadOnly(true)]
         public int Step { get { return step; } }
+        private int step = 0;
 
         private static int IDs = 0;
 
         private Enviroment enviroment;
 
-        public Platform(Enviroment enviroment, Controller controller)
+        [Browsable(false)]
+        public Controller Controller { get; set; }
+
+        [Browsable(false)]
+        public CommunicationModel CommunicationModel { get; set; }
+
+
+        public Platform(Enviroment enviroment, Controller controller, CommunicationModel commModel)
         {
             Pose = new Pose();
             Map = new MapObject(enviroment.Map.Rows, enviroment.Map.Columns);
@@ -49,6 +82,7 @@ namespace CooperativeMapping
             this.enviroment = enviroment;
             FieldOfViewRadius = 2;
             this.Controller = controller;
+            this.CommunicationModel = commModel;
             IDs++;
             this.ID = IDs;
             this.Color = Color.Blue;
@@ -63,6 +97,7 @@ namespace CooperativeMapping
         {
             List<Pose> candidates = new List<Pose>();
             List<Pose> newCandidates = new List<Pose>();
+            ObservedPlatforms.Clear();
             candidates.Add(this.Pose);
 
             for (int k = 0; k < FieldOfViewRadius; k++)
@@ -104,18 +139,26 @@ namespace CooperativeMapping
                             Map.MapMatrix[p.X, p.Y] = (int)MapPlaceIndicator.Discovered;
                         }
 
+                        foreach (Platform pe in enviroment.Platforms)
+                        {
+                            if ((pe.Pose.X == p.X) && (pe.Pose.Y == p.Y))
+                            {
+                                if (!ObservedPlatforms.Exists(x => x == pe))
+                                {
+                                    ObservedPlatforms.Add(pe);
+                                }
+                            }
+                        }
+
                     }
                 }
                 candidates = new List<Pose>(newCandidates);
             }
+        }
 
-            // add platforms to the map
-            ObservedPlatforms.Clear();
-            foreach (Platform p in enviroment.Platforms)
-            {
-                ObservedPlatforms.Add(p);
-            }
-
+        public void Communicate()
+        {
+            CommunicationModel.Acquire(this, this.enviroment);
         }
 
         public void SendLog(String message)
@@ -137,7 +180,7 @@ namespace CooperativeMapping
 
         public override string ToString()
         {
-            return "Platform " + this.ID + " Map " + this.Map.ID;
+            return "Platform #" + this.ID;
         }
 
     }

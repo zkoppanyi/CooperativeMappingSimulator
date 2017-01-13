@@ -23,12 +23,16 @@ namespace CooperativeMapping.Controllers
 
         public override void Next(Platform platform)
         {
+            if (platform.Map.IsDiscovered()) return;
+
+
             if (PriorityMap == null)
             {
                 PriorityMap = Matrix.Create<double>(platform.Map.Rows, platform.Map.Columns, 1);
             }
 
             platform.Measure();
+            platform.Communicate();
 
             RegionLimits limits = platform.Map.CalculateLimits(platform.Pose, 1);
             List<Pose> poses = limits.GetPosesWithinLimits();
@@ -172,6 +176,11 @@ namespace CooperativeMapping.Controllers
             }
 
             return int.MaxValue;
+        }
+
+        public override string ToString()
+        {
+            return "Raster Path Planning Strategy With Priority Map Controller";
         }
     }
 }

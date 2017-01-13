@@ -60,6 +60,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Communication\CommunicationModel.cs" />
+    <Compile Include="Communication\GlobalCommunicationModel.cs" />
+    <Compile Include="Communication\NoCommunication.cs" />
     <Compile Include="CreateOrModifyEnviromentForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -77,6 +80,12 @@
     <Compile Include="MapDrawer.cs" />
     <Compile Include="Controllers\NaiveStrategyController.cs" />
     <Compile Include="Platform.cs" />
+    <Compile Include="PlatformSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PlatformSettings.Designer.cs">
+      <DependentUpon>PlatformSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="Pose.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -101,6 +110,9 @@
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PlatformSettings.resx">
+      <DependentUpon>PlatformSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

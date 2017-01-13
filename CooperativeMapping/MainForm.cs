@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using CooperativeMapping.Controllers;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using CooperativeMapping.Communication;
 
 namespace CooperativeMapping
 {
@@ -36,6 +37,7 @@ namespace CooperativeMapping
         private void updateUI()
         {
             toolStripComboBoxMaps.Items.Clear();
+            toolStripComboBoxMaps.SelectedItem = null;
             if (enviroment != null)
             {
                 foreach (Platform ptf in enviroment.Platforms)
@@ -149,68 +151,62 @@ namespace CooperativeMapping
             Controller priorityMapStrategy3 = new RasterPathPlanningWithPriorityStrategy(priorityMap3);
             Controller priorityMapStrategy4 = new RasterPathPlanningWithPriorityStrategy(priorityMap4);
 
+            CommunicationModel globComm = new GlobalCommunicationModel();
+
+
 
             // Priority map strategy
-            /*Platform robot1 = new Platform(enviroment, priorityMapStrategy1);
+            /*Platform robot1 = new Platform(enviroment, priorityMapStrategy1, globComm);
             robot1.Pose = new Pose(0, 0);            
             robot1.Measure();
             robot1.PlatformLogEvent += PlatformLogEvent;
 
-
-            Platform robot2 = new Platform(enviroment, priorityMapStrategy2);
+            Platform robot2 = new Platform(enviroment, priorityMapStrategy2, globComm);
             robot2.Pose = new Pose(0, 1);
             robot2.Measure();
-            robot2.Map = robot1.Map;
             robot2.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot3 = new Platform(enviroment, priorityMapStrategy3);
+            Platform robot3 = new Platform(enviroment, priorityMapStrategy3, globComm);
             robot3.Pose = new Pose(0, 2);
             robot3.Measure();
-            robot3.Map = robot1.Map;
             robot3.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot4 = new Platform(enviroment, priorityMapStrategy4);
+            Platform robot4 = new Platform(enviroment, priorityMapStrategy4, globComm);
             robot4.Pose = new Pose(1, 0);
             robot4.Measure();
-            robot4.Map = robot1.Map;
             robot4.PlatformLogEvent += PlatformLogEvent;*/
 
             // Raster planning strategy
-            Platform robot1 = new Platform(enviroment, rasterPlanningController);
+            Platform robot1 = new Platform(enviroment, rasterPlanningController, globComm);
             robot1.Pose = new Pose(0, 0);
             robot1.Measure();
             robot1.PlatformLogEvent += PlatformLogEvent;
 
 
-            Platform robot2 = new Platform(enviroment, rasterPlanningController);
+            Platform robot2 = new Platform(enviroment, rasterPlanningController, globComm);
             robot2.Pose = new Pose(0, 1);
             robot2.Measure();
-            robot2.Map = robot1.Map;
             robot2.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot3 = new Platform(enviroment, rasterPlanningController);
+            Platform robot3 = new Platform(enviroment, rasterPlanningController, globComm);
             robot3.Pose = new Pose(0, 2);
             robot3.Measure();
-            robot3.Map = robot1.Map;
             robot3.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot4 = new Platform(enviroment, rasterPlanningController);
+            Platform robot4 = new Platform(enviroment, rasterPlanningController, globComm);
             robot4.Pose = new Pose(1, 0);
             robot4.Measure();
-            robot4.Map = robot1.Map;
             robot4.PlatformLogEvent += PlatformLogEvent;
 
-            /*Platform robot5 = new Platform(enviroment, rasterPlanningController);
+            /*Platform robot5 = new Platform(enviroment, rasterPlanningController, globComm);
             robot5.Pose = new Pose(1, 1);
             robot5.Measure();
-            robot5.Map = (MapObject)robot1.Map.Clone();
             robot5.Color = Color.Red;
             robot5.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot6 = new Platform(enviroment, naiveController);
+            Platform robot6 = new Platform(enviroment, naiveController, globComm);
             robot6.Pose = new Pose(1, 2);
             robot6.Measure();
-            robot6.Map = robot1.Map;
             robot6.PlatformLogEvent += PlatformLogEvent;*/
 
             selectedPlatform = robot1;
@@ -262,7 +258,14 @@ namespace CooperativeMapping
                 mapImageBox.BackgroundImage = enviroment.Drawer.Draw(selectedPlatform);
             }
 
-            if (isMapDiscovered)
+            // Print coordinates at each step
+            /*textBoxConsole.Text += System.Environment.NewLine;
+            foreach (Platform plt in enviroment.Platforms)
+            {
+                textBoxConsole.Text += "ID: " + plt.ID + " X = " + plt.Pose.X + " Y = " + plt.Pose.Y + System.Environment.NewLine;
+            }*/
+
+                if (isMapDiscovered)
             {
                 robotTimer.Stop();
             }
@@ -360,6 +363,10 @@ namespace CooperativeMapping
         private void loadEnviromentToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "bin files (*.bin)|*.bin|All files (*.*)|*.*";
+            openFileDialog.FilterIndex = 1;
+            openFileDialog.RestoreDirectory = true;
+
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 FileStream stream = new FileStream(openFileDialog.FileName, FileMode.Open);
@@ -368,6 +375,10 @@ namespace CooperativeMapping
                 if (enviroment.Platforms.Count > 0)
                 {
                     selectedPlatform = enviroment.Platforms[0];
+                }
+                else
+                {
+                    selectedPlatform = null;
                 }
                 stream.Close();
                 updateUI();
