@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace CooperativeMapping.Communication
 {
+    [Serializable]
     public abstract class CommunicationModel
     {
         public abstract void Acquire(Platform platform, Enviroment enviroment);

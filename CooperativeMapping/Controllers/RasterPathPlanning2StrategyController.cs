@@ -7,32 +7,23 @@ using System.Threading.Tasks;
 
 namespace CooperativeMapping.Controllers
 {
-    public class RasterPathPlanningWithPriorityStrategy : Controller
+    [Serializable]
+    public class RasterPathPlanningStrategy2 : Controller
     {
-        public double[,] PriorityMap = null;
 
-        public RasterPathPlanningWithPriorityStrategy()
-        {
-            
-        }
+        private const int maxDeep = 100;
 
-        public RasterPathPlanningWithPriorityStrategy(double[,] priorityMap)
+        public RasterPathPlanningStrategy2()
         {
-            this.PriorityMap = priorityMap;
+
         }
 
         public override void Next(Platform platform)
         {
-            if (platform.Map.IsDiscovered()) return;
-
-
-            if (PriorityMap == null)
-            {
-                PriorityMap = Matrix.Create<double>(platform.Map.Rows, platform.Map.Columns, 1);
-            }
-
             platform.Measure();
             platform.Communicate();
+
+            if (platform.Map.IsDiscovered()) return;
 
             RegionLimits limits = platform.Map.CalculateLimits(platform.Pose, 1);
             List<Pose> poses = limits.GetPosesWithinLimits();
@@ -53,6 +44,7 @@ namespace CooperativeMapping.Controllers
                 }
                 if (find) continue;
 
+                // is this pose an obstacle
                 if ((platform.Map.GetPlace(p) != MapPlaceIndicator.Obstacle) && (platform.Map.GetPlace(p) != MapPlaceIndicator.NoBackVisist))
                 {
                     nextPoses.Add(p);
@@ -65,8 +57,7 @@ namespace CooperativeMapping.Controllers
 
             foreach (Pose p in nextPoses)
             {
-                double cmin = FindClosesUndiscovered(p, platform);
-
+                double cmin = FindClosestUndiscovered(p, platform);
                 if (cmin < minVal)
                 {
                     minVal = cmin;
@@ -82,13 +73,12 @@ namespace CooperativeMapping.Controllers
             platform.Move(minPose.X - platform.Pose.X, minPose.Y - platform.Pose.Y);
         }
 
-        private double FindClosesUndiscovered(Pose startPose, Platform platform)
+        private double FindClosestUndiscovered(Pose startPose, Platform platform)
         {
             List<Pose> candidates = new List<Pose>();
             List<Pose> newCandidates = new List<Pose>();
             double[,] distMap = Matrix.Create<double>(platform.Map.Rows, platform.Map.Columns, int.MaxValue);
             candidates.Add(startPose);
-            int maxDeep = 100;
 
             double bestScore = Double.PositiveInfinity;
             Pose bestPose = null;
@@ -119,8 +109,8 @@ namespace CooperativeMapping.Controllers
                             RegionLimits limitsp = platform.Map.CalculateLimits(p, platform.FieldOfViewRadius);
                             List<Pose> neighp = limitsp.GetPosesWithinLimits();
                             int undiscoveredNeigbours = neighp.Count(x => platform.Map.MapMatrix[x.X, x.Y] == (int)MapPlaceIndicator.Undiscovered);
-                            double currentScoreWithModifiers = currentScore + (1.0 - undiscoveredNeigbours / (double)neighp.Count) + PriorityMap[p.X, p.Y];
-                            currentScore = currentScoreWithModifiers;
+                            double currentScoreWithModifiers = (currentScore + (1.0 - undiscoveredNeigbours / (double)neighp.Count));
+                            //currentScore = currentScoreWithModifiers;
 
                             if (currentScoreWithModifiers < bestScore)
                             {
@@ -145,12 +135,10 @@ namespace CooperativeMapping.Controllers
 
             return bestScore;
         }
-
-       
-
         public override string ToString()
         {
-            return "Raster Path Planning Strategy With Priority Map Controller";
+            return "Raster Path Planning Strategy Controller With Undiscovered Counts";
         }
+
     }
 }

@@ -96,6 +96,7 @@
             // 
             // comboBoxController
             // 
+            this.comboBoxController.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxController.FormattingEnabled = true;
             this.comboBoxController.Location = new System.Drawing.Point(6, 48);
             this.comboBoxController.Name = "comboBoxController";
@@ -163,6 +164,7 @@
             // 
             // comboBoxCommunicationModel
             // 
+            this.comboBoxCommunicationModel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxCommunicationModel.FormattingEnabled = true;
             this.comboBoxCommunicationModel.Location = new System.Drawing.Point(6, 48);
             this.comboBoxCommunicationModel.Name = "comboBoxCommunicationModel";

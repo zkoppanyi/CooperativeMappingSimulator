@@ -118,7 +118,7 @@ namespace CooperativeMapping
 
             if (selectedBinType == MapPlaceIndicator.Platform)
             {
-                Controller cnt = new RasterPathPlanningStrategy();
+                Controller cnt = new RasterPathPlanningStrategy2();
                 CommunicationModel comm = new GlobalCommunicationModel();
                 Platform platform = new Platform(enviroment, cnt, comm);
                 platform.FieldOfViewRadius = 5;

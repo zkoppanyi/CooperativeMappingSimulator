@@ -101,7 +101,7 @@ namespace CooperativeMapping
             mapImageBox.BackgroundImage = enviroment.Drawer.Draw(enviroment.Map);
 
             // Priority maps
-            double val = 0.3;
+            double val = 0.1;
             double[,] priorityMap1 = Matrix.Create<double>(enviroment.Map.Rows, enviroment.Map.Columns, 1);
             for (int i = 0; i<enviroment.Map.Rows/2; i++)
             {
@@ -144,7 +144,7 @@ namespace CooperativeMapping
 
 
             // Initialize robot and timer
-            Controller rasterPlanningController = new RasterPathPlanningStrategy();
+            Controller rasterPlanningController = new RasterPathPlanningStrategy2();
             Controller naiveController = new NaiveStrategyController();
             Controller priorityMapStrategy1 = new RasterPathPlanningWithPriorityStrategy(priorityMap1);
             Controller priorityMapStrategy2 = new RasterPathPlanningWithPriorityStrategy(priorityMap2);
@@ -156,7 +156,7 @@ namespace CooperativeMapping
 
 
             // Priority map strategy
-            /*Platform robot1 = new Platform(enviroment, priorityMapStrategy1, globComm);
+            Platform robot1 = new Platform(enviroment, priorityMapStrategy1, globComm);
             robot1.Pose = new Pose(0, 0);            
             robot1.Measure();
             robot1.PlatformLogEvent += PlatformLogEvent;
@@ -174,14 +174,13 @@ namespace CooperativeMapping
             Platform robot4 = new Platform(enviroment, priorityMapStrategy4, globComm);
             robot4.Pose = new Pose(1, 0);
             robot4.Measure();
-            robot4.PlatformLogEvent += PlatformLogEvent;*/
+            robot4.PlatformLogEvent += PlatformLogEvent;
 
             // Raster planning strategy
-            Platform robot1 = new Platform(enviroment, rasterPlanningController, globComm);
+            /*Platform robot1 = new Platform(enviroment, rasterPlanningController, globComm);
             robot1.Pose = new Pose(0, 0);
             robot1.Measure();
             robot1.PlatformLogEvent += PlatformLogEvent;
-
 
             Platform robot2 = new Platform(enviroment, rasterPlanningController, globComm);
             robot2.Pose = new Pose(0, 1);
@@ -196,7 +195,7 @@ namespace CooperativeMapping
             Platform robot4 = new Platform(enviroment, rasterPlanningController, globComm);
             robot4.Pose = new Pose(1, 0);
             robot4.Measure();
-            robot4.PlatformLogEvent += PlatformLogEvent;
+            robot4.PlatformLogEvent += PlatformLogEvent;*/
 
             /*Platform robot5 = new Platform(enviroment, rasterPlanningController, globComm);
             robot5.Pose = new Pose(1, 1);
@@ -281,6 +280,11 @@ namespace CooperativeMapping
             if (isMapDiscovered) textBoxConsole.Text += "Sum step: " + sumStep + System.Environment.NewLine;
             if (isMapDiscovered) textBoxConsole.Text += "Average step: " + (double)sumStep / (double)enviroment.Platforms.Count() + System.Environment.NewLine;
             toolStripStatusLabel.Text = "SUM: " + sumStep + " AVG: " + (double)sumStep / (double)enviroment.Platforms.Count();
+
+            if (selectedPlatform != null)
+            {
+                toolStripStatusLabel.Text += " Discovered Area: " + ((double)selectedPlatform.Map.NumDiscoveredBins() / (double)selectedPlatform.Map.NumBins() * 100).ToString("0.00") + "%";
+            }
             
 
         }
@@ -354,6 +358,16 @@ namespace CooperativeMapping
         private void toolStripComboBoxMaps_SelectedIndexChanged(object sender, EventArgs e)
         {
             selectedPlatform = (Platform)toolStripComboBoxMaps.SelectedItem;
+            textBoxConsole.Text += System.Environment.NewLine;
+            textBoxConsole.Text += "Platform #" + selectedPlatform.ID + System.Environment.NewLine;
+            textBoxConsole.Text += "--------------------------------" + System.Environment.NewLine;
+            textBoxConsole.Text += "Controller: " + System.Environment.NewLine + selectedPlatform.Controller.ToString() + System.Environment.NewLine;
+            textBoxConsole.Text += "Communication: " + System.Environment.NewLine + selectedPlatform.CommunicationModel.ToString() + System.Environment.NewLine;
+            textBoxConsole.Text += "Steps: " + selectedPlatform.Step + System.Environment.NewLine;
+            textBoxConsole.Text += "Discovered area: " + selectedPlatform.Map.NumDiscoveredBins() + System.Environment.NewLine;
+            textBoxConsole.Text += "Area: " + selectedPlatform.Map.NumBins() + System.Environment.NewLine;
+            textBoxConsole.Text += "Discovered area ratio: " + ((double)selectedPlatform.Map.NumDiscoveredBins() / (double)selectedPlatform.Map.NumBins() * 100).ToString("0.00") + "%" + System.Environment.NewLine;
+
             if (selectedPlatform != null)
             {
                 mapImageBox.BackgroundImage = enviroment.Drawer.Draw(selectedPlatform);

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace CooperativeMapping.Communication
 {
+    [Serializable]
     public class GlobalCommunicationModel : CommunicationModel
     {
         public override void Acquire(Platform platform, Enviroment enviroment)

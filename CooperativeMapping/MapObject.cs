@@ -181,5 +181,28 @@ namespace CooperativeMapping
 
             return true;
         }
+
+        public int NumDiscoveredBins()
+        {
+            int sum = 0;
+            for (int i = 0; i < this.Rows; ++i)
+            {
+                for (int j = 0; j < this.Columns; ++j)
+                {
+                    if (this.MapMatrix[i, j] != (int)MapPlaceIndicator.Undiscovered)
+                    {
+                        sum++;
+                    }
+                }
+            }
+
+            return sum;
+        }
+
+        public int NumBins()
+        {
+            return this.Rows * this.Columns;
+        }
+
     }
 }

@@ -35,18 +35,18 @@
             this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.createEnviromentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.modifyEnviromentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadEnviromentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.vizulaizationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.mapImageBox = new System.Windows.Forms.PictureBox();
             this.textBoxConsole = new System.Windows.Forms.TextBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripComboBoxMaps = new System.Windows.Forms.ToolStripComboBox();
-            this.loadEnviromentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mapImageBox)).BeginInit();
@@ -104,6 +104,13 @@
             this.modifyEnviromentToolStripMenuItem.Text = "Modify Enviroment...";
             this.modifyEnviromentToolStripMenuItem.Click += new System.EventHandler(this.modifyEnviromentToolStripMenuItem_Click);
             // 
+            // loadEnviromentToolStripMenuItem
+            // 
+            this.loadEnviromentToolStripMenuItem.Name = "loadEnviromentToolStripMenuItem";
+            this.loadEnviromentToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.loadEnviromentToolStripMenuItem.Text = "Load Enviroment...";
+            this.loadEnviromentToolStripMenuItem.Click += new System.EventHandler(this.loadEnviromentToolStripMenuItem_Click);
+            // 
             // vizulaizationToolStripMenuItem
             // 
             this.vizulaizationToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -129,6 +136,12 @@
             this.statusStrip1.TabIndex = 1;
             this.statusStrip1.Text = "statusStrip1";
             // 
+            // toolStripStatusLabel
+            // 
+            this.toolStripStatusLabel.Name = "toolStripStatusLabel";
+            this.toolStripStatusLabel.Size = new System.Drawing.Size(39, 17);
+            this.toolStripStatusLabel.Text = "Status";
+            // 
             // mapImageBox
             // 
             this.mapImageBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -139,7 +152,7 @@
             this.mapImageBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.mapImageBox.Location = new System.Drawing.Point(0, 52);
             this.mapImageBox.Name = "mapImageBox";
-            this.mapImageBox.Size = new System.Drawing.Size(635, 507);
+            this.mapImageBox.Size = new System.Drawing.Size(595, 507);
             this.mapImageBox.TabIndex = 2;
             this.mapImageBox.TabStop = false;
             this.mapImageBox.Click += new System.EventHandler(this.mapImageBox_Click);
@@ -149,12 +162,13 @@
             this.textBoxConsole.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxConsole.BackColor = System.Drawing.Color.White;
-            this.textBoxConsole.Location = new System.Drawing.Point(641, 52);
+            this.textBoxConsole.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxConsole.Location = new System.Drawing.Point(601, 52);
             this.textBoxConsole.Multiline = true;
             this.textBoxConsole.Name = "textBoxConsole";
             this.textBoxConsole.ReadOnly = true;
-            this.textBoxConsole.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
-            this.textBoxConsole.Size = new System.Drawing.Size(191, 507);
+            this.textBoxConsole.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.textBoxConsole.Size = new System.Drawing.Size(231, 507);
             this.textBoxConsole.TabIndex = 4;
             this.textBoxConsole.TextChanged += new System.EventHandler(this.textBoxConsole_TextChanged);
             // 
@@ -201,24 +215,13 @@
             this.toolStripButton3.Text = "toolStripButton3";
             this.toolStripButton3.Click += new System.EventHandler(this.toolStripButton3_Click);
             // 
-            // toolStripStatusLabel
-            // 
-            this.toolStripStatusLabel.Name = "toolStripStatusLabel";
-            this.toolStripStatusLabel.Size = new System.Drawing.Size(39, 17);
-            this.toolStripStatusLabel.Text = "Status";
             // toolStripComboBoxMaps
             // 
+            this.toolStripComboBoxMaps.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.toolStripComboBoxMaps.Name = "toolStripComboBoxMaps";
             this.toolStripComboBoxMaps.Size = new System.Drawing.Size(121, 25);
             this.toolStripComboBoxMaps.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBoxMaps_SelectedIndexChanged);
             this.toolStripComboBoxMaps.Click += new System.EventHandler(this.toolStripComboBoxMaps_Click);
-            // 
-            // loadEnviromentToolStripMenuItem
-            // 
-            this.loadEnviromentToolStripMenuItem.Name = "loadEnviromentToolStripMenuItem";
-            this.loadEnviromentToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
-            this.loadEnviromentToolStripMenuItem.Text = "Load Enviroment...";
-            this.loadEnviromentToolStripMenuItem.Click += new System.EventHandler(this.loadEnviromentToolStripMenuItem_Click);
             // 
             // MainForm
             // 
