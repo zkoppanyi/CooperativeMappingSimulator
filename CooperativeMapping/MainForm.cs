@@ -74,10 +74,53 @@ namespace CooperativeMapping
             //textBoxConsole.Text = Matrix.ToString<int>(enviroment.Map.MapMatrix);
             mapImageBox.BackgroundImage = MapDrawer.Drawer(enviroment.Map);
 
+            double val = 0.3;
+            double[,] priorityMap1 = Matrix.Create<double>(enviroment.Map.Rows, enviroment.Map.Columns, 1);
+            for (int i = 0; i<enviroment.Map.Rows/2; i++)
+            {
+                for (int j = 0; j < enviroment.Map.Columns/2; j++)
+                {
+                    priorityMap1[i, j] = val;
+                }
+
+            }
+
+            double[,] priorityMap2 = Matrix.Create<double>(enviroment.Map.Rows, enviroment.Map.Columns, 1);
+            for (int i = enviroment.Map.Rows / 2; i < enviroment.Map.Rows; i++)
+            {
+                for (int j = 0; j < enviroment.Map.Columns/2; j++)
+                {
+                    priorityMap2[i, j] = val;
+                }
+
+            }
+
+            double[,] priorityMap3 = Matrix.Create<double>(enviroment.Map.Rows, enviroment.Map.Columns, 1);
+            for (int i = enviroment.Map.Rows / 2; i < enviroment.Map.Rows; i++)
+            {
+                for (int j = enviroment.Map.Columns / 2; j < enviroment.Map.Columns; j++)
+                {
+                    priorityMap3[i, j] = val;
+                }
+
+            }
+
+            double[,] priorityMap4 = Matrix.Create<double>(enviroment.Map.Rows, enviroment.Map.Columns, 1);
+            for (int i = 0; i < enviroment.Map.Rows / 2; i++)
+            {
+                for (int j = enviroment.Map.Columns / 2; j < enviroment.Map.Columns; j++)
+                {
+                    priorityMap4[i, j] = val;
+                }
+
+            }
+
+
             // Initialize robot and timer
             Platform robot1 = new Platform(enviroment);
             robot1.Pose = new Pose(0, 0);
-            Controller controller1 = new RasterPathPlanningStrategy(robot1);
+            RasterPathPlanningStrategy controller1 = new RasterPathPlanningStrategy(robot1);
+            //controller1.PriorityMap = priorityMap1;
             controllers.Add(controller1);
             robot1.Measure();
             robot1.PlatformLogEvent += PlatformLogEvent;
@@ -85,7 +128,8 @@ namespace CooperativeMapping
             Platform robot2 = new Platform(enviroment);
             robot2.Pose = new Pose(0, 1);
             robot2.Measure();
-            Controller controller2 = new RasterPathPlanningStrategy(robot2);
+            RasterPathPlanningStrategy controller2 = new RasterPathPlanningStrategy(robot2);
+            //controller2.PriorityMap = priorityMap2;
             controllers.Add(controller2);
             robot2.Map = robot1.Map;
             robot2.PlatformLogEvent += PlatformLogEvent;
@@ -93,7 +137,8 @@ namespace CooperativeMapping
             Platform robot3 = new Platform(enviroment);
             robot3.Pose = new Pose(0, 2);
             robot3.Measure();
-            Controller controller3 = new RasterPathPlanningStrategy(robot3);
+            RasterPathPlanningStrategy controller3 = new RasterPathPlanningStrategy(robot3);
+            //controller3.PriorityMap = priorityMap3;
             controllers.Add(controller3);
             robot3.Map = robot1.Map;
             robot3.PlatformLogEvent += PlatformLogEvent;
@@ -101,26 +146,28 @@ namespace CooperativeMapping
             Platform robot4 = new Platform(enviroment);
             robot4.Pose = new Pose(1, 0);
             robot4.Measure();
-            Controller controller4 = new RasterPathPlanningStrategy(robot4);
+            RasterPathPlanningStrategy controller4 = new RasterPathPlanningStrategy(robot4);
+            //controller4.PriorityMap = priorityMap4;
             controllers.Add(controller4);
             robot4.Map = robot1.Map;
             robot4.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot5 = new Platform(enviroment);
+            /*Platform robot5 = new Platform(enviroment);
             robot5.Pose = new Pose(1, 1);
             robot5.Measure();
             Controller controller5 = new RasterPathPlanningStrategy(robot5);
             controllers.Add(controller5);
             robot5.Map = robot1.Map;
-            robot5.PlatformLogEvent += PlatformLogEvent;
+            robot5.Color = Color.Red;
+            robot5.PlatformLogEvent += PlatformLogEvent;*/
 
-            Platform robot6 = new Platform(enviroment);
-            robot6.Pose = new Pose(1, 2);
-            robot6.Measure();
-            Controller controller6 = new RasterPathPlanningStrategy(robot6);
-            controllers.Add(controller6);
-            robot6.Map = robot1.Map;
-            robot6.PlatformLogEvent += PlatformLogEvent;
+            //Platform robot6 = new Platform(enviroment);
+            //robot6.Pose = new Pose(1, 2);
+            //robot6.Measure();
+            //Controller controller6 = new RasterPathPlanningStrategy(robot6);
+            //controllers.Add(controller6);
+            //robot6.Map = robot1.Map;
+            //robot6.PlatformLogEvent += PlatformLogEvent;
 
             robotTimer.Start();
         }
@@ -133,6 +180,7 @@ namespace CooperativeMapping
 
         private void RobotTimer_Tick(object sender, EventArgs e)
         {
+            bool isMapDiscovered = true;
             foreach (Controller controller in controllers)
             {
                 //robot.Move(1, 1);
@@ -151,7 +199,7 @@ namespace CooperativeMapping
 
                     if (platformState == PlatformState.Destroy)
                     {
-                        textBoxConsole.Text += System.Environment.NewLine +  "Collision with obstacle or other platform";
+                        textBoxConsole.Text += System.Environment.NewLine + "Collision with obstacle or other platform";
                         mapImageBox.BackgroundImage = MapDrawer.Drawer(controller.Platform, enviroment);
                     }
 
@@ -160,8 +208,25 @@ namespace CooperativeMapping
                 }
 
                 mapImageBox.BackgroundImage = MapDrawer.Drawer(controller.Platform, enviroment);
+                isMapDiscovered &= controller.Platform.Map.IsDiscovered();
             }
 
+            if (isMapDiscovered)
+            {
+                robotTimer.Stop();
+            }
+
+            int sumStep = 0;
+            if (isMapDiscovered) textBoxConsole.Text += System.Environment.NewLine + System.Environment.NewLine;
+            foreach (Controller c in controllers)
+            {
+                if (isMapDiscovered) textBoxConsole.Text += "Step #" + c.Platform.ID + ": " + c.Platform.Step + System.Environment.NewLine;
+                sumStep += c.Platform.Step;
+            }
+            if (isMapDiscovered) textBoxConsole.Text += "Sum step: " + sumStep + System.Environment.NewLine;
+            if (isMapDiscovered) textBoxConsole.Text += "Average step: " + (double)sumStep / (double)controllers.Count() + System.Environment.NewLine;
+
+            toolStripStatusLabel.Text = "SUM: " + sumStep + " AVG: " + (double)sumStep / (double)controllers.Count();
 
         }
 

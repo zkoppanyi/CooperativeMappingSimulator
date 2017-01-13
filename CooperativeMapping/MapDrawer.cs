@@ -19,7 +19,7 @@ namespace CooperativeMapping
         private static Color colorRobot = Color.Blue;
         private static Color colorUnknown = Color.Red;
 
-        public static Bitmap Drawer(MapObject map)
+        public static Bitmap Drawer(MapObject map, Enviroment enviroment = null, Platform platform = null)
         {
             Bitmap bitmap = new Bitmap(map.Columns * squareSize, map.Rows * squareSize);
             Graphics g = Graphics.FromImage(bitmap);
@@ -51,6 +51,22 @@ namespace CooperativeMapping
 
                         case (int)MapPlaceIndicator.Platform:
                             brush = new SolidBrush(colorRobot);
+                            if (platform != null)
+                            {
+                                brush = new SolidBrush(platform.Color);
+                            }
+                            if (enviroment != null)
+                            {
+                                foreach(Platform plt in enviroment.Platforms)
+                                {
+                                    if ((plt.Pose.X == i) && (plt.Pose.Y == j))
+                                    {
+                                        brush = new SolidBrush(plt.Color);
+                                        break;
+                                    }
+                                }
+                            }
+
                             break;
 
                         case (int)MapPlaceIndicator.NoBackVisist:
@@ -76,18 +92,18 @@ namespace CooperativeMapping
         {
             MapObject mapCopy = (MapObject)platform.Map.Clone();
             mapCopy.MapMatrix[platform.Pose.X, platform.Pose.Y] = (int)MapPlaceIndicator.Platform;
-            return Drawer(mapCopy);
+            return Drawer(mapCopy, null, platform);
         }
 
-        public static Bitmap Drawer(Platform platform, Enviroment env)
+        public static Bitmap Drawer(Platform platform, Enviroment enviroment)
         {
             MapObject mapCopy = (MapObject)platform.Map.Clone();
             mapCopy.RemovePlatforms();
-            foreach (Platform p in env.Platforms)
+            foreach (Platform p in enviroment.Platforms)
             {
                 mapCopy.MapMatrix[p.Pose.X, p.Pose.Y] = (int)MapPlaceIndicator.Platform;
             }
-            return Drawer(mapCopy);
+            return Drawer(mapCopy, enviroment);
         }
     }
 }

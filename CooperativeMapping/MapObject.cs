@@ -126,5 +126,18 @@ namespace CooperativeMapping
                 }
             }
         }
+
+        public bool IsDiscovered()
+        {
+            foreach (double d in MapMatrix)
+            {
+                if (d == (int)MapPlaceIndicator.Undiscovered)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Accord.Math;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,8 +25,12 @@ namespace CooperativeMapping
         public Pose Pose { get; set; }
         public int FieldOfViewRadius { get; set; }
         public int ID { get; }
+        public Color Color { get; set; }
 
         public event PlatformLogHandler PlatformLogEvent;
+
+        public int step = 0;
+        public int Step { get { return step; } }
 
         private static int IDs = 0;
 
@@ -37,9 +42,10 @@ namespace CooperativeMapping
             Map = new MapObject(enviroment.Map.Rows, enviroment.Map.Columns);
             enviroment.Platforms.Add(this);
             this.enviroment = enviroment;
-            FieldOfViewRadius = 5;
+            FieldOfViewRadius = 2;
             IDs++;
             this.ID = IDs;
+            this.Color = Color.Blue;
         }
 
 
@@ -161,6 +167,7 @@ namespace CooperativeMapping
         /// <param name="dy">Displacement along Y axis</param>
         public void Move(int dx, int dy)
         {
+            step++;
             Pose.X = Pose.X + dx;
             Pose.Y = Pose.Y + dy;
         }
