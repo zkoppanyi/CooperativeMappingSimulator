@@ -119,6 +119,7 @@ namespace CooperativeMapping
             {
                 Controller cnt = new RasterPathPlanningStrategy();
                 Platform robot1 = new Platform(enviroment, cnt);
+                robot1.FieldOfViewRadius = 5;
                 robot1.Pose = new Pose(i, j);
             }
             else
@@ -177,6 +178,36 @@ namespace CooperativeMapping
                     stream.Close();
                 }
             }
+        }
+
+        private void textToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Bitmap bmp = new Bitmap(150, 50);
+
+            RectangleF rectf = new RectangleF(1, 1, bmp.Width, bmp.Height);
+
+            Graphics g = Graphics.FromImage(bmp);
+            g.DrawString("I  l o v e  y o u \n L u c i a !", new Font("Tahoma", 10), Brushes.Black, rectf);
+            g.Flush();
+
+            Enviroment env = new Enviroment(bmp.Height, bmp.Width);
+
+            for(int i=0; i< bmp.Width; i++)
+            {
+                for (int j = 0; j < bmp.Height; j++)
+                {
+                    Color c = bmp.GetPixel(i, j);
+                    if (c != bmp.GetPixel(0, 0))
+                    {
+                        env.Map.MapMatrix[j, i] = (int)MapPlaceIndicator.Obstacle;
+                    }
+
+                }
+            }
+
+            this.enviroment = env;
+            propertyGridEnviroment.SelectedObject = enviroment;
+            updateUI();
         }
     }
 }

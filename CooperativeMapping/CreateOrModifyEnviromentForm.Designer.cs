@@ -36,13 +36,14 @@
             this.propertyGridEnviroment = new System.Windows.Forms.PropertyGrid();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.toolStripStatusLabelSelectedBinType = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripButtonObstacle = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonUndiscovered = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonDiscovered = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonPlatform = new System.Windows.Forms.ToolStripButton();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusLabelSelectedBinType = new System.Windows.Forms.ToolStripStatusLabel();
+            this.textToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mapImageBox)).BeginInit();
             this.toolStrip1.SuspendLayout();
@@ -63,7 +64,8 @@
             // parametersToolStripMenuItem
             // 
             this.parametersToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.limitsToolStripMenuItem});
+            this.limitsToolStripMenuItem,
+            this.textToolStripMenuItem});
             this.parametersToolStripMenuItem.Name = "parametersToolStripMenuItem";
             this.parametersToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.parametersToolStripMenuItem.Text = "File";
@@ -125,29 +127,6 @@
             this.toolStripButton1.Text = "toolStripButton1";
             this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
             // 
-            // statusStrip1
-            // 
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel,
-            this.toolStripStatusLabelSelectedBinType});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 519);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(804, 22);
-            this.statusStrip1.TabIndex = 6;
-            this.statusStrip1.Text = "statusStrip1";
-            // 
-            // toolStripStatusLabel
-            // 
-            this.toolStripStatusLabel.Name = "toolStripStatusLabel";
-            this.toolStripStatusLabel.Size = new System.Drawing.Size(50, 17);
-            this.toolStripStatusLabel.Text = "Status: -";
-            // 
-            // toolStripStatusLabelSelectedBinType
-            // 
-            this.toolStripStatusLabelSelectedBinType.Name = "toolStripStatusLabelSelectedBinType";
-            this.toolStripStatusLabelSelectedBinType.Size = new System.Drawing.Size(53, 17);
-            this.toolStripStatusLabelSelectedBinType.Text = "Bin type:";
-            // 
             // toolStripButtonObstacle
             // 
             this.toolStripButtonObstacle.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
@@ -193,6 +172,36 @@
             this.toolStripButtonPlatform.Text = "P";
             this.toolStripButtonPlatform.Click += new System.EventHandler(this.toolStripButtonPlatform_Click);
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel,
+            this.toolStripStatusLabelSelectedBinType});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 519);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(804, 22);
+            this.statusStrip1.TabIndex = 6;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel
+            // 
+            this.toolStripStatusLabel.Name = "toolStripStatusLabel";
+            this.toolStripStatusLabel.Size = new System.Drawing.Size(50, 17);
+            this.toolStripStatusLabel.Text = "Status: -";
+            // 
+            // toolStripStatusLabelSelectedBinType
+            // 
+            this.toolStripStatusLabelSelectedBinType.Name = "toolStripStatusLabelSelectedBinType";
+            this.toolStripStatusLabelSelectedBinType.Size = new System.Drawing.Size(53, 17);
+            this.toolStripStatusLabelSelectedBinType.Text = "Bin type:";
+            // 
+            // textToolStripMenuItem
+            // 
+            this.textToolStripMenuItem.Name = "textToolStripMenuItem";
+            this.textToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.textToolStripMenuItem.Text = "Text";
+            this.textToolStripMenuItem.Click += new System.EventHandler(this.textToolStripMenuItem_Click);
+            // 
             // CreateOrModifyEnviromentForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -235,5 +244,6 @@
         private System.Windows.Forms.ToolStripButton toolStripButtonUndiscovered;
         private System.Windows.Forms.ToolStripButton toolStripButtonDiscovered;
         private System.Windows.Forms.ToolStripButton toolStripButtonPlatform;
+        private System.Windows.Forms.ToolStripMenuItem textToolStripMenuItem;
     }
 }
