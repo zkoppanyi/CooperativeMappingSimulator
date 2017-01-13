@@ -60,6 +60,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CreateOrModifyEnviromentForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CreateOrModifyEnviromentForm.Designer.cs">
+      <DependentUpon>CreateOrModifyEnviromentForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Enviroment.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -69,14 +75,34 @@
     </Compile>
     <Compile Include="MapObject.cs" />
     <Compile Include="MapDrawer.cs" />
-    <Compile Include="NaiveStrategy.cs" />
+    <Compile Include="Controllers\NaiveStrategyController.cs" />
     <Compile Include="Platform.cs" />
     <Compile Include="Pose.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+<<<<<<< HEAD
     <Compile Include="Controller.cs" />
     <Compile Include="RasterPathPlanningStrategy.cs" />
     <Compile Include="RasterPathPlanningWithPriorityStrategy.cs" />
+=======
+    <Compile Include="Controllers\Controller.cs" />
+    <Compile Include="Controllers\RasterPathPlanningStrategyController.cs" />
+    <Compile Include="SettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SettingsForm.Designer.cs">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SetUpForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SetUpForm.Designer.cs">
+      <DependentUpon>SetUpForm.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="CreateOrModifyEnviromentForm.resx">
+      <DependentUpon>CreateOrModifyEnviromentForm.cs</DependentUpon>
+    </EmbeddedResource>
+>>>>>>> 16cd8984a20e6f1e6a2f97efa4fb6dec56704218
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -89,6 +115,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="SettingsForm.resx">
+      <DependentUpon>SettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

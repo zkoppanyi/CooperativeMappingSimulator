@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace CooperativeMapping
 {
+    [Serializable]
     public class Pose
     {
         public int X { get; set; }

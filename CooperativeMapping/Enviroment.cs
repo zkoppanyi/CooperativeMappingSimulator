@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CooperativeMapping
 {
+
+    [Serializable]
     public enum PlatformState
     {
         Healthy = 1,
@@ -13,14 +16,17 @@ namespace CooperativeMapping
         OutOfBounderies = 3
     }
 
+    [Serializable]
     public class Enviroment
     {
         public MapObject Map { get; set; }
         public List<Platform> Platforms = new List<Platform>();
+        public MapDrawer Drawer { get; set; }
 
         public Enviroment(int Rows, int Columns)
         {
             Map = new MapObject(Rows, Columns);
+            Drawer = new MapDrawer();
         }
 
         public PlatformState CheckPlatformState(Platform platform)

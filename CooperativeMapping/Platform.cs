@@ -1,4 +1,5 @@
 ﻿using Accord.Math;
+using CooperativeMapping.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -19,14 +20,22 @@ namespace CooperativeMapping
 
     public delegate void PlatformLogHandler(object sender, PlatformLogEventArgs e);
 
+    [Serializable]
     public class Platform
     {
         public MapObject Map { get; set; }
         public Pose Pose { get; set; }
         public int FieldOfViewRadius { get; set; }
         public int ID { get; }
+<<<<<<< HEAD
         public Color Color { get; set; }
+=======
+        public Controller Controller { get; }
+>>>>>>> 16cd8984a20e6f1e6a2f97efa4fb6dec56704218
 
+        public List<Platform> ObservedPlatforms = new List<Platform>();
+
+        [field: NonSerialized]
         public event PlatformLogHandler PlatformLogEvent;
 
         public int step = 0;
@@ -36,63 +45,26 @@ namespace CooperativeMapping
 
         private Enviroment enviroment;
 
-        public Platform(Enviroment enviroment)
+        public Platform(Enviroment enviroment, Controller controller)
         {
             Pose = new Pose();
             Map = new MapObject(enviroment.Map.Rows, enviroment.Map.Columns);
             enviroment.Platforms.Add(this);
             this.enviroment = enviroment;
+<<<<<<< HEAD
             FieldOfViewRadius = 2;
+=======
+            this.Controller = controller;
+            FieldOfViewRadius = 5;
+>>>>>>> 16cd8984a20e6f1e6a2f97efa4fb6dec56704218
             IDs++;
             this.ID = IDs;
             this.Color = Color.Blue;
         }
 
-
-        /// <summary>
-        /// Map update
-        /// </summary>
-        public void Measure2()
+        public void Next()
         {
-            Map.RemovePlatforms();
-
-            RegionLimits limits = enviroment.Map.CalculateLimits(this.Pose, FieldOfViewRadius);
-            for (int i = limits.MinLimitX; i <= limits.MaxLimitX; ++i)
-            {
-                for (int j = limits.MinLimitY; j <= limits.MaxLimitY; ++j)
-                {
-                    if (this.Map.MapMatrix[i, j] == (int)MapPlaceIndicator.NoBackVisist)
-                    {
-                        continue;
-                    }
-
-                    int val = enviroment.Map.MapMatrix[i, j];
-
-                    if (val == (int)MapPlaceIndicator.Obstacle)
-                    {
-                        Map.MapMatrix[i, j] = val;
-                    }
-
-                    if (val == (int)MapPlaceIndicator.Platform)
-                    {
-                        Map.MapMatrix[i, j] = val;
-                    }
-
-                    if ((val == (int)MapPlaceIndicator.Undiscovered) || (val == (int)MapPlaceIndicator.Discovered))
-                    {
-                        Map.MapMatrix[i, j] = (int)MapPlaceIndicator.Discovered;
-                    }
-                }
-            }
-
-            foreach (Platform p in enviroment.Platforms)
-            {
-                if (Map.GetPlace(p.Pose.X, p.Pose.Y) != MapPlaceIndicator.NoBackVisist)
-                {
-                    Map.MapMatrix[p.Pose.X, p.Pose.Y] = (int)MapPlaceIndicator.Platform;
-                }
-            }
-
+            Controller.Next(this);
         }
 
         public void Measure()
@@ -145,12 +117,11 @@ namespace CooperativeMapping
                 candidates = new List<Pose>(newCandidates);
             }
 
+            // add platforms to the map
+            ObservedPlatforms.Clear();
             foreach (Platform p in enviroment.Platforms)
             {
-                if (Map.GetPlace(p.Pose.X, p.Pose.Y) != MapPlaceIndicator.NoBackVisist)
-                {
-                    Map.MapMatrix[p.Pose.X, p.Pose.Y] = (int)MapPlaceIndicator.Platform;
-                }
+                ObservedPlatforms.Add(p);
             }
 
         }
@@ -170,6 +141,11 @@ namespace CooperativeMapping
             step++;
             Pose.X = Pose.X + dx;
             Pose.Y = Pose.Y + dy;
+        }
+
+        public override string ToString()
+        {
+            return "Platform " + this.ID + " Map " + this.Map.ID;
         }
 
     }

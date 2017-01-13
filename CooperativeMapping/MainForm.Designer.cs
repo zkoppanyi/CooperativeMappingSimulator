@@ -32,6 +32,11 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createEnviromentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.modifyEnviromentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.vizulaizationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.mapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.mapImageBox = new System.Windows.Forms.PictureBox();
             this.textBoxConsole = new System.Windows.Forms.TextBox();
@@ -39,7 +44,12 @@
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
+<<<<<<< HEAD
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+=======
+            this.toolStripComboBoxMaps = new System.Windows.Forms.ToolStripComboBox();
+            this.loadEnviromentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+>>>>>>> 16cd8984a20e6f1e6a2f97efa4fb6dec56704218
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mapImageBox)).BeginInit();
@@ -49,7 +59,8 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.vizulaizationToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(844, 24);
@@ -60,7 +71,11 @@
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.startToolStripMenuItem});
+            this.startToolStripMenuItem,
+            this.settingsToolStripMenuItem,
+            this.createEnviromentToolStripMenuItem,
+            this.modifyEnviromentToolStripMenuItem,
+            this.loadEnviromentToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
@@ -68,9 +83,44 @@
             // startToolStripMenuItem
             // 
             this.startToolStripMenuItem.Name = "startToolStripMenuItem";
-            this.startToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
+            this.startToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
             this.startToolStripMenuItem.Text = "Start";
             this.startToolStripMenuItem.Click += new System.EventHandler(this.startToolStripMenuItem_Click);
+            // 
+            // settingsToolStripMenuItem
+            // 
+            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.settingsToolStripMenuItem.Text = "Set Up...";
+            // 
+            // createEnviromentToolStripMenuItem
+            // 
+            this.createEnviromentToolStripMenuItem.Name = "createEnviromentToolStripMenuItem";
+            this.createEnviromentToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.createEnviromentToolStripMenuItem.Text = "Create Enviroment...";
+            this.createEnviromentToolStripMenuItem.Click += new System.EventHandler(this.createEnviromentToolStripMenuItem_Click);
+            // 
+            // modifyEnviromentToolStripMenuItem
+            // 
+            this.modifyEnviromentToolStripMenuItem.Name = "modifyEnviromentToolStripMenuItem";
+            this.modifyEnviromentToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.modifyEnviromentToolStripMenuItem.Text = "Modify Enviroment...";
+            this.modifyEnviromentToolStripMenuItem.Click += new System.EventHandler(this.modifyEnviromentToolStripMenuItem_Click);
+            // 
+            // vizulaizationToolStripMenuItem
+            // 
+            this.vizulaizationToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mapToolStripMenuItem});
+            this.vizulaizationToolStripMenuItem.Name = "vizulaizationToolStripMenuItem";
+            this.vizulaizationToolStripMenuItem.Size = new System.Drawing.Size(85, 20);
+            this.vizulaizationToolStripMenuItem.Text = "Vizulaisation";
+            // 
+            // mapToolStripMenuItem
+            // 
+            this.mapToolStripMenuItem.Name = "mapToolStripMenuItem";
+            this.mapToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
+            this.mapToolStripMenuItem.Text = "Map";
+            this.mapToolStripMenuItem.Click += new System.EventHandler(this.mapToolStripMenuItem_Click);
             // 
             // statusStrip1
             // 
@@ -106,6 +156,7 @@
             this.textBoxConsole.Multiline = true;
             this.textBoxConsole.Name = "textBoxConsole";
             this.textBoxConsole.ReadOnly = true;
+            this.textBoxConsole.ScrollBars = System.Windows.Forms.ScrollBars.Horizontal;
             this.textBoxConsole.Size = new System.Drawing.Size(191, 507);
             this.textBoxConsole.TabIndex = 4;
             this.textBoxConsole.TextChanged += new System.EventHandler(this.textBoxConsole_TextChanged);
@@ -115,7 +166,8 @@
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripButton1,
             this.toolStripButton2,
-            this.toolStripButton3});
+            this.toolStripButton3,
+            this.toolStripComboBoxMaps});
             this.toolStrip1.Location = new System.Drawing.Point(0, 24);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(844, 25);
@@ -152,11 +204,27 @@
             this.toolStripButton3.Text = "toolStripButton3";
             this.toolStripButton3.Click += new System.EventHandler(this.toolStripButton3_Click);
             // 
+<<<<<<< HEAD
             // toolStripStatusLabel
             // 
             this.toolStripStatusLabel.Name = "toolStripStatusLabel";
             this.toolStripStatusLabel.Size = new System.Drawing.Size(39, 17);
             this.toolStripStatusLabel.Text = "Status";
+=======
+            // toolStripComboBoxMaps
+            // 
+            this.toolStripComboBoxMaps.Name = "toolStripComboBoxMaps";
+            this.toolStripComboBoxMaps.Size = new System.Drawing.Size(121, 25);
+            this.toolStripComboBoxMaps.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBoxMaps_SelectedIndexChanged);
+            this.toolStripComboBoxMaps.Click += new System.EventHandler(this.toolStripComboBoxMaps_Click);
+            // 
+            // loadEnviromentToolStripMenuItem
+            // 
+            this.loadEnviromentToolStripMenuItem.Name = "loadEnviromentToolStripMenuItem";
+            this.loadEnviromentToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.loadEnviromentToolStripMenuItem.Text = "Load Enviroment...";
+            this.loadEnviromentToolStripMenuItem.Click += new System.EventHandler(this.loadEnviromentToolStripMenuItem_Click);
+>>>>>>> 16cd8984a20e6f1e6a2f97efa4fb6dec56704218
             // 
             // MainForm
             // 
@@ -196,7 +264,17 @@
         private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripButton toolStripButton2;
         private System.Windows.Forms.ToolStripButton toolStripButton3;
+<<<<<<< HEAD
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
+=======
+        private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem createEnviromentToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem vizulaizationToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem mapToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem modifyEnviromentToolStripMenuItem;
+        private System.Windows.Forms.ToolStripComboBox toolStripComboBoxMaps;
+        private System.Windows.Forms.ToolStripMenuItem loadEnviromentToolStripMenuItem;
+>>>>>>> 16cd8984a20e6f1e6a2f97efa4fb6dec56704218
     }
 }
 

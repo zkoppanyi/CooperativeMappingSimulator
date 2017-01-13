@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Accord.Math;
+using System.ComponentModel;
 
 namespace CooperativeMapping
 {
+    [Serializable]
     public enum MapPlaceIndicator
     {
         Undiscovered = 0,
@@ -17,6 +19,7 @@ namespace CooperativeMapping
         NoBackVisist = 5
     }
 
+    [Serializable]
     public class RegionLimits
     {
         public int MinLimitX { get; set; }
@@ -41,19 +44,42 @@ namespace CooperativeMapping
 
     }
 
-
+    [TypeConverter(typeof(ExpandableObjectConverter))]
+    [Serializable]
     public class MapObject : ICloneable
     {
+        [Browsable(false)]
         public int[,] MapMatrix { get; set; }
 
-        public int Rows { get { return MapMatrix.Rows();  } }
-        public int Columns { get { return MapMatrix.Columns(); } }
+        public int Rows { get { return MapMatrix.Rows();  } set { Resize(value, this.Columns); } }
+        public int Columns { get { return MapMatrix.Columns(); } set { Resize(this.Rows, value); } }
+
+        public static int IDs = 0;
+        public int ID { get; }
 
         public MapObject(int rows, int cols)
         {
             MapMatrix = Matrix.Create<int>(rows, cols, (int)MapPlaceIndicator.Undiscovered);
+            this.ID = ++IDs;
         }
 
+        public void Resize(int nrow, int ncol, MapPlaceIndicator indicator = MapPlaceIndicator.Undiscovered)
+        {
+            MapObject nobj = new MapObject(nrow, ncol);
+            nobj.SetAllPlace(indicator);
+            int rowl = nrow > this.Rows ? this.Rows : nrow;
+            int coll = ncol > this.Columns ? this.Columns : ncol;
+            for (int i = 0; i < rowl; i++)
+            {
+                for (int j = 0; j < coll; j++)
+                {
+                    nobj.MapMatrix[i, j] = this.MapMatrix[i, j];
+                }
+            }
+
+            this.MapMatrix = nobj.MapMatrix;
+        }
+                
         public object Clone()
         {
             MapObject obj = new MapObject(this.Rows, this.Columns);
@@ -112,17 +138,13 @@ namespace CooperativeMapping
             return CalculateLimits(pose.X, pose.Y, fieldOfViewRadius);
         }
 
-        public void RemovePlatforms()
+        public void SetAllPlace(MapPlaceIndicator indicator)
         {
-            // Delete the previous platform positions
             for (int i = 0; i < this.Rows; ++i)
             {
                 for (int j = 0; j < this.Columns; ++j)
                 {
-                    if (this.GetPlace(i, j) == MapPlaceIndicator.Platform)
-                    {
-                        this.MapMatrix[i, j] = (int)MapPlaceIndicator.Discovered;
-                    }
+                    this.MapMatrix[i, j] = (int)indicator;
                 }
             }
         }
