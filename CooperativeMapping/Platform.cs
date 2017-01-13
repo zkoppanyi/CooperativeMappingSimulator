@@ -27,12 +27,8 @@ namespace CooperativeMapping
         public Pose Pose { get; set; }
         public int FieldOfViewRadius { get; set; }
         public int ID { get; }
-<<<<<<< HEAD
         public Color Color { get; set; }
-=======
         public Controller Controller { get; }
->>>>>>> 16cd8984a20e6f1e6a2f97efa4fb6dec56704218
-
         public List<Platform> ObservedPlatforms = new List<Platform>();
 
         [field: NonSerialized]
@@ -51,12 +47,8 @@ namespace CooperativeMapping
             Map = new MapObject(enviroment.Map.Rows, enviroment.Map.Columns);
             enviroment.Platforms.Add(this);
             this.enviroment = enviroment;
-<<<<<<< HEAD
             FieldOfViewRadius = 2;
-=======
             this.Controller = controller;
-            FieldOfViewRadius = 5;
->>>>>>> 16cd8984a20e6f1e6a2f97efa4fb6dec56704218
             IDs++;
             this.ID = IDs;
             this.Color = Color.Blue;

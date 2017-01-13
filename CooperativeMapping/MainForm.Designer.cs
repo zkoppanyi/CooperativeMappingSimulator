@@ -44,12 +44,9 @@
             this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
-<<<<<<< HEAD
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-=======
             this.toolStripComboBoxMaps = new System.Windows.Forms.ToolStripComboBox();
             this.loadEnviromentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
->>>>>>> 16cd8984a20e6f1e6a2f97efa4fb6dec56704218
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mapImageBox)).BeginInit();
@@ -204,13 +201,11 @@
             this.toolStripButton3.Text = "toolStripButton3";
             this.toolStripButton3.Click += new System.EventHandler(this.toolStripButton3_Click);
             // 
-<<<<<<< HEAD
             // toolStripStatusLabel
             // 
             this.toolStripStatusLabel.Name = "toolStripStatusLabel";
             this.toolStripStatusLabel.Size = new System.Drawing.Size(39, 17);
             this.toolStripStatusLabel.Text = "Status";
-=======
             // toolStripComboBoxMaps
             // 
             this.toolStripComboBoxMaps.Name = "toolStripComboBoxMaps";
@@ -224,7 +219,6 @@
             this.loadEnviromentToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
             this.loadEnviromentToolStripMenuItem.Text = "Load Enviroment...";
             this.loadEnviromentToolStripMenuItem.Click += new System.EventHandler(this.loadEnviromentToolStripMenuItem_Click);
->>>>>>> 16cd8984a20e6f1e6a2f97efa4fb6dec56704218
             // 
             // MainForm
             // 
@@ -264,9 +258,7 @@
         private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripButton toolStripButton2;
         private System.Windows.Forms.ToolStripButton toolStripButton3;
-<<<<<<< HEAD
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
-=======
         private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem createEnviromentToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem vizulaizationToolStripMenuItem;
@@ -274,7 +266,6 @@
         private System.Windows.Forms.ToolStripMenuItem modifyEnviromentToolStripMenuItem;
         private System.Windows.Forms.ToolStripComboBox toolStripComboBoxMaps;
         private System.Windows.Forms.ToolStripMenuItem loadEnviromentToolStripMenuItem;
->>>>>>> 16cd8984a20e6f1e6a2f97efa4fb6dec56704218
     }
 }
 

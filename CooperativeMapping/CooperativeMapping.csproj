@@ -80,13 +80,9 @@
     <Compile Include="Pose.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-<<<<<<< HEAD
-    <Compile Include="Controller.cs" />
-    <Compile Include="RasterPathPlanningStrategy.cs" />
-    <Compile Include="RasterPathPlanningWithPriorityStrategy.cs" />
-=======
     <Compile Include="Controllers\Controller.cs" />
     <Compile Include="Controllers\RasterPathPlanningStrategyController.cs" />
+    <Compile Include="Controllers\RasterPathPlanningWithPriorityStrategy.cs" />
     <Compile Include="SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -102,9 +98,9 @@
     <EmbeddedResource Include="CreateOrModifyEnviromentForm.resx">
       <DependentUpon>CreateOrModifyEnviromentForm.cs</DependentUpon>
     </EmbeddedResource>
->>>>>>> 16cd8984a20e6f1e6a2f97efa4fb6dec56704218
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

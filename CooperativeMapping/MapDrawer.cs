@@ -21,9 +21,6 @@ namespace CooperativeMapping
         [Browsable(false)]
         public int StartX { get; set; }
 
-<<<<<<< HEAD
-        public static Bitmap Drawer(MapObject map, Enviroment enviroment = null, Platform platform = null)
-=======
         [Browsable(false)]
         public int StartY { get; set; }
 
@@ -71,7 +68,6 @@ namespace CooperativeMapping
     }
 
         public Bitmap Draw(MapObject map)
->>>>>>> 16cd8984a20e6f1e6a2f97efa4fb6dec56704218
         {
             Bitmap bitmap = new Bitmap(map.Columns * BinSize, map.Rows * BinSize);
             Graphics g = Graphics.FromImage(bitmap);
@@ -102,27 +98,7 @@ namespace CooperativeMapping
                             break;
 
                         case (int)MapPlaceIndicator.Platform:
-<<<<<<< HEAD
-                            brush = new SolidBrush(colorRobot);
-                            if (platform != null)
-                            {
-                                brush = new SolidBrush(platform.Color);
-                            }
-                            if (enviroment != null)
-                            {
-                                foreach(Platform plt in enviroment.Platforms)
-                                {
-                                    if ((plt.Pose.X == i) && (plt.Pose.Y == j))
-                                    {
-                                        brush = new SolidBrush(plt.Color);
-                                        break;
-                                    }
-                                }
-                            }
-
-=======
                             brush = new SolidBrush(ColorPlatform);
->>>>>>> 16cd8984a20e6f1e6a2f97efa4fb6dec56704218
                             break;
 
                         case (int)MapPlaceIndicator.NoBackVisist:
@@ -148,15 +124,6 @@ namespace CooperativeMapping
         {
             MapObject mapCopy = (MapObject)platform.Map.Clone();
             mapCopy.MapMatrix[platform.Pose.X, platform.Pose.Y] = (int)MapPlaceIndicator.Platform;
-<<<<<<< HEAD
-            return Drawer(mapCopy, null, platform);
-        }
-
-        public static Bitmap Drawer(Platform platform, Enviroment enviroment)
-        {
-            MapObject mapCopy = (MapObject)platform.Map.Clone();
-            mapCopy.RemovePlatforms();
-=======
             foreach (Platform p in platform.ObservedPlatforms)
             {
                 mapCopy.MapMatrix[p.Pose.X, p.Pose.Y] = (int)MapPlaceIndicator.Platform;
@@ -169,17 +136,12 @@ namespace CooperativeMapping
         {
             MapObject mapCopy = (MapObject)enviroment.Map.Clone();
 
->>>>>>> 16cd8984a20e6f1e6a2f97efa4fb6dec56704218
             foreach (Platform p in enviroment.Platforms)
             {
                 mapCopy.MapMatrix[p.Pose.X, p.Pose.Y] = (int)MapPlaceIndicator.Platform;
             }
-<<<<<<< HEAD
-            return Drawer(mapCopy, enviroment);
-=======
 
             return Draw(mapCopy);
->>>>>>> 16cd8984a20e6f1e6a2f97efa4fb6dec56704218
         }
     }
 }
