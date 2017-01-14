@@ -20,6 +20,7 @@ namespace CooperativeMapping
         private Timer robotTimer = new Timer();
         private Enviroment enviroment;
         private Platform selectedPlatform;
+        public String currentEnviromentLocation = null;
         
         public MainForm()
         {
@@ -31,7 +32,7 @@ namespace CooperativeMapping
         {
             robotTimer.Interval = 100;
             robotTimer.Tick += RobotTimer_Tick;
-            StartSimulation();
+            StartUpSimulation();
         }
 
         private void updateUI()
@@ -55,9 +56,14 @@ namespace CooperativeMapping
             {
                 mapImageBox.BackgroundImage = enviroment.Drawer.Draw(enviroment);
             }
+
+            if (currentEnviromentLocation != null)
+            {
+                this.Text = "Swarm Mapping Simulator - " + currentEnviromentLocation;
+            }
         }
 
-        private void StartSimulation()
+        private void StartUpSimulation()
         {
             //// Initializing new enviroment
             //enviroment = new Enviroment(15, 15);
@@ -101,7 +107,7 @@ namespace CooperativeMapping
             mapImageBox.BackgroundImage = enviroment.Drawer.Draw(enviroment.Map);
 
             // Priority maps
-            double val = 0.1;
+            double val = 2;
             double[,] priorityMap1 = Matrix.Create<double>(enviroment.Map.Rows, enviroment.Map.Columns, 1);
             for (int i = 0; i<enviroment.Map.Rows/2; i++)
             {
@@ -151,29 +157,31 @@ namespace CooperativeMapping
             Controller priorityMapStrategy3 = new RasterPathPlanningWithPriorityStrategy(priorityMap3);
             Controller priorityMapStrategy4 = new RasterPathPlanningWithPriorityStrategy(priorityMap4);
 
-            CommunicationModel globComm = new GlobalCommunicationModel();
-
-
+            CommunicationModel commModel = new NearbyCommunicationModel();
 
             // Priority map strategy
-            Platform robot1 = new Platform(enviroment, priorityMapStrategy1, globComm);
-            robot1.Pose = new Pose(0, 0);            
+            Platform robot1 = new Platform(enviroment, priorityMapStrategy1, commModel);
+            robot1.Pose = new Pose(1, 2);
+            robot1.FieldOfViewRadius = 2;
             robot1.Measure();
             robot1.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot2 = new Platform(enviroment, priorityMapStrategy2, globComm);
-            robot2.Pose = new Pose(0, 1);
+            Platform robot2 = new Platform(enviroment, priorityMapStrategy2, commModel);
+            robot2.Pose = new Pose(1, 4);
             robot2.Measure();
+            robot2.FieldOfViewRadius = 2;
             robot2.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot3 = new Platform(enviroment, priorityMapStrategy3, globComm);
-            robot3.Pose = new Pose(0, 2);
+            Platform robot3 = new Platform(enviroment, priorityMapStrategy3, commModel);
+            robot3.Pose = new Pose(3, 2);
             robot3.Measure();
+            robot3.FieldOfViewRadius = 2;
             robot3.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot4 = new Platform(enviroment, priorityMapStrategy4, globComm);
-            robot4.Pose = new Pose(1, 0);
+            Platform robot4 = new Platform(enviroment, priorityMapStrategy4, commModel);
+            robot4.Pose = new Pose(3, 4);
             robot4.Measure();
+            robot4.FieldOfViewRadius = 2;
             robot4.PlatformLogEvent += PlatformLogEvent;
 
             // Raster planning strategy
@@ -210,8 +218,6 @@ namespace CooperativeMapping
 
             selectedPlatform = robot1;
             updateUI();
-
-            //robotTimer.Start();
         }
 
         private void PlatformLogEvent(object sender, PlatformLogEventArgs e)
@@ -324,7 +330,15 @@ namespace CooperativeMapping
         private void toolStripButton3_Click(object sender, EventArgs e)
         {
             robotTimer.Stop();
-            StartSimulation();
+
+            if (currentEnviromentLocation == null)
+            {
+                StartUpSimulation();
+            }
+            else
+            {
+                LoadEnviroment(currentEnviromentLocation);
+            }
         }
 
         private void createEnviromentToolStripMenuItem_Click(object sender, EventArgs e)
@@ -382,21 +396,31 @@ namespace CooperativeMapping
             openFileDialog.RestoreDirectory = true;
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                FileStream stream = new FileStream(openFileDialog.FileName, FileMode.Open);
-                BinaryFormatter formatter = new BinaryFormatter();
-                this.enviroment = (Enviroment)formatter.Deserialize(stream);
-                if (enviroment.Platforms.Count > 0)
-                {
-                    selectedPlatform = enviroment.Platforms[0];
-                }
-                else
-                {
-                    selectedPlatform = null;
-                }
-                stream.Close();
-                updateUI();
+            {                
+                currentEnviromentLocation = openFileDialog.FileName;
+                LoadEnviroment(currentEnviromentLocation);
+
+
             }
+        }
+
+        public void LoadEnviroment(String fileName)
+        {
+            FileStream stream = new FileStream(fileName, FileMode.Open);
+            BinaryFormatter formatter = new BinaryFormatter();
+            this.enviroment = (Enviroment)formatter.Deserialize(stream);
+            if (enviroment.Platforms.Count > 0)
+            {
+                selectedPlatform = enviroment.Platforms[0];
+            }
+            else
+            {
+                selectedPlatform = null;
+            }
+
+            textBoxConsole.Text += System.Environment.NewLine + "Enviroment Loaded: " + currentEnviromentLocation + System.Environment.NewLine;
+            stream.Close();
+            updateUI();
         }
     }
 }

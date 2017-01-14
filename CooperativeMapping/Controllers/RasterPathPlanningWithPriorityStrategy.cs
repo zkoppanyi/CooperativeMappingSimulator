@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace CooperativeMapping.Controllers
 {
+    [Serializable]
     public class RasterPathPlanningWithPriorityStrategy : Controller
     {
         public double[,] PriorityMap = null;

@@ -110,33 +110,46 @@ namespace CooperativeMapping
             int j = (int)(x0 / binSize);
             int i = (int)(y0 / binSize);
 
-            if ((i < 0) || (i>=enviroment.Map.Rows) || (j < 0) || (j >= enviroment.Map.Columns))
+            if (e.Button == MouseButtons.Left)
             {
-                toolStripStatusLabel.Text = "Bin is not found!";
-                return;
-            }
-
-            if (selectedBinType == MapPlaceIndicator.Platform)
-            {
-                Controller cnt = new RasterPathPlanningStrategy2();
-                CommunicationModel comm = new GlobalCommunicationModel();
-                Platform platform = new Platform(enviroment, cnt, comm);
-                platform.FieldOfViewRadius = 5;
-                platform.Pose = new Pose(i, j);
-
-                PlatformSettings platformSettings = new PlatformSettings(platform, enviroment);
-                if (platformSettings.ShowDialog() != DialogResult.OK)
+                
+                if ((i < 0) || (i >= enviroment.Map.Rows) || (j < 0) || (j >= enviroment.Map.Columns))
                 {
-                    // TODO
+                    toolStripStatusLabel.Text = "Bin is not found!";
+                    return;
                 }
-            }
-            else
-            {
-                enviroment.Map.MapMatrix[i, j] = (int)selectedBinType;
-            }
 
-            UpdateEnviromentPictureBox();
-            updateUI();
+                if (selectedBinType == MapPlaceIndicator.Platform)
+                {
+                    Platform platform = enviroment.Platforms.Find(p => ((p.Pose.X == i) && (p.Pose.Y == j)));
+
+                    if (platform == null)
+                    {
+                        Controller cnt = new RasterPathPlanningStrategy2();
+                        CommunicationModel comm = new GlobalCommunicationModel();
+                        platform = new Platform(enviroment, cnt, comm);
+                        platform.FieldOfViewRadius = 5;
+                        platform.Pose = new Pose(i, j);
+                    }
+
+                    PlatformSettings platformSettings = new PlatformSettings(platform, enviroment);
+                    if (platformSettings.ShowDialog() != DialogResult.OK)
+                    {
+                        // TODO
+                    }
+                }
+                else
+                {
+                    enviroment.Map.MapMatrix[i, j] = (int)selectedBinType;
+                }
+
+                UpdateEnviromentPictureBox();
+                updateUI();
+            }
+            else if (e.Button == MouseButtons.Right)
+            {
+                toolStripStatusLabel.Text = "Status: X = " + i + " Y = " + j; 
+            }
         }
 
         private void toolStripButtonObstacle_Click(object sender, EventArgs e)

@@ -30,6 +30,10 @@
         {
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.groupBoxCommunication = new System.Windows.Forms.GroupBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.comboBoxCommunicationModel = new System.Windows.Forms.ComboBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.groupBoxController = new System.Windows.Forms.GroupBox();
             this.label2 = new System.Windows.Forms.Label();
             this.comboBoxController = new System.Windows.Forms.ComboBox();
@@ -37,15 +41,12 @@
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.propertyGrid = new System.Windows.Forms.PropertyGrid();
             this.button1 = new System.Windows.Forms.Button();
-            this.groupBoxCommunication = new System.Windows.Forms.GroupBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.comboBoxCommunicationModel = new System.Windows.Forms.ComboBox();
-            this.label4 = new System.Windows.Forms.Label();
+            this.button2 = new System.Windows.Forms.Button();
             this.tabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.groupBoxCommunication.SuspendLayout();
             this.groupBoxController.SuspendLayout();
             this.tabPage2.SuspendLayout();
-            this.groupBoxCommunication.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl
@@ -72,6 +73,45 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Settings";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // groupBoxCommunication
+            // 
+            this.groupBoxCommunication.Controls.Add(this.label3);
+            this.groupBoxCommunication.Controls.Add(this.comboBoxCommunicationModel);
+            this.groupBoxCommunication.Controls.Add(this.label4);
+            this.groupBoxCommunication.Location = new System.Drawing.Point(3, 120);
+            this.groupBoxCommunication.Name = "groupBoxCommunication";
+            this.groupBoxCommunication.Size = new System.Drawing.Size(447, 88);
+            this.groupBoxCommunication.TabIndex = 3;
+            this.groupBoxCommunication.TabStop = false;
+            this.groupBoxCommunication.Text = "Communication";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(9, 25);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(151, 13);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "Choose communication model:";
+            // 
+            // comboBoxCommunicationModel
+            // 
+            this.comboBoxCommunicationModel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxCommunicationModel.FormattingEnabled = true;
+            this.comboBoxCommunicationModel.Location = new System.Drawing.Point(6, 48);
+            this.comboBoxCommunicationModel.Name = "comboBoxCommunicationModel";
+            this.comboBoxCommunicationModel.Size = new System.Drawing.Size(432, 21);
+            this.comboBoxCommunicationModel.TabIndex = 1;
+            this.comboBoxCommunicationModel.SelectedIndexChanged += new System.EventHandler(this.comboBoxMap_SelectedIndexChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(3, 25);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(0, 13);
+            this.label4.TabIndex = 0;
             // 
             // groupBoxController
             // 
@@ -141,50 +181,22 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // groupBoxCommunication
+            // button2
             // 
-            this.groupBoxCommunication.Controls.Add(this.label3);
-            this.groupBoxCommunication.Controls.Add(this.comboBoxCommunicationModel);
-            this.groupBoxCommunication.Controls.Add(this.label4);
-            this.groupBoxCommunication.Location = new System.Drawing.Point(3, 120);
-            this.groupBoxCommunication.Name = "groupBoxCommunication";
-            this.groupBoxCommunication.Size = new System.Drawing.Size(447, 88);
-            this.groupBoxCommunication.TabIndex = 3;
-            this.groupBoxCommunication.TabStop = false;
-            this.groupBoxCommunication.Text = "Communication";
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(9, 25);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(151, 13);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "Choose communication model:";
-            // 
-            // comboBoxCommunicationModel
-            // 
-            this.comboBoxCommunicationModel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxCommunicationModel.FormattingEnabled = true;
-            this.comboBoxCommunicationModel.Location = new System.Drawing.Point(6, 48);
-            this.comboBoxCommunicationModel.Name = "comboBoxCommunicationModel";
-            this.comboBoxCommunicationModel.Size = new System.Drawing.Size(432, 21);
-            this.comboBoxCommunicationModel.TabIndex = 1;
-            this.comboBoxCommunicationModel.SelectedIndexChanged += new System.EventHandler(this.comboBoxMap_SelectedIndexChanged);
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(3, 25);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(0, 13);
-            this.label4.TabIndex = 0;
+            this.button2.Location = new System.Drawing.Point(237, 321);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(108, 41);
+            this.button2.TabIndex = 2;
+            this.button2.Text = "Delete";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // PlatformSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(466, 364);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.tabControl);
             this.Name = "PlatformSettings";
@@ -192,11 +204,11 @@
             this.Load += new System.EventHandler(this.PlatformSettings_Load);
             this.tabControl.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.groupBoxCommunication.ResumeLayout(false);
+            this.groupBoxCommunication.PerformLayout();
             this.groupBoxController.ResumeLayout(false);
             this.groupBoxController.PerformLayout();
             this.tabPage2.ResumeLayout(false);
-            this.groupBoxCommunication.ResumeLayout(false);
-            this.groupBoxCommunication.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -216,5 +228,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox comboBoxCommunicationModel;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button button2;
     }
 }

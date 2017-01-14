@@ -26,11 +26,13 @@ namespace CooperativeMapping
             comboBoxController.Items.Clear();
             comboBoxController.Items.Add(new NaiveStrategyController());
             comboBoxController.Items.Add(new RasterPathPlanningStrategy());
+            comboBoxController.Items.Add(new RasterPathPlanningStrategy2());
             comboBoxController.Items.Add(new RasterPathPlanningWithPriorityStrategy());
             comboBoxController.Items.Add(Platform.Controller);
             comboBoxController.SelectedItem = Platform.Controller;
 
             comboBoxCommunicationModel.Items.Clear();
+            comboBoxCommunicationModel.Items.Add(new NearbyCommunicationModel());
             comboBoxCommunicationModel.Items.Add(new GlobalCommunicationModel());
             comboBoxCommunicationModel.Items.Add(new NoCommunication());
             comboBoxCommunicationModel.Items.Add(Platform.CommunicationModel);
@@ -61,6 +63,12 @@ namespace CooperativeMapping
         {
             object sel = comboBoxCommunicationModel.SelectedItem;
             Platform.CommunicationModel = sel as CommunicationModel;            
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Enviroment.Platforms.Remove(Platform);
+            this.DialogResult = DialogResult.OK;
         }
     }
 }

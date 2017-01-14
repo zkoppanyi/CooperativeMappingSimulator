@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="Communication\CommunicationModel.cs" />
     <Compile Include="Communication\GlobalCommunicationModel.cs" />
+    <Compile Include="Communication\NearbyCommunicationModel.cs" />
     <Compile Include="Communication\NoCommunication.cs" />
     <Compile Include="Controllers\RasterPathPlanning2StrategyController.cs" />
     <Compile Include="CreateOrModifyEnviromentForm.cs">

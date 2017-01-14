@@ -51,3 +51,4 @@ C:\OSU3\Others\CooperativeMapping\CooperativeMappingSimulator\CooperativeMapping
 C:\OSU3\Others\CooperativeMapping\CooperativeMappingSimulator\CooperativeMapping\obj\Debug\CooperativeMapping.SettingsForm.resources
 C:\OSU3\Others\CooperativeMapping\CooperativeMappingSimulator\CooperativeMapping\obj\Debug\CooperativeMapping.csproj.GenerateResource.Cache
 C:\OSU3\Others\CooperativeMapping\CooperativeMappingSimulator\CooperativeMapping\obj\Debug\CooperativeMapping.PlatformSettings.resources
+C:\OSU3\CooperativeMapping\CooperativeMapping\obj\Debug\CooperativeMapping.PlatformSettings.resources
