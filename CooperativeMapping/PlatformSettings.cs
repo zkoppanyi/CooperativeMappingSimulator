@@ -25,9 +25,10 @@ namespace CooperativeMapping
 
             comboBoxController.Items.Clear();
             comboBoxController.Items.Add(new NaiveStrategyController());
-            comboBoxController.Items.Add(new RasterPathPlanningStrategy());
-            comboBoxController.Items.Add(new RasterPathPlanningStrategy2());
-            comboBoxController.Items.Add(new RasterPathPlanningWithPriorityStrategy());
+            comboBoxController.Items.Add(new RasterPathPlanningStrategyController());
+            comboBoxController.Items.Add(new RasterPathPlanningStrategy2Controller());
+            comboBoxController.Items.Add(new RasterPathPlanningWithPriorityMapStrategyController());
+            comboBoxController.Items.Add(new RasterPathPlanningWithPriorityDirectionStrategyController());
             comboBoxController.Items.Add(Platform.Controller);
             comboBoxController.SelectedItem = Platform.Controller;
 
@@ -69,6 +70,17 @@ namespace CooperativeMapping
         {
             Enviroment.Platforms.Remove(Platform);
             this.DialogResult = DialogResult.OK;
+        }
+
+        private void tabPageStrategy_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void tabControl_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            propertyGridStrategy.SelectedObject = Platform.Controller;
+            propertyGridCommunication.SelectedObject = Platform.CommunicationModel;
         }
     }
 }

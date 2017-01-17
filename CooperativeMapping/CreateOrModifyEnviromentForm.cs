@@ -125,7 +125,7 @@ namespace CooperativeMapping
 
                     if (platform == null)
                     {
-                        Controller cnt = new RasterPathPlanningStrategy2();
+                        Controller cnt = new RasterPathPlanningStrategy2Controller();
                         CommunicationModel comm = new GlobalCommunicationModel();
                         platform = new Platform(enviroment, cnt, comm);
                         platform.FieldOfViewRadius = 5;

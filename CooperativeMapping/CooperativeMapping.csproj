@@ -65,6 +65,7 @@
     <Compile Include="Communication\NearbyCommunicationModel.cs" />
     <Compile Include="Communication\NoCommunication.cs" />
     <Compile Include="Controllers\RasterPathPlanning2StrategyController.cs" />
+    <Compile Include="Controllers\RasterPathPlanningWithPriorityDirectionStrategyController.cs" />
     <Compile Include="CreateOrModifyEnviromentForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -93,7 +94,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controllers\Controller.cs" />
     <Compile Include="Controllers\RasterPathPlanningStrategyController.cs" />
-    <Compile Include="Controllers\RasterPathPlanningWithPriorityStrategy.cs" />
+    <Compile Include="Controllers\RasterPathPlanningWithPriorityMapStrategyController.cs" />
     <Compile Include="SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>

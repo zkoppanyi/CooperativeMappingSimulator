@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace CooperativeMapping.Controllers
 {
     [Serializable]
-    public class RasterPathPlanningStrategy : Controller
+    public class RasterPathPlanningStrategyController : Controller
     {
-        public RasterPathPlanningStrategy()
+        public RasterPathPlanningStrategyController()
         {
 
         }

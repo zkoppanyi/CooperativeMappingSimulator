@@ -150,12 +150,12 @@ namespace CooperativeMapping
 
 
             // Initialize robot and timer
-            Controller rasterPlanningController = new RasterPathPlanningStrategy2();
+            Controller rasterPlanningController = new RasterPathPlanningStrategy2Controller();
             Controller naiveController = new NaiveStrategyController();
-            Controller priorityMapStrategy1 = new RasterPathPlanningWithPriorityStrategy(priorityMap1);
-            Controller priorityMapStrategy2 = new RasterPathPlanningWithPriorityStrategy(priorityMap2);
-            Controller priorityMapStrategy3 = new RasterPathPlanningWithPriorityStrategy(priorityMap3);
-            Controller priorityMapStrategy4 = new RasterPathPlanningWithPriorityStrategy(priorityMap4);
+            Controller priorityMapStrategy1 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap1);
+            Controller priorityMapStrategy2 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap2);
+            Controller priorityMapStrategy3 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap3);
+            Controller priorityMapStrategy4 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap4);
 
             CommunicationModel commModel = new NearbyCommunicationModel();
 

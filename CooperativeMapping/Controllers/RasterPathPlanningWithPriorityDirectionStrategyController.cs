@@ -8,29 +8,26 @@ using System.Threading.Tasks;
 namespace CooperativeMapping.Controllers
 {
     [Serializable]
-    public class RasterPathPlanningWithPriorityStrategy : Controller
+    public class RasterPathPlanningWithPriorityDirectionStrategyController : Controller
     {
-        public double[,] PriorityMap = null;
 
-        public RasterPathPlanningWithPriorityStrategy()
+        public int PriorityDirection { get; set; }
+        public double DirectionWeight { get; set; }
+
+        public RasterPathPlanningWithPriorityDirectionStrategyController()
         {
-            
+            PriorityDirection = 1;
+            DirectionWeight = 0.8;
         }
 
-        public RasterPathPlanningWithPriorityStrategy(double[,] priorityMap)
+        public RasterPathPlanningWithPriorityDirectionStrategyController(int priorityDirection)
         {
-            this.PriorityMap = priorityMap;
+            this.PriorityDirection = priorityDirection;
         }
 
         public override void Next(Platform platform)
         {
             if (platform.Map.IsDiscovered()) return;
-
-
-            if (PriorityMap == null)
-            {
-                PriorityMap = Matrix.Create<double>(platform.Map.Rows, platform.Map.Columns, 1);
-            }
 
             platform.Measure();
             platform.Communicate();
@@ -38,10 +35,15 @@ namespace CooperativeMapping.Controllers
             RegionLimits limits = platform.Map.CalculateLimits(platform.Pose, 1);
             List<Pose> poses = limits.GetPosesWithinLimits();
 
-            //Remove those possible poses that are obstacles 
-            List<Pose> nextPoses = new List<Pose>();
+            // Find closest undiscovered point
+            double minVal = Double.PositiveInfinity;
+            Pose minPose = platform.Pose;
+
+            int i = 0;
             foreach (Pose p in poses)
             {
+                i++;
+
                 // is there another platform on this pose?
                 bool find = false;
                 foreach (Platform plt in platform.ObservedPlatforms)
@@ -54,19 +56,17 @@ namespace CooperativeMapping.Controllers
                 }
                 if (find) continue;
 
-                if ((platform.Map.GetPlace(p) != MapPlaceIndicator.Obstacle) && (platform.Map.GetPlace(p) != MapPlaceIndicator.NoBackVisist))
+                if ((platform.Map.GetPlace(p) == MapPlaceIndicator.Obstacle) || (platform.Map.GetPlace(p) == MapPlaceIndicator.NoBackVisist))
                 {
-                    nextPoses.Add(p);
+                    continue;
                 }
-            }
 
-            // Find closest undiscovered point
-            double minVal = Double.PositiveInfinity;
-            Pose minPose = platform.Pose;
+                double cmin = FindClosestUndiscovered(p, platform);
 
-            foreach (Pose p in nextPoses)
-            {
-                double cmin = FindClosesUndiscovered(p, platform);
+                if (i == PriorityDirection)
+                {
+                    cmin = cmin - DirectionWeight;
+                }
 
                 if (cmin < minVal)
                 {
@@ -83,7 +83,7 @@ namespace CooperativeMapping.Controllers
             platform.Move(minPose.X - platform.Pose.X, minPose.Y - platform.Pose.Y);
         }
 
-        private double FindClosesUndiscovered(Pose startPose, Platform platform)
+        private double FindClosestUndiscovered(Pose startPose, Platform platform)
         {
             List<Pose> candidates = new List<Pose>();
             List<Pose> newCandidates = new List<Pose>();
@@ -120,7 +120,7 @@ namespace CooperativeMapping.Controllers
                             RegionLimits limitsp = platform.Map.CalculateLimits(p, platform.FieldOfViewRadius);
                             List<Pose> neighp = limitsp.GetPosesWithinLimits();
                             int undiscoveredNeigbours = neighp.Count(x => platform.Map.MapMatrix[x.X, x.Y] == (int)MapPlaceIndicator.Undiscovered);
-                            double currentScoreWithModifiers = currentScore + (1.0 - undiscoveredNeigbours / (double)neighp.Count) + PriorityMap[p.X, p.Y];
+                            double currentScoreWithModifiers = currentScore + (1.0 - undiscoveredNeigbours / (double)neighp.Count);
                             currentScore = currentScoreWithModifiers;
 
                             if (currentScoreWithModifiers < bestScore)
@@ -147,11 +147,11 @@ namespace CooperativeMapping.Controllers
             return bestScore;
         }
 
-       
+
 
         public override string ToString()
         {
-            return "Raster Path Planning Strategy With Priority Map Controller";
+            return "Raster Path Planning Strategy With Priority Direction Controller";
         }
     }
 }
