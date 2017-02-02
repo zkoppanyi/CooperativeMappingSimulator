@@ -64,8 +64,8 @@
     <Compile Include="Communication\GlobalCommunicationModel.cs" />
     <Compile Include="Communication\NearbyCommunicationModel.cs" />
     <Compile Include="Communication\NoCommunication.cs" />
-    <Compile Include="Controllers\RasterPathPlanning2StrategyController.cs" />
-    <Compile Include="Controllers\RasterPathPlanningWithPriorityDirectionStrategyController.cs" />
+    <Compile Include="ControlPolicy\RasterPathPlanning2StrategyController.cs" />
+    <Compile Include="ControlPolicy\RasterPathPlanningWithPriorityDirectionStrategyController.cs" />
     <Compile Include="CreateOrModifyEnviromentForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -81,7 +81,7 @@
     </Compile>
     <Compile Include="MapObject.cs" />
     <Compile Include="MapDrawer.cs" />
-    <Compile Include="Controllers\NaiveStrategyController.cs" />
+    <Compile Include="ControlPolicy\NaiveStrategyControlPolicy.cs" />
     <Compile Include="Platform.cs" />
     <Compile Include="PlatformSettings.cs">
       <SubType>Form</SubType>
@@ -92,9 +92,9 @@
     <Compile Include="Pose.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Controllers\Controller.cs" />
-    <Compile Include="Controllers\RasterPathPlanningStrategyController.cs" />
-    <Compile Include="Controllers\RasterPathPlanningWithPriorityMapStrategyController.cs" />
+    <Compile Include="ControlPolicy\ControlPolicyAbstract.cs" />
+    <Compile Include="ControlPolicy\ClosestFronterierControlPolicy.cs" />
+    <Compile Include="ControlPolicy\RasterPathPlanningWithPriorityMapStrategyController.cs" />
     <Compile Include="SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>

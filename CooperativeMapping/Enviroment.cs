@@ -21,7 +21,7 @@ namespace CooperativeMapping
     {
         public MapObject Map { get; set; }
         public List<Platform> Platforms = new List<Platform>();
-        public MapDrawer Drawer { get; set; }
+        public MapDrawer Drawer { get; set; }        
 
         public Enviroment(int Rows, int Columns)
         {
@@ -44,8 +44,9 @@ namespace CooperativeMapping
                 }
             }
 
-            if ((Map.MapMatrix[platform.Pose.X, platform.Pose.Y] == (int)MapPlaceIndicator.Discovered) ||
-                  (Map.MapMatrix[platform.Pose.X, platform.Pose.Y] == (int)MapPlaceIndicator.Undiscovered))
+            double val = Map.MapMatrix[platform.Pose.X, platform.Pose.Y];
+
+            if (Map.MapMatrix[platform.Pose.X, platform.Pose.Y] != 1)
             {
                 return PlatformState.Healthy;
             }

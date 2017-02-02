@@ -1,5 +1,5 @@
 ﻿using CooperativeMapping.Communication;
-using CooperativeMapping.Controllers;
+using CooperativeMapping.ControlPolicy;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,14 +17,14 @@ namespace CooperativeMapping
     {
         private Enviroment enviroment;
         public Enviroment Enviroment { get { return enviroment; } }
-        private MapPlaceIndicator selectedBinType;
+        private double selectedBinType;
 
         public CreateOrModifyEnviromentForm(Enviroment enviroment)
         {
             InitializeComponent();
             this.enviroment = enviroment;
             updateUI();
-            selectedBinType = MapPlaceIndicator.Obstacle;
+            selectedBinType = 1;
         }
 
         private void CreateOrModifyEnviroment_Load(object sender, EventArgs e)
@@ -56,25 +56,17 @@ namespace CooperativeMapping
         private void updateUI()
         {
             toolStripStatusLabel.Text = "Status: - ";
-            if (selectedBinType == MapPlaceIndicator.Discovered)
+            if (selectedBinType == 0)
             {
                 toolStripStatusLabelSelectedBinType.Text = "Selected bin type: Discovered";
             }
-            else if (selectedBinType == MapPlaceIndicator.Undiscovered)
+            else if (selectedBinType == 0.5)
             {
                 toolStripStatusLabelSelectedBinType.Text = "Selected bin type: Undiscovered";
             }
-            else if (selectedBinType == MapPlaceIndicator.Obstacle)
+            else if (selectedBinType == 1)
             {
                 toolStripStatusLabelSelectedBinType.Text = "Selected bin type: Obstacle";
-            }
-            else if (selectedBinType == MapPlaceIndicator.OutOfBound)
-            {
-                toolStripStatusLabelSelectedBinType.Text = "Selected bin type: OutOfBound";
-            }
-            else if (selectedBinType == MapPlaceIndicator.Platform)
-            {
-                toolStripStatusLabelSelectedBinType.Text = "Selected bin type: Platform";
             }
 
             toolStripButtonObstacle.BackColor = enviroment.Drawer.ColorObstacle;
@@ -119,13 +111,13 @@ namespace CooperativeMapping
                     return;
                 }
 
-                if (selectedBinType == MapPlaceIndicator.Platform)
+                if (selectedBinType == -1)
                 {
                     Platform platform = enviroment.Platforms.Find(p => ((p.Pose.X == i) && (p.Pose.Y == j)));
 
                     if (platform == null)
                     {
-                        Controller cnt = new RasterPathPlanningStrategy2Controller();
+                        ControlPolicy.ControlPolicyAbstract cnt = new RasterPathPlanningStrategy2Controller();
                         CommunicationModel comm = new GlobalCommunicationModel();
                         platform = new Platform(enviroment, cnt, comm);
                         platform.FieldOfViewRadius = 5;
@@ -154,19 +146,19 @@ namespace CooperativeMapping
 
         private void toolStripButtonObstacle_Click(object sender, EventArgs e)
         {
-            selectedBinType = MapPlaceIndicator.Obstacle;
+            selectedBinType = 1;
             updateUI();
         }
 
         private void toolStripButtonUndiscovered_Click(object sender, EventArgs e)
         {
-            selectedBinType = MapPlaceIndicator.Undiscovered;
+            selectedBinType = 0.5;
             updateUI();
         }
 
         private void toolStripButtonDiscovered_Click(object sender, EventArgs e)
         {
-            selectedBinType = MapPlaceIndicator.Discovered;
+            selectedBinType = 0;
             updateUI();
         }
 
@@ -177,7 +169,7 @@ namespace CooperativeMapping
 
         private void toolStripButtonPlatform_Click(object sender, EventArgs e)
         {
-            selectedBinType = MapPlaceIndicator.Platform;
+            selectedBinType = -1;
             updateUI();
         }
 
@@ -225,7 +217,7 @@ namespace CooperativeMapping
                     Color c = bmp.GetPixel(i, j);
                     if (c != bmp.GetPixel(0, 0))
                     {
-                        env.Map.MapMatrix[j, i] = (int)MapPlaceIndicator.Obstacle;
+                        env.Map.MapMatrix[j, i] = 1;
                     }
 
                 }
@@ -238,7 +230,7 @@ namespace CooperativeMapping
 
         private void clearMapToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            enviroment.Map.SetAllPlace(MapPlaceIndicator.Undiscovered);
+            enviroment.Map.SetAllPlace(0.5);
             updateUI();
         }
     }

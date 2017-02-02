@@ -1,5 +1,5 @@
 ﻿using CooperativeMapping.Communication;
-using CooperativeMapping.Controllers;
+using CooperativeMapping.ControlPolicy;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -24,8 +24,8 @@ namespace CooperativeMapping
             this.Enviroment = enviroment;
 
             comboBoxController.Items.Clear();
-            comboBoxController.Items.Add(new NaiveStrategyController());
-            comboBoxController.Items.Add(new RasterPathPlanningStrategyController());
+            comboBoxController.Items.Add(new NaiveStrategyControlPolicy());
+            comboBoxController.Items.Add(new ClosestFronterierControlPolicy());
             comboBoxController.Items.Add(new RasterPathPlanningStrategy2Controller());
             comboBoxController.Items.Add(new RasterPathPlanningWithPriorityMapStrategyController());
             comboBoxController.Items.Add(new RasterPathPlanningWithPriorityDirectionStrategyController());
@@ -56,7 +56,7 @@ namespace CooperativeMapping
         private void comboBoxController_SelectedIndexChanged(object sender, EventArgs e)
         {
             object sel = comboBoxController.SelectedItem;
-            Platform.Controller = sel as Controller;
+            Platform.Controller = sel as ControlPolicy.ControlPolicyAbstract;
             
         }
 

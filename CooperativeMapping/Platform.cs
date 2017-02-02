@@ -1,6 +1,6 @@
 ﻿using Accord.Math;
 using CooperativeMapping.Communication;
-using CooperativeMapping.Controllers;
+using CooperativeMapping.ControlPolicy;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -68,13 +68,13 @@ namespace CooperativeMapping
         private Enviroment enviroment;
 
         [Browsable(false)]
-        public Controller Controller { get; set; }
+        public ControlPolicyAbstract Controller { get; set; }
 
         [Browsable(false)]
         public CommunicationModel CommunicationModel { get; set; }
 
 
-        public Platform(Enviroment enviroment, Controller controller, CommunicationModel commModel)
+        public Platform(Enviroment enviroment, ControlPolicy.ControlPolicyAbstract controller, CommunicationModel commModel)
         {
             Pose = new Pose();
             Map = new MapObject(enviroment.Map.Rows, enviroment.Map.Columns);
@@ -110,34 +110,37 @@ namespace CooperativeMapping
 
                     foreach (Pose p in poses)
                     {
-                        if (this.Map.MapMatrix[p.X, p.Y] == (int)MapPlaceIndicator.NoBackVisist)
-                        {
-                            continue;
-                        }
-
                         if ((p.X == cp.X) && (p.Y == cp.Y)) continue;
 
-                        if (this.Map.GetPlace(p) != MapPlaceIndicator.Obstacle)
+                        if (enviroment.Map.GetPlace(p) < 0.9)
                         {
                             newCandidates.Add(p);
                         }
 
-                        int val = enviroment.Map.MapMatrix[p.X, p.Y];
+                        double val_env = enviroment.Map.MapMatrix[p.X, p.Y];
+                        double val_curr = Map.MapMatrix[p.X, p.Y];
+                        double val_new = val_curr;
+                        double val_cand = val_env;
 
-                        if (val == (int)MapPlaceIndicator.Obstacle)
+                        if (val_env == 0)
                         {
-                            Map.MapMatrix[p.X, p.Y] = val;
+                            val_cand = 0.5*((double)k / (double)FieldOfViewRadius);
+                            //val_cand = 0;
+                        }
+                        else if (val_env == 1)
+                        {
+                            val_cand = 1 - 0.5 * ((double)k / (double)FieldOfViewRadius);
+                            //val_cand = 1;
+
                         }
 
-                        if (val == (int)MapPlaceIndicator.Platform)
+                        if (Math.Abs(0.5 - val_cand) > Math.Abs(0.5 - val_curr)) // avoid overwrite the better solution
                         {
-                            Map.MapMatrix[p.X, p.Y] = val;
+                            val_new = val_cand;
                         }
 
-                        if ((val == (int)MapPlaceIndicator.Undiscovered) || (val == (int)MapPlaceIndicator.Discovered))
-                        {
-                            Map.MapMatrix[p.X, p.Y] = (int)MapPlaceIndicator.Discovered;
-                        }
+                        //double d = Math.Sqrt(Math.Pow(p.X - this.Pose.X, 2) + Math.Pow(p.Y - this.Pose.Y, 2));
+                        Map.MapMatrix[p.X, p.Y] = val_new;                       
 
                         foreach (Platform pe in enviroment.Platforms)
                         {

@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CooperativeMapping.Controllers
+namespace CooperativeMapping.ControlPolicy
 {
     [Serializable]
-    public class RasterPathPlanningWithPriorityDirectionStrategyController : Controller
+    public class RasterPathPlanningWithPriorityDirectionStrategyController : ControlPolicyAbstract
     {
 
         public int PriorityDirection { get; set; }
@@ -56,7 +56,7 @@ namespace CooperativeMapping.Controllers
                 }
                 if (find) continue;
 
-                if ((platform.Map.GetPlace(p) == MapPlaceIndicator.Obstacle) || (platform.Map.GetPlace(p) == MapPlaceIndicator.NoBackVisist))
+                if (platform.Map.GetPlace(p) == 1)
                 {
                     continue;
                 }
@@ -112,14 +112,14 @@ namespace CooperativeMapping.Controllers
                         if ((p.X == cp.X) && (p.Y == cp.Y)) continue;
                         double currentScore = distMap[cp.X, cp.Y] + 1;
 
-                        if (platform.Map.GetPlace(p) == MapPlaceIndicator.Undiscovered)
+                        if (platform.Map.GetPlace(p) == 0.5)
                         {
                             undiscoverNum++;
 
                             // calculate how many undiscovered places are around this pose
                             RegionLimits limitsp = platform.Map.CalculateLimits(p, platform.FieldOfViewRadius);
                             List<Pose> neighp = limitsp.GetPosesWithinLimits();
-                            int undiscoveredNeigbours = neighp.Count(x => platform.Map.MapMatrix[x.X, x.Y] == (int)MapPlaceIndicator.Undiscovered);
+                            int undiscoveredNeigbours = neighp.Count(x => platform.Map.MapMatrix[x.X, x.Y] == 0.5);
                             double currentScoreWithModifiers = currentScore + (1.0 - undiscoveredNeigbours / (double)neighp.Count);
                             currentScore = currentScoreWithModifiers;
 
@@ -131,7 +131,7 @@ namespace CooperativeMapping.Controllers
                         }
 
                         // next steps
-                        if ((platform.Map.GetPlace(p) != MapPlaceIndicator.Obstacle))
+                        if ((platform.Map.GetPlace(p) !=1))
                         {
                             if (distMap[p.X, p.Y] > currentScore)
                             {

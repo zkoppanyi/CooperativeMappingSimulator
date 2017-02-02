@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using CooperativeMapping.Controllers;
+using CooperativeMapping.ControlPolicy;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using CooperativeMapping.Communication;
@@ -30,7 +30,7 @@ namespace CooperativeMapping
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            robotTimer.Interval = 100;
+            robotTimer.Interval = 60;
             robotTimer.Tick += RobotTimer_Tick;
             StartUpSimulation();
         }
@@ -80,6 +80,7 @@ namespace CooperativeMapping
 
             // Initializing new enviroment
             enviroment = new Enviroment(50, 60);
+            enviroment.Map.SetAllPlace(0);
 
             for (int l = 0; l < 3 * 12; l = l + 11)
             {
@@ -87,17 +88,17 @@ namespace CooperativeMapping
                 {
                     for (int i = 0; i < 6; i++)
                     {
-                        enviroment.Map.MapMatrix[k + i, l + 6] = (int)MapPlaceIndicator.Obstacle;
+                        enviroment.Map.MapMatrix[k + i, l + 6] = 1;
                     }
 
                     for (int i = 14; i > 5; i--)
                     {
-                        enviroment.Map.MapMatrix[k + 10, l + i] = (int)MapPlaceIndicator.Obstacle;
+                        enviroment.Map.MapMatrix[k + 10, l + i] = 1;
                     }
 
                     for (int i = 0; i < 10; i++)
                     {
-                        enviroment.Map.MapMatrix[k + i, l + 14] = (int)MapPlaceIndicator.Obstacle;
+                        enviroment.Map.MapMatrix[k + i, l + 14] = 1;
                     }
                 }
             }
@@ -150,38 +151,40 @@ namespace CooperativeMapping
 
 
             // Initialize robot and timer
-            Controller rasterPlanningController = new RasterPathPlanningStrategy2Controller();
-            Controller naiveController = new NaiveStrategyController();
-            Controller priorityMapStrategy1 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap1);
-            Controller priorityMapStrategy2 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap2);
-            Controller priorityMapStrategy3 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap3);
-            Controller priorityMapStrategy4 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap4);
+            ControlPolicy.ControlPolicyAbstract closestFronterier = new ClosestFronterierControlPolicy();
+            ControlPolicy.ControlPolicyAbstract rasterPlanningController = new RasterPathPlanningStrategy2Controller();
+            ControlPolicy.ControlPolicyAbstract naiveController = new NaiveStrategyControlPolicy();
+            ControlPolicy.ControlPolicyAbstract priorityMapStrategy1 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap1);
+            ControlPolicy.ControlPolicyAbstract priorityMapStrategy2 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap2);
+            ControlPolicy.ControlPolicyAbstract priorityMapStrategy3 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap3);
+            ControlPolicy.ControlPolicyAbstract priorityMapStrategy4 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap4);
 
             CommunicationModel commModel = new NearbyCommunicationModel();
+            int FieldOfViewRadius = 5;
 
             // Priority map strategy
-            Platform robot1 = new Platform(enviroment, priorityMapStrategy1, commModel);
+            Platform robot1 = new Platform(enviroment, closestFronterier, commModel);
             robot1.Pose = new Pose(1, 2);
-            robot1.FieldOfViewRadius = 2;
+            robot1.FieldOfViewRadius = FieldOfViewRadius;
             robot1.Measure();
             robot1.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot2 = new Platform(enviroment, priorityMapStrategy2, commModel);
+            Platform robot2 = new Platform(enviroment, closestFronterier, commModel);
             robot2.Pose = new Pose(1, 4);
             robot2.Measure();
-            robot2.FieldOfViewRadius = 2;
+            robot2.FieldOfViewRadius = FieldOfViewRadius;
             robot2.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot3 = new Platform(enviroment, priorityMapStrategy3, commModel);
+            Platform robot3 = new Platform(enviroment, closestFronterier, commModel);
             robot3.Pose = new Pose(3, 2);
             robot3.Measure();
-            robot3.FieldOfViewRadius = 2;
+            robot3.FieldOfViewRadius = FieldOfViewRadius;
             robot3.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot4 = new Platform(enviroment, priorityMapStrategy4, commModel);
+            Platform robot4 = new Platform(enviroment, closestFronterier, commModel);
             robot4.Pose = new Pose(3, 4);
             robot4.Measure();
-            robot4.FieldOfViewRadius = 2;
+            robot4.FieldOfViewRadius = FieldOfViewRadius;
             robot4.PlatformLogEvent += PlatformLogEvent;
 
             // Raster planning strategy
@@ -270,7 +273,7 @@ namespace CooperativeMapping
                 textBoxConsole.Text += "ID: " + plt.ID + " X = " + plt.Pose.X + " Y = " + plt.Pose.Y + System.Environment.NewLine;
             }*/
 
-                if (isMapDiscovered)
+            if (isMapDiscovered)
             {
                 robotTimer.Stop();
             }
@@ -344,7 +347,7 @@ namespace CooperativeMapping
         private void createEnviromentToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Enviroment env = new Enviroment(10, 10);
-            env.Map.SetAllPlace(MapPlaceIndicator.Undiscovered);
+            env.Map.SetAllPlace(0.5);
             CreateOrModifyEnviromentForm createOrModifyEnviromentForm = new CreateOrModifyEnviromentForm(env);
             createOrModifyEnviromentForm.ShowDialog();
             updateUI();

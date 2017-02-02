@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CooperativeMapping.Controllers
+namespace CooperativeMapping.ControlPolicy
 {
     [Serializable]
-    public abstract class Controller
+    public abstract class ControlPolicyAbstract
     {
         public abstract void Next(Platform platform);
     }

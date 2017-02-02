@@ -83,31 +83,14 @@ namespace CooperativeMapping
                     Rectangle rect = new Rectangle(StartX + j * BinSize, StartY + i * BinSize, BinSize, BinSize);
 
                     SolidBrush brush;
-                    switch (map.MapMatrix[i, j])
+                    if (map.MapMatrix[i, j] != -1)
                     {
-                        case (int)MapPlaceIndicator.Undiscovered:
-                            brush = new SolidBrush(ColorUndiscovered);
-                            break;
-
-                        case (int)MapPlaceIndicator.Discovered:
-                            brush = new SolidBrush(ColorDiscovered);
-                            break;
-
-                        case (int)MapPlaceIndicator.Obstacle:
-                            brush = new SolidBrush(ColorObstacle);
-                            break;
-
-                        case (int)MapPlaceIndicator.Platform:
-                            brush = new SolidBrush(ColorPlatform);
-                            break;
-
-                        case (int)MapPlaceIndicator.NoBackVisist:
-                            brush = new SolidBrush(ColorUnknown);
-                            break;
-
-                        default:
-                            brush = new SolidBrush(ColorUnknown);
-                            break;
+                        int val = 255 - (int)(map.MapMatrix[i, j] * 255);
+                        brush = new SolidBrush(Color.FromArgb(val, val, val));
+                    }
+                    else
+                    {
+                        brush = new SolidBrush(ColorPlatform);
                     }
 
                     g.FillRectangles(brush, new Rectangle[] { rect });
@@ -123,10 +106,10 @@ namespace CooperativeMapping
         public Bitmap Draw(Platform platform)
         {
             MapObject mapCopy = (MapObject)platform.Map.Clone();
-            mapCopy.MapMatrix[platform.Pose.X, platform.Pose.Y] = (int)MapPlaceIndicator.Platform;
+            mapCopy.MapMatrix[platform.Pose.X, platform.Pose.Y] = -1;
             foreach (Platform p in platform.ObservedPlatforms)
             {
-                mapCopy.MapMatrix[p.Pose.X, p.Pose.Y] = (int)MapPlaceIndicator.Platform;
+                mapCopy.MapMatrix[p.Pose.X, p.Pose.Y] = -1;
             }
 
             return Draw(mapCopy);
@@ -138,7 +121,7 @@ namespace CooperativeMapping
 
             foreach (Platform p in enviroment.Platforms)
             {
-                mapCopy.MapMatrix[p.Pose.X, p.Pose.Y] = (int)MapPlaceIndicator.Platform;
+                mapCopy.MapMatrix[p.Pose.X, p.Pose.Y] = -1;
             }
 
             return Draw(mapCopy);

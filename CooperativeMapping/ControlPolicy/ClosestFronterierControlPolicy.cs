@@ -5,15 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CooperativeMapping.Controllers
+namespace CooperativeMapping.ControlPolicy
 {
     [Serializable]
-    public class RasterPathPlanningStrategy2Controller : Controller
+    public class ClosestFronterierControlPolicy : ControlPolicyAbstract
     {
 
-        private const int maxDeep = 100;
+        public double OccupiedLimit { get { return 0.9; } }
+        public double FreeLimit { get { return 0.1; } }
 
-        public RasterPathPlanningStrategy2Controller()
+        public ClosestFronterierControlPolicy()
         {
 
         }
@@ -45,7 +46,7 @@ namespace CooperativeMapping.Controllers
                 if (find) continue;
 
                 // is this pose an obstacle
-                if ((platform.Map.GetPlace(p) != MapPlaceIndicator.Obstacle) && (platform.Map.GetPlace(p) != MapPlaceIndicator.NoBackVisist))
+                if (platform.Map.GetPlace(p) < OccupiedLimit)
                 {
                     nextPoses.Add(p);
                 }
@@ -55,9 +56,10 @@ namespace CooperativeMapping.Controllers
             double minVal = Double.PositiveInfinity;
             Pose minPose = platform.Pose;
 
-            foreach (Pose p in nextPoses)
+            foreach(Pose p in nextPoses)
             {
-                double cmin = FindClosestUndiscovered(p, platform);
+                int cmin = FindClosestUndiscovered(p, platform);               
+
                 if (cmin < minVal)
                 {
                     minVal = cmin;
@@ -73,71 +75,51 @@ namespace CooperativeMapping.Controllers
             platform.Move(minPose.X - platform.Pose.X, minPose.Y - platform.Pose.Y);
         }
 
-        private double FindClosestUndiscovered(Pose startPose, Platform platform)
+        private int FindClosestUndiscovered(Pose startPose, Platform platform)
         {
             List<Pose> candidates = new List<Pose>();
             List<Pose> newCandidates = new List<Pose>();
-            double[,] distMap = Matrix.Create<double>(platform.Map.Rows, platform.Map.Columns, int.MaxValue);
+            int[,] distMap = Matrix.Create<int>(platform.Map.Rows, platform.Map.Columns, int.MaxValue);
             candidates.Add(startPose);
-
-            double bestScore = Double.PositiveInfinity;
-            Pose bestPose = null;
-            int undiscoverNum = 0;
+            int maxDeep = 1000;
 
             distMap[startPose.X, startPose.Y] = 0;
 
             for (int k = 1; k < maxDeep; k++)
             {
-                if (undiscoverNum > 100) break;
-
                 newCandidates.Clear();
                 foreach (Pose cp in candidates)
-                {
+                {                    
                     RegionLimits limits = platform.Map.CalculateLimits(cp.X, cp.Y, 1);
                     List<Pose> poses = limits.GetPosesWithinLimits();
-
+                                       
                     foreach (Pose p in poses)
                     {
                         if ((p.X == cp.X) && (p.Y == cp.Y)) continue;
-                        double currentScore = distMap[cp.X, cp.Y] + 1;
 
-                        if (platform.Map.GetPlace(p) == MapPlaceIndicator.Undiscovered)
+                        if ((platform.Map.GetPlace(p) > FreeLimit) && (platform.Map.GetPlace(p) < OccupiedLimit))
+                        //if (platform.Map.GetPlace(p) == 0.5)
                         {
-                            undiscoverNum++;
-
-                            // calculate how many undiscovered places are around this pose
-                            RegionLimits limitsp = platform.Map.CalculateLimits(p, platform.FieldOfViewRadius);
-                            List<Pose> neighp = limitsp.GetPosesWithinLimits();
-                            int undiscoveredNeigbours = neighp.Count(x => platform.Map.MapMatrix[x.X, x.Y] == (int)MapPlaceIndicator.Undiscovered);
-                            double currentScoreWithModifiers = (currentScore + (1.0 - undiscoveredNeigbours / (double)neighp.Count));
-                            //currentScore = currentScoreWithModifiers;
-
-                            if (currentScoreWithModifiers < bestScore)
-                            {
-                                bestScore = currentScoreWithModifiers;
-                                bestPose = p;
-                            }
+                            return k;
                         }
 
-                        // next steps
-                        if ((platform.Map.GetPlace(p) != MapPlaceIndicator.Obstacle))
+                        //if ((Platform.Map.GetPlace(p) == MapPlaceIndicator.Discovered) || (Platform.Map.GetPlace(p) == MapPlaceIndicator.Platform))
+                        if ((platform.Map.GetPlace(p) < OccupiedLimit) && (distMap[p.X, p.Y] == int.MaxValue))
                         {
-                            if (distMap[p.X, p.Y] > currentScore)
-                            {
-                                distMap[p.X, p.Y] = currentScore;
-                                newCandidates.Add(p);
-                            }
+                            distMap[p.X, p.Y] = k;
+                            newCandidates.Add(p);
                         }
                     }
                 }
                 candidates = new List<Pose>(newCandidates);
             }
 
-            return bestScore;
+            return int.MaxValue;
         }
+
         public override string ToString()
         {
-            return "Raster Path Planning Strategy Controller With Undiscovered Counts";
+            return "Closest Fronterier Control Policy";
         }
 
     }

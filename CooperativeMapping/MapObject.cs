@@ -8,7 +8,7 @@ using System.ComponentModel;
 
 namespace CooperativeMapping
 {
-    [Serializable]
+    /*[Serializable]
     public enum MapPlaceIndicator
     {
         Undiscovered = 0,
@@ -17,7 +17,7 @@ namespace CooperativeMapping
         Platform = 3,
         OutOfBound = 4,
         NoBackVisist = 5
-    }
+    }*/
 
     [Serializable]
     public class RegionLimits
@@ -49,7 +49,7 @@ namespace CooperativeMapping
     public class MapObject : ICloneable
     {
         [Browsable(false)]
-        public int[,] MapMatrix { get; set; }
+        public double[,] MapMatrix { get; set; }
 
         public int Rows { get { return MapMatrix.Rows();  } set { Resize(value, this.Columns); } }
         public int Columns { get { return MapMatrix.Columns(); } set { Resize(this.Rows, value); } }
@@ -59,14 +59,14 @@ namespace CooperativeMapping
 
         public MapObject(int rows, int cols)
         {
-            MapMatrix = Matrix.Create<int>(rows, cols, (int)MapPlaceIndicator.Undiscovered);
+            MapMatrix = Matrix.Create<double>(rows, cols, 0.5);
             this.ID = ++IDs;
         }
 
-        public void Resize(int nrow, int ncol, MapPlaceIndicator indicator = MapPlaceIndicator.Undiscovered)
+        public void Resize(int nrow, int ncol)
         {
             MapObject nobj = new MapObject(nrow, ncol);
-            nobj.SetAllPlace(indicator);
+            nobj.SetAllPlace(0.5);
             int rowl = nrow > this.Rows ? this.Rows : nrow;
             int coll = ncol > this.Columns ? this.Columns : ncol;
             for (int i = 0; i < rowl; i++)
@@ -92,7 +92,7 @@ namespace CooperativeMapping
             {
                 for (int j = 0; j < coll; j++)
                 {
-                    if (map.MapMatrix[i, j] != (int)MapPlaceIndicator.Undiscovered)
+                    if (Math.Abs(0.5 - map.MapMatrix[i, j]) > Math.Abs(0.5 - this.MapMatrix[i, j]))
                     {
                         this.MapMatrix[i, j] = map.MapMatrix[i, j];
                     }
@@ -114,17 +114,17 @@ namespace CooperativeMapping
             return obj;
         }
 
-        public MapPlaceIndicator GetPlace(int i, int j)
+        public double GetPlace(int i, int j)
         {
             if (isOutOfBound(i,j))
             {
-                return MapPlaceIndicator.OutOfBound;
+                return -1;
             }
 
-            return (MapPlaceIndicator)this.MapMatrix[i, j];
+            return this.MapMatrix[i, j];
         }
 
-        public MapPlaceIndicator GetPlace(Pose pose)
+        public double GetPlace(Pose pose)
         {
             return GetPlace(pose.X, pose.Y);
         }
@@ -158,13 +158,13 @@ namespace CooperativeMapping
             return CalculateLimits(pose.X, pose.Y, fieldOfViewRadius);
         }
 
-        public void SetAllPlace(MapPlaceIndicator indicator)
+        public void SetAllPlace(double val)
         {
             for (int i = 0; i < this.Rows; ++i)
             {
                 for (int j = 0; j < this.Columns; ++j)
                 {
-                    this.MapMatrix[i, j] = (int)indicator;
+                    this.MapMatrix[i, j] = val;
                 }
             }
         }
@@ -173,7 +173,7 @@ namespace CooperativeMapping
         {
             foreach (double d in MapMatrix)
             {
-                if (d == (int)MapPlaceIndicator.Undiscovered)
+                if (d == 0.5)
                 {
                     return false;
                 }
@@ -189,7 +189,7 @@ namespace CooperativeMapping
             {
                 for (int j = 0; j < this.Columns; ++j)
                 {
-                    if (this.MapMatrix[i, j] != (int)MapPlaceIndicator.Undiscovered)
+                    if (this.MapMatrix[i, j] != 0.5)
                     {
                         sum++;
                     }

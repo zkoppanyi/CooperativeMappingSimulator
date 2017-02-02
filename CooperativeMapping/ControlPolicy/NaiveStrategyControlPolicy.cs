@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CooperativeMapping.Controllers
+namespace CooperativeMapping.ControlPolicy
 {
     [Serializable]
-    public class NaiveStrategyController : Controller
+    public class NaiveStrategyControlPolicy : ControlPolicyAbstract
     {
-        public NaiveStrategyController() 
+        public NaiveStrategyControlPolicy() 
         {
 
         }      
@@ -39,15 +39,10 @@ namespace CooperativeMapping.Controllers
                 }
                 if (find) continue;
 
-                if ((platform.Map.GetPlace(p) != MapPlaceIndicator.Obstacle) && (platform.Map.GetPlace(p) != MapPlaceIndicator.NoBackVisist))
+                if (platform.Map.GetPlace(p) != 1) 
                 {
                     possiblePoses.Add(p);
                 }
-            }
-
-            if (platform.Map.GetPlace(platform.Pose) != MapPlaceIndicator.NoBackVisist)
-            {
-                possiblePoses.Add(platform.Pose);
             }
 
             // Find closest undiscovered point
@@ -57,12 +52,12 @@ namespace CooperativeMapping.Controllers
             {
                 for (int j = 0; j < platform.Map.Columns; j++)
                 {
-                    if (platform.Map.MapMatrix[i, j] == (int)MapPlaceIndicator.Undiscovered)
+                    if (platform.Map.MapMatrix[i, j] == 0.5)
                     {
                         // Check whether the cell has discovered neighbor
                         limits = platform.Map.CalculateLimits(i, j, 1);
                         poses = limits.GetPosesWithinLimits();
-                        Pose discoveredPlace = poses.Find(p => platform.Map.GetPlace(p) == MapPlaceIndicator.Discovered);
+                        Pose discoveredPlace = poses.Find(p => platform.Map.GetPlace(p) == 1);
 
                         // if it does not have discovered neigbor, then skip it
                         if (discoveredPlace != null)
@@ -82,17 +77,12 @@ namespace CooperativeMapping.Controllers
                 }
             }
 
-            if ((minPose.X == platform.Pose.X) && (minPose.Y == platform.Pose.Y))
-            {
-                platform.Map.MapMatrix[platform.Pose.X, platform.Pose.Y] = (int)MapPlaceIndicator.NoBackVisist;
-            }
-
             platform.Move(minPose.X - platform.Pose.X, minPose.Y - platform.Pose.Y);
         }
 
         public override string ToString()
         {
-            return "Naive Strategy Controller";
+            return "Naive Strategy Control Policy";
         }
     }
 }
