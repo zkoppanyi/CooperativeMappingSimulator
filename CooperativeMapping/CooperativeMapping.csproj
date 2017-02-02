@@ -64,7 +64,7 @@
     <Compile Include="Communication\GlobalCommunicationModel.cs" />
     <Compile Include="Communication\NearbyCommunicationModel.cs" />
     <Compile Include="Communication\NoCommunication.cs" />
-    <Compile Include="ControlPolicy\RasterPathPlanning2StrategyController.cs" />
+    <Compile Include="ControlPolicy\MaxInformationGainControlPolicy.cs" />
     <Compile Include="ControlPolicy\RasterPathPlanningWithPriorityDirectionStrategyController.cs" />
     <Compile Include="CreateOrModifyEnviromentForm.cs">
       <SubType>Form</SubType>

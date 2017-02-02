@@ -30,7 +30,7 @@ namespace CooperativeMapping
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            robotTimer.Interval = 60;
+            robotTimer.Interval = 1;
             robotTimer.Tick += RobotTimer_Tick;
             StartUpSimulation();
         }
@@ -151,9 +151,7 @@ namespace CooperativeMapping
 
 
             // Initialize robot and timer
-            ControlPolicy.ControlPolicyAbstract closestFronterier = new ClosestFronterierControlPolicy();
-            ControlPolicy.ControlPolicyAbstract rasterPlanningController = new RasterPathPlanningStrategy2Controller();
-            ControlPolicy.ControlPolicyAbstract naiveController = new NaiveStrategyControlPolicy();
+            ControlPolicy.ControlPolicyAbstract policy = new MaxInformationGainControlPolicy();
             ControlPolicy.ControlPolicyAbstract priorityMapStrategy1 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap1);
             ControlPolicy.ControlPolicyAbstract priorityMapStrategy2 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap2);
             ControlPolicy.ControlPolicyAbstract priorityMapStrategy3 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap3);
@@ -163,25 +161,25 @@ namespace CooperativeMapping
             int FieldOfViewRadius = 5;
 
             // Priority map strategy
-            Platform robot1 = new Platform(enviroment, closestFronterier, commModel);
+            Platform robot1 = new Platform(enviroment, policy, commModel);
             robot1.Pose = new Pose(1, 2);
             robot1.FieldOfViewRadius = FieldOfViewRadius;
             robot1.Measure();
             robot1.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot2 = new Platform(enviroment, closestFronterier, commModel);
+            Platform robot2 = new Platform(enviroment, policy, commModel);
             robot2.Pose = new Pose(1, 4);
             robot2.Measure();
             robot2.FieldOfViewRadius = FieldOfViewRadius;
             robot2.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot3 = new Platform(enviroment, closestFronterier, commModel);
+            Platform robot3 = new Platform(enviroment, policy, commModel);
             robot3.Pose = new Pose(3, 2);
             robot3.Measure();
             robot3.FieldOfViewRadius = FieldOfViewRadius;
             robot3.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot4 = new Platform(enviroment, closestFronterier, commModel);
+            Platform robot4 = new Platform(enviroment, policy, commModel);
             robot4.Pose = new Pose(3, 4);
             robot4.Measure();
             robot4.FieldOfViewRadius = FieldOfViewRadius;
@@ -258,7 +256,8 @@ namespace CooperativeMapping
                     return;
                 }
 
-                isMapDiscovered &= plt.Map.IsDiscovered();
+                bool val = plt.Map.IsDiscovered(plt);
+                isMapDiscovered &= plt.Map.IsDiscovered(plt);
             }
 
             if (selectedPlatform != null)

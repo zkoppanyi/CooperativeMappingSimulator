@@ -11,9 +11,6 @@ namespace CooperativeMapping.ControlPolicy
     public class ClosestFronterierControlPolicy : ControlPolicyAbstract
     {
 
-        public double OccupiedLimit { get { return 0.9; } }
-        public double FreeLimit { get { return 0.1; } }
-
         public ClosestFronterierControlPolicy()
         {
 
@@ -24,7 +21,7 @@ namespace CooperativeMapping.ControlPolicy
             platform.Measure();
             platform.Communicate();
 
-            if (platform.Map.IsDiscovered()) return;
+            if (platform.Map.IsDiscovered(platform)) return;
 
             RegionLimits limits = platform.Map.CalculateLimits(platform.Pose, 1);
             List<Pose> poses = limits.GetPosesWithinLimits();
@@ -46,7 +43,7 @@ namespace CooperativeMapping.ControlPolicy
                 if (find) continue;
 
                 // is this pose an obstacle
-                if (platform.Map.GetPlace(p) < OccupiedLimit)
+                if (platform.Map.GetPlace(p) < platform.OccupiedThreshold)
                 {
                     nextPoses.Add(p);
                 }
@@ -58,7 +55,7 @@ namespace CooperativeMapping.ControlPolicy
 
             foreach(Pose p in nextPoses)
             {
-                int cmin = FindClosestUndiscovered(p, platform);               
+                int cmin = FindClosestFronterier(p, platform);               
 
                 if (cmin < minVal)
                 {
@@ -75,7 +72,7 @@ namespace CooperativeMapping.ControlPolicy
             platform.Move(minPose.X - platform.Pose.X, minPose.Y - platform.Pose.Y);
         }
 
-        private int FindClosestUndiscovered(Pose startPose, Platform platform)
+        private int FindClosestFronterier(Pose startPose, Platform platform)
         {
             List<Pose> candidates = new List<Pose>();
             List<Pose> newCandidates = new List<Pose>();
@@ -97,14 +94,14 @@ namespace CooperativeMapping.ControlPolicy
                     {
                         if ((p.X == cp.X) && (p.Y == cp.Y)) continue;
 
-                        if ((platform.Map.GetPlace(p) > FreeLimit) && (platform.Map.GetPlace(p) < OccupiedLimit))
+                        if ((platform.Map.GetPlace(p) > platform.FreeThreshold) && (platform.Map.GetPlace(p) < platform.OccupiedThreshold))
                         //if (platform.Map.GetPlace(p) == 0.5)
                         {
                             return k;
                         }
 
                         //if ((Platform.Map.GetPlace(p) == MapPlaceIndicator.Discovered) || (Platform.Map.GetPlace(p) == MapPlaceIndicator.Platform))
-                        if ((platform.Map.GetPlace(p) < OccupiedLimit) && (distMap[p.X, p.Y] == int.MaxValue))
+                        if ((platform.Map.GetPlace(p) < platform.OccupiedThreshold) && (distMap[p.X, p.Y] == int.MaxValue))
                         {
                             distMap[p.X, p.Y] = k;
                             newCandidates.Add(p);

@@ -39,7 +39,7 @@ namespace CooperativeMapping.ControlPolicy
                 }
                 if (find) continue;
 
-                if (platform.Map.GetPlace(p) != 1) 
+                if (platform.Map.GetPlace(p) < platform.OccupiedThreshold) 
                 {
                     possiblePoses.Add(p);
                 }
@@ -52,12 +52,13 @@ namespace CooperativeMapping.ControlPolicy
             {
                 for (int j = 0; j < platform.Map.Columns; j++)
                 {
-                    if (platform.Map.MapMatrix[i, j] == 0.5)
+                    double val = platform.Map.MapMatrix[i, j];
+                    if ((val > platform.FreeThreshold) && (val < platform.OccupiedThreshold))
                     {
                         // Check whether the cell has discovered neighbor
                         limits = platform.Map.CalculateLimits(i, j, 1);
                         poses = limits.GetPosesWithinLimits();
-                        Pose discoveredPlace = poses.Find(p => platform.Map.GetPlace(p) == 1);
+                        Pose discoveredPlace = poses.Find(p => ((platform.Map.GetPlace(p) > platform.FreeThreshold) && (platform.Map.GetPlace(p) < platform.OccupiedThreshold)));
 
                         // if it does not have discovered neigbor, then skip it
                         if (discoveredPlace != null)

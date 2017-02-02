@@ -26,7 +26,7 @@ namespace CooperativeMapping
             comboBoxController.Items.Clear();
             comboBoxController.Items.Add(new NaiveStrategyControlPolicy());
             comboBoxController.Items.Add(new ClosestFronterierControlPolicy());
-            comboBoxController.Items.Add(new RasterPathPlanningStrategy2Controller());
+            comboBoxController.Items.Add(new MaxInformationGainControlPolicy());
             comboBoxController.Items.Add(new RasterPathPlanningWithPriorityMapStrategyController());
             comboBoxController.Items.Add(new RasterPathPlanningWithPriorityDirectionStrategyController());
             comboBoxController.Items.Add(Platform.Controller);

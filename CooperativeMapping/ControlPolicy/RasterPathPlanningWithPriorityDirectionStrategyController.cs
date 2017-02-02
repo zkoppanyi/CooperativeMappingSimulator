@@ -27,7 +27,7 @@ namespace CooperativeMapping.ControlPolicy
 
         public override void Next(Platform platform)
         {
-            if (platform.Map.IsDiscovered()) return;
+            if (platform.Map.IsDiscovered(platform)) return;
 
             platform.Measure();
             platform.Communicate();

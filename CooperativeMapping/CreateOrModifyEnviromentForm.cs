@@ -117,7 +117,7 @@ namespace CooperativeMapping
 
                     if (platform == null)
                     {
-                        ControlPolicy.ControlPolicyAbstract cnt = new RasterPathPlanningStrategy2Controller();
+                        ControlPolicy.ControlPolicyAbstract cnt = new MaxInformationGainControlPolicy();
                         CommunicationModel comm = new GlobalCommunicationModel();
                         platform = new Platform(enviroment, cnt, comm);
                         platform.FieldOfViewRadius = 5;

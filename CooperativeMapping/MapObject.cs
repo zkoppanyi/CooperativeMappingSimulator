@@ -169,11 +169,11 @@ namespace CooperativeMapping
             }
         }
 
-        public bool IsDiscovered()
+        public bool IsDiscovered(Platform p)
         {
             foreach (double d in MapMatrix)
             {
-                if (d == 0.5)
+                if (!((d >= p.OccupiedThreshold) || (d <= p.FreeThreshold)))
                 {
                     return false;
                 }
