@@ -158,23 +158,36 @@ namespace CooperativeMapping
         }
 
         /// <summary>
-        /// Graph search for the possible FOV
+        /// Graph search for the bins that is within the FOV limits
         /// </summary>
         /// <returns></returns>
-        public List<Tuple<int, Pose>> CalculateBinsInFOV(Pose pcent)
+        public List<Tuple<int, Pose>> CalculateBinsInFOV(Pose pcent, double FOV = -1)
         {
+            if (FOV < 0)
+            {
+                FOV = this.FieldOfViewRadius;
+            }
+
             List<Pose> candidates = new List<Pose>();
+            List<Pose> visited = new List<Pose>();
             List<Pose> newCandidates = new List<Pose>();
             List< Tuple<int, Pose> > ret = new List<Tuple<int, Pose>>();
 
             candidates.Add(pcent);
             ret.Add(new Tuple<int, Pose>(0, pcent));
 
-            for (int k = 0; k < FieldOfViewRadius; k++)
+            for (int k = 0; k < FOV; k++)
             {
                 newCandidates.Clear();
                 foreach (Pose cp in candidates)
                 {
+                    if (visited.Find(p => (p.X == cp.X) && (p.Y == cp.Y)) != null)
+                    {
+                        continue;
+                    }
+
+                    visited.Add(cp);
+
                     RegionLimits limits = this.Map.CalculateLimits(cp.X, cp.Y, 1);
                     List<Pose> poses = limits.GetPosesWithinLimits();
 
@@ -191,6 +204,23 @@ namespace CooperativeMapping
                 }
                 candidates = new List<Pose>(newCandidates);
             }
+
+            return ret;
+        }
+
+        /// <summary>
+        /// LOS calculation to select bins that is within the FOV limits
+        /// </summary>
+        /// <returns></returns>
+        public List<Tuple<int, Pose>> CalculateBinsInFOVWithLOS(Pose pcent, double FOV = -1)
+        {
+            if (FOV < 0)
+            {
+                FOV = this.FieldOfViewRadius;
+            }
+
+            List<Tuple<int, Pose>> ret = new List<Tuple<int, Pose>>();
+                        
 
             return ret;
         }

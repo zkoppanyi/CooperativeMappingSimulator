@@ -51,6 +51,22 @@ namespace CooperativeMapping.ControlPolicy
                 }
             }
 
+
+            //vectors
+            double sx = 0;
+            double sy = 0;
+            foreach (Platform plt in platform.ObservedPlatforms)
+            {
+                if ((plt.Pose.X != platform.Pose.X) && (plt.Pose.Y != platform.Pose.Y))
+                {
+                    double dx = (platform.Pose.X - plt.Pose.X);
+                    double dy = (platform.Pose.Y - plt.Pose.Y);
+                    sx += dx;
+                    sy += dy;
+                }
+            }
+            double alpha = Math.Atan2(sy, sx);
+
             // Find closest undiscovered point
             double maxVal = Double.NegativeInfinity;
             Pose minPose = platform.Pose;
@@ -58,6 +74,21 @@ namespace CooperativeMapping.ControlPolicy
             foreach (Pose p in nextPoses)
             {
                 double cmax = FindClosestFrontrierWithInformationGain(p, platform);
+                /*double alphap = Math.Atan2(platform.Pose.Y - p.Y, platform.Pose.X - p.X);
+                double forceCorrection = -Math.Abs(alpha - alphap)/50;
+                //double forceCorrection = -Math.Abs(alpha - alphap);
+                cmax += forceCorrection;*/
+
+                double r = 0;
+                foreach (Platform plt in platform.ObservedPlatforms)
+                {
+                    if ((plt.Pose.X != p.X) && (plt.Pose.Y != p.Y))
+                    {
+                         r += Math.Sqrt(Math.Pow((p.X - plt.Pose.X), 2) + Math.Pow((p.Y - plt.Pose.Y), 2));
+                    }
+                }
+                cmax -= r / platform.ObservedPlatforms.Count;
+
                 if (cmax > maxVal)
                 {
                     maxVal = cmax;
@@ -86,9 +117,16 @@ namespace CooperativeMapping.ControlPolicy
 
             distMap[startPose.X, startPose.Y] = 0;
 
-            for (int k = 1; k < maxDeep; k++)
+            int k = 1;
+            for (k = 1; k < maxDeep; k++)
             {
-                if (undiscoverNum > 100)
+
+                if (candidates.Count == 0)
+                {
+                    break;
+                }
+
+                if (undiscoverNum > 5)
                 {
                     break;
                 }
@@ -104,20 +142,15 @@ namespace CooperativeMapping.ControlPolicy
                     {
                         if ((p.X == cp.X) && (p.Y == cp.Y)) continue;
 
-                        //if (platform.Map.GetPlace(p) == 0.5)
-                        //{
-                        
-                        // calculate how many undiscovered places are around this pose
-                        //List<Tuple<int, Pose>> neighp = platform.CalculateBinsInFOV(p);
-                        //double info = neighp.Sum(x => platform.Map.MapMatrix[x.Item2.X, x.Item2.Y]);
+                        // calculate information gain considering FOV - it's too slow
+                        /*List<Tuple<int, Pose>> neighp = platform.CalculateBinsInFOV(p, 2);
+                        double info = neighp.Sum(x => 0.5 - Math.Abs(platform.Map.MapMatrix[x.Item2.X, x.Item2.Y] - 0.5)) / neighp.Count;*/
 
-                        double info = (0.5 - Math.Abs(platform.Map.MapMatrix[p.X, p.Y] - 0.5));
-                        double newScore = (currentScore + info);
+                        RegionLimits nlimits = platform.Map.CalculateLimits(cp.X, cp.Y, 1);
+                        List<Pose> neighp = nlimits.GetPosesWithinLimits();
+                        double info = neighp.Sum(x => 0.5 - Math.Abs(platform.Map.MapMatrix[x.X, x.Y] - 0.5)) / neighp.Count;
 
-                        //int discoveredNeigbours = neighp.Count(x => platform.Map.MapMatrix[x.X, x.Y] == (int)MapPlaceIndicator.Discovered);
-                        //double currentScoreWithModifiers = (currentScore + (discoveredNeigbours / 8)*2);
-
-                        //currentScore = currentScoreWithModifiers;
+                        double newScore = (currentScore + info) - k;
 
                         if ((platform.Map.MapMatrix[p.X, p.Y] < platform.OccupiedThreshold) && (platform.Map.MapMatrix[p.X, p.Y] > platform.FreeThreshold))
                         {
@@ -129,19 +162,13 @@ namespace CooperativeMapping.ControlPolicy
                             bestScore = newScore;
                             bestPose = p;
                         }
-                        //}
 
                         // next steps
-                        if (distMap[p.X, p.Y] < newScore) 
+                        if ((distMap[p.X, p.Y] < newScore) && (platform.Map.MapMatrix[p.X, p.Y] <= platform.FreeThreshold))
                         {
                             distMap[p.X, p.Y] = newScore;
-                        }
-
-                        if (platform.Map.MapMatrix[p.X, p.Y] < platform.OccupiedThreshold)
-                        {
                             newCandidates.Add(p);
                         }
-
                     }
                 }
                 candidates = new List<Pose>(newCandidates);
