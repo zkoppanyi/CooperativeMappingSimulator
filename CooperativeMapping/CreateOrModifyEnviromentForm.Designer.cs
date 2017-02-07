@@ -33,6 +33,7 @@
             this.parametersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.limitsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.textToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mapImageBox = new System.Windows.Forms.PictureBox();
             this.propertyGridEnviroment = new System.Windows.Forms.PropertyGrid();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -44,7 +45,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabelSelectedBinType = new System.Windows.Forms.ToolStripStatusLabel();
-            this.clearMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadFromMATFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mapImageBox)).BeginInit();
             this.toolStrip1.SuspendLayout();
@@ -67,7 +68,8 @@
             this.parametersToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.limitsToolStripMenuItem,
             this.textToolStripMenuItem,
-            this.clearMapToolStripMenuItem});
+            this.clearMapToolStripMenuItem,
+            this.loadFromMATFileToolStripMenuItem});
             this.parametersToolStripMenuItem.Name = "parametersToolStripMenuItem";
             this.parametersToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.parametersToolStripMenuItem.Text = "File";
@@ -75,16 +77,23 @@
             // limitsToolStripMenuItem
             // 
             this.limitsToolStripMenuItem.Name = "limitsToolStripMenuItem";
-            this.limitsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.limitsToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.limitsToolStripMenuItem.Text = "Save...";
             this.limitsToolStripMenuItem.Click += new System.EventHandler(this.limitsToolStripMenuItem_Click);
             // 
             // textToolStripMenuItem
             // 
             this.textToolStripMenuItem.Name = "textToolStripMenuItem";
-            this.textToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.textToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.textToolStripMenuItem.Text = "Text";
             this.textToolStripMenuItem.Click += new System.EventHandler(this.textToolStripMenuItem_Click);
+            // 
+            // clearMapToolStripMenuItem
+            // 
+            this.clearMapToolStripMenuItem.Name = "clearMapToolStripMenuItem";
+            this.clearMapToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
+            this.clearMapToolStripMenuItem.Text = "Clear Map";
+            this.clearMapToolStripMenuItem.Click += new System.EventHandler(this.clearMapToolStripMenuItem_Click);
             // 
             // mapImageBox
             // 
@@ -204,12 +213,12 @@
             this.toolStripStatusLabelSelectedBinType.Size = new System.Drawing.Size(53, 17);
             this.toolStripStatusLabelSelectedBinType.Text = "Bin type:";
             // 
-            // clearMapToolStripMenuItem
+            // loadFromMATFileToolStripMenuItem
             // 
-            this.clearMapToolStripMenuItem.Name = "clearMapToolStripMenuItem";
-            this.clearMapToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.clearMapToolStripMenuItem.Text = "Clear Map";
-            this.clearMapToolStripMenuItem.Click += new System.EventHandler(this.clearMapToolStripMenuItem_Click);
+            this.loadFromMATFileToolStripMenuItem.Name = "loadFromMATFileToolStripMenuItem";
+            this.loadFromMATFileToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
+            this.loadFromMATFileToolStripMenuItem.Text = "Load from MAT file...";
+            this.loadFromMATFileToolStripMenuItem.Click += new System.EventHandler(this.loadFromMATFileToolStripMenuItem_Click);
             // 
             // CreateOrModifyEnviromentForm
             // 
@@ -255,5 +264,6 @@
         private System.Windows.Forms.ToolStripButton toolStripButtonPlatform;
         private System.Windows.Forms.ToolStripMenuItem textToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem clearMapToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadFromMATFileToolStripMenuItem;
     }
 }

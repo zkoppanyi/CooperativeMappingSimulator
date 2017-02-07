@@ -186,8 +186,6 @@ namespace CooperativeMapping
                         continue;
                     }
 
-                    visited.Add(cp);
-
                     RegionLimits limits = this.Map.CalculateLimits(cp.X, cp.Y, 1);
                     List<Pose> poses = limits.GetPosesWithinLimits();
 
@@ -198,7 +196,11 @@ namespace CooperativeMapping
                         ret.Add(new Tuple<int, Pose>(k, p));
                         if (enviroment.Map.GetPlace(p) < this.OccupiedThreshold)
                         {
-                            newCandidates.Add(p);
+                            if (visited.Find(ps => ((ps.X == p.X) && (ps.Y == p.Y))) == null)
+                            {
+                                visited.Add(cp);
+                                newCandidates.Add(p);
+                            }
                         }
                     }
                 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CooperativeMapping.ControlPolicy;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -67,7 +68,7 @@ namespace CooperativeMapping
             ColorUnknown = Color.Red;
     }
 
-        public Bitmap Draw(MapObject map)
+        public Bitmap Draw(MapObject map, Platform platform = null)
         {
             Bitmap bitmap = new Bitmap(map.Columns * BinSize, map.Rows * BinSize);
             Graphics g = Graphics.FromImage(bitmap);
@@ -75,7 +76,7 @@ namespace CooperativeMapping
             Pen blackPen = new Pen(Color.Black, 1);
             //Color customColor = Color.FromArgb(50, Color.Gray);
             //SolidBrush shadowBrush = new SolidBrush(customColor);
-            
+
             for (int i = 0; i < map.Rows; i++)
             {
                 for (int j = 0; j < map.Columns; j++)
@@ -94,9 +95,71 @@ namespace CooperativeMapping
                     }
 
                     g.FillRectangles(brush, new Rectangle[] { rect });
-                    g.DrawRectangle(blackPen, rect);
+                    //g.DrawRectangle(blackPen, rect);
+
+                    if (platform != null)
+                    {
+                        if (platform.Controller is IDistanceMap)
+                        {
+                            IDistanceMap policy = platform.Controller as IDistanceMap;
+                            double[,] distMap = policy.DistMap;
+                            if (distMap != null)
+                            {
+                                if ((distMap[i, j] != Double.NegativeInfinity) && (distMap[i, j] != Double.PositiveInfinity))
+                                {
+                                    double minDistMap = policy.MinDistMap;
+                                    double maxDistMap = policy.MaxDistMap;
+                                    double val2 = distMap[i, j];
+                                    int val = 0;
+                                    if (val2 > 0)
+                                    {
+                                        val = (int)((distMap[i, j] + minDistMap) / (maxDistMap - minDistMap) * 100 + 1);
+                                    }
+                                    else
+                                    {
+                                        val = (int)((distMap[i, j] - minDistMap) / (maxDistMap - minDistMap) * 100 + 1);
+                                    }
+
+                                    brush = new SolidBrush(Color.FromArgb(255 - val, 0, 0));
+                                    g.FillRectangles(brush, new Rectangle[] { rect });
+                                }
+                            }                           
+                        }                       
+                    }
+
+                    if (map.MapMatrix[i, j] == -1)
+                    {
+                        brush = new SolidBrush(ColorPlatform);
+                        g.FillRectangles(brush, new Rectangle[] { rect });
+                    }
                 }
             }
+
+
+            if (platform != null)
+            {
+                if (platform.Controller is MaxInformationGainControlPolicy)
+                {
+                    MaxInformationGainControlPolicy policy = platform.Controller as MaxInformationGainControlPolicy;
+                    if (policy.CumberBreads != null)
+                    {
+                        foreach (Pose p in policy.CumberBreads)
+                        {
+                            Rectangle rect = new Rectangle(StartX + p.Y * BinSize, StartY + p.X * BinSize, BinSize, BinSize);
+                            g.FillRectangles(new SolidBrush(Color.Yellow), new Rectangle[] { rect });
+                        }
+                    }
+
+                    if (policy.BestFronterier != null)
+                    {
+                        Rectangle minPoseRect = new Rectangle(StartX + policy.BestFronterier.Y * BinSize, StartY + policy.BestFronterier.X * BinSize, BinSize, BinSize);
+                        g.FillRectangles(new SolidBrush(Color.Orange), new Rectangle[] { minPoseRect });
+                    }
+
+                }
+            }
+
+
             blackPen = new Pen(Color.Black, 2);
             g.DrawRectangle(blackPen, StartX, StartY, map.Columns * BinSize, map.Rows * BinSize);
 
@@ -112,7 +175,7 @@ namespace CooperativeMapping
                 mapCopy.MapMatrix[p.Pose.X, p.Pose.Y] = -1;
             }
 
-            return Draw(mapCopy);
+            return Draw(mapCopy, platform);
         }      
 
         public Bitmap Draw(Enviroment enviroment)

@@ -1,4 +1,6 @@
-﻿using CooperativeMapping.Communication;
+﻿using Accord.IO;
+using Accord.Math;
+using CooperativeMapping.Communication;
 using CooperativeMapping.ControlPolicy;
 using System;
 using System.Collections.Generic;
@@ -232,6 +234,58 @@ namespace CooperativeMapping
         {
             enviroment.Map.SetAllPlace(0.5);
             updateUI();
+        }
+
+        private void loadFromMATFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Stream myStream = null;
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+
+            openFileDialog1.Filter = "MAT files (*.mat)|*.mat|All files (*.*)|*.*";
+            openFileDialog1.FilterIndex = 1;
+            openFileDialog1.RestoreDirectory = true;
+
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    if ((myStream = openFileDialog1.OpenFile()) != null)
+                    {
+                        using (myStream)
+                        {
+                            MatReader reader = new MatReader(myStream);
+                            var aType = reader["img_bin"].GetType();
+                            byte[,] bins = reader["img_bin"].GetValue<byte[,]>();
+                            //double[,] mapMatrix = Matrix.Create<double>(bins.Rows(), bins.Columns(), 0);
+                            Enviroment env = new Enviroment(bins.Rows(), bins.Columns());
+                            for (int i = 0; i < bins.Rows(); i++)
+                            {
+                                for (int j = 0; j < bins.Columns(); j++)
+                                {
+                                    if (bins[i,j] == 0)
+                                    {
+                                        env.Map.MapMatrix[i, j] = 1;
+                                    }
+                                    else
+                                    {
+                                        env.Map.MapMatrix[i, j] = 0;
+                                    }
+                                }
+                            }
+
+                            this.enviroment = env;
+                            propertyGridEnviroment.SelectedObject = enviroment;
+                            updateUI();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: Could not read file from disk. Original error: " + ex.Message);
+                }
+
+                
+            }
         }
     }
 }

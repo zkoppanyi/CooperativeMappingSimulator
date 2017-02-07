@@ -8,8 +8,35 @@ using System.Threading.Tasks;
 namespace CooperativeMapping.ControlPolicy
 {
     [Serializable]
-    public class ClosestFronterierControlPolicy : ControlPolicyAbstract
+    public class ClosestFronterierControlPolicy : ControlPolicyAbstract, IDistanceMap
     {
+        private double[,] distMap;
+        private double minDistMap;
+        private double maxDistMap;
+
+        public double[,] DistMap
+        {
+            get
+            {
+                return distMap;
+            }
+        }
+
+        public double MinDistMap
+        {
+            get
+            {
+                return minDistMap;
+            }
+        }
+
+        public double MaxDistMap
+        {
+            get
+            {
+                return maxDistMap;
+            }
+        }
 
         public ClosestFronterierControlPolicy()
         {
@@ -64,11 +91,12 @@ namespace CooperativeMapping.ControlPolicy
                 }
             }
 
-            if (minVal == int.MaxValue)
+            if (minVal == Double.NegativeInfinity)
             {
                 platform.SendLog("No undiscovered area!");
             }
 
+            FindClosestFronterier(minPose, platform);
             platform.Move(minPose.X - platform.Pose.X, minPose.Y - platform.Pose.Y);
         }
 
@@ -76,11 +104,13 @@ namespace CooperativeMapping.ControlPolicy
         {
             List<Pose> candidates = new List<Pose>();
             List<Pose> newCandidates = new List<Pose>();
-            int[,] distMap = Matrix.Create<int>(platform.Map.Rows, platform.Map.Columns, int.MaxValue);
+            distMap = Matrix.Create<double>(platform.Map.Rows, platform.Map.Columns, Double.PositiveInfinity);
             candidates.Add(startPose);
             int maxDeep = 1000;
 
             distMap[startPose.X, startPose.Y] = 0;
+            minDistMap = 0;
+            maxDistMap = 0;
 
             for (int k = 1; k < maxDeep; k++)
             {
@@ -101,10 +131,13 @@ namespace CooperativeMapping.ControlPolicy
                         }
 
                         //if ((Platform.Map.GetPlace(p) == MapPlaceIndicator.Discovered) || (Platform.Map.GetPlace(p) == MapPlaceIndicator.Platform))
-                        if ((platform.Map.GetPlace(p) < platform.OccupiedThreshold) && (distMap[p.X, p.Y] == int.MaxValue))
+                        if ((platform.Map.GetPlace(p) < platform.OccupiedThreshold) && (distMap[p.X, p.Y] == Double.PositiveInfinity))
                         {
-                            distMap[p.X, p.Y] = k;
+                            distMap[p.X, p.Y] = (double)k;
                             newCandidates.Add(p);
+
+                            if (minDistMap > k) minDistMap = (double)k;
+                            if (maxDistMap < k) maxDistMap = (double)k;
                         }
                     }
                 }

@@ -8,14 +8,44 @@ using System.Threading.Tasks;
 namespace CooperativeMapping.ControlPolicy
 {
     [Serializable]
-    public class MaxInformationGainControlPolicy : ControlPolicyAbstract
+    public class MaxInformationGainControlPolicy : ControlPolicyAbstract, IDistanceMap
     {
+        public Stack<Pose> CumberBreads;
+        private Pose prevPose;
+        private double[,] distMap;
+        private double minDistMap;
+        private double maxDistMap;
+        public Pose MinPose;
+        public Pose BestFronterier;
 
-        private const int maxDeep = 100;
+        public double[,] DistMap
+        {
+            get
+            {
+                return distMap;
+            }
+        }
+
+        public double MinDistMap
+        {
+            get
+            {
+                return minDistMap;
+            }
+        }
+
+        public double MaxDistMap
+        {
+            get
+            {
+                return maxDistMap;
+            }
+        }
+
 
         public MaxInformationGainControlPolicy()
         {
-
+            CumberBreads = new Stack<Pose>(100);
         }
 
         public override void Next(Platform platform)
@@ -24,6 +54,11 @@ namespace CooperativeMapping.ControlPolicy
             platform.Communicate();
 
             if (platform.Map.IsDiscovered(platform)) return;
+
+            if (this.CumberBreads == null)
+            {
+                this.CumberBreads = new Stack<Pose>(100);
+            }
 
             RegionLimits limits = platform.Map.CalculateLimits(platform.Pose, 1);
             List<Pose> poses = limits.GetPosesWithinLimits();
@@ -51,64 +86,105 @@ namespace CooperativeMapping.ControlPolicy
                 }
             }
 
+            Tuple<double, Pose> result = FindNextStep(platform, nextPoses, (int)((double)platform.FieldOfViewRadius*1.2));
+            double maxVal = result.Item1;
+            MinPose = result.Item2;
 
-            //vectors
-            double sx = 0;
-            double sy = 0;
-            foreach (Platform plt in platform.ObservedPlatforms)
+            bool extensiveSearchIsNeeded = false;
+            if (this.CumberBreads.Count > 0)
             {
-                if ((plt.Pose.X != platform.Pose.X) && (plt.Pose.Y != platform.Pose.Y))
+                if (maxVal == Double.NegativeInfinity)
                 {
-                    double dx = (platform.Pose.X - plt.Pose.X);
-                    double dy = (platform.Pose.Y - plt.Pose.Y);
-                    sx += dx;
-                    sy += dy;
+                    //platform.SendLog("No undiscovered area!");
+                    MinPose = this.CumberBreads.Pop();
+
+                    Pose res = nextPoses.Find(p => (p.X == MinPose.X) && (p.Y == MinPose.Y));
+
+                    if (res != null)
+                    {
+                        platform.Move(MinPose.X - platform.Pose.X, MinPose.Y - platform.Pose.Y);
+                    }
+                    else
+                    {
+                        extensiveSearchIsNeeded = true;
+                    }
+
+                }
+                else
+                {
+                    if (prevPose != null)
+                    {
+                        this.CumberBreads.Push(prevPose);
+                    }
+                    prevPose = new Pose(MinPose.X, MinPose.Y);
+                    platform.Move(MinPose.X - platform.Pose.X, MinPose.Y - platform.Pose.Y);
                 }
             }
-            double alpha = Math.Atan2(sy, sx);
+            else
+            {
+                extensiveSearchIsNeeded = true;
+            }
 
+
+            if (extensiveSearchIsNeeded)
+            {
+                result = FindNextStep(platform, nextPoses, 100);
+                maxVal = result.Item1;
+                Pose minPose = result.Item2;
+
+                if (maxVal == Double.NegativeInfinity)
+                {
+                    platform.SendLog("No undiscovered area!");
+                }
+                else
+                {
+                    if (prevPose != null)
+                    {
+                        this.CumberBreads.Push(prevPose);
+                    }
+                    prevPose = new Pose(minPose.X, minPose.Y);
+                    platform.Move(minPose.X - platform.Pose.X, minPose.Y - platform.Pose.Y);
+                }
+            }
+        }
+
+        private Tuple<double, Pose> FindNextStep(Platform platform, List<Pose> nextPoses, int maxDeep)
+        {
             // Find closest undiscovered point
             double maxVal = Double.NegativeInfinity;
             Pose minPose = platform.Pose;
-
             foreach (Pose p in nextPoses)
             {
-                double cmax = FindClosestFrontrierWithInformationGain(p, platform);
-                /*double alphap = Math.Atan2(platform.Pose.Y - p.Y, platform.Pose.X - p.X);
-                double forceCorrection = -Math.Abs(alpha - alphap)/50;
-                //double forceCorrection = -Math.Abs(alpha - alphap);
-                cmax += forceCorrection;*/
+                Tuple<double, Pose> res = FindClosestFrontrierWithInformationGain(p, platform, maxDeep);
+                double cmax = res.Item1;
 
-                double r = 0;
+                /*double r = 0;
                 foreach (Platform plt in platform.ObservedPlatforms)
                 {
                     if ((plt.Pose.X != p.X) && (plt.Pose.Y != p.Y))
                     {
                          r += Math.Sqrt(Math.Pow((p.X - plt.Pose.X), 2) + Math.Pow((p.Y - plt.Pose.Y), 2));
                     }
-                }
-                cmax -= r / platform.ObservedPlatforms.Count;
+                }*/
+                //cmax -= r / platform.ObservedPlatforms.Count;
 
                 if (cmax > maxVal)
                 {
                     maxVal = cmax;
                     minPose = p;
+                    BestFronterier = res.Item2;
                 }
             }
 
-            if (maxVal == int.MaxValue)
-            {
-                platform.SendLog("No undiscovered area!");
-            }
-
-            platform.Move(minPose.X - platform.Pose.X, minPose.Y - platform.Pose.Y);
+            FindClosestFrontrierWithInformationGain(minPose, platform, maxDeep);
+            return new Tuple<double, Pose>(maxVal, minPose);
         }
 
-        private double FindClosestFrontrierWithInformationGain(Pose startPose, Platform platform)
+        private Tuple<double, Pose> FindClosestFrontrierWithInformationGain(Pose startPose, Platform platform, int maxDeep)
         {
             List<Pose> candidates = new List<Pose>();
             List<Pose> newCandidates = new List<Pose>();
-            double[,] distMap = Matrix.Create<double>(platform.Map.Rows, platform.Map.Columns, Double.NegativeInfinity);
+            distMap = Matrix.Create<double>(platform.Map.Rows, platform.Map.Columns, Double.NegativeInfinity);
             candidates.Add(startPose);
 
             double bestScore = Double.NegativeInfinity;
@@ -116,6 +192,8 @@ namespace CooperativeMapping.ControlPolicy
             int undiscoverNum = 0;
 
             distMap[startPose.X, startPose.Y] = 0;
+            minDistMap = 0;
+            maxDistMap = 0;
 
             int k = 1;
             for (k = 1; k < maxDeep; k++)
@@ -126,7 +204,7 @@ namespace CooperativeMapping.ControlPolicy
                     break;
                 }
 
-                if (undiscoverNum > 5)
+                if ((undiscoverNum > 0) && (maxDeep > platform.FieldOfViewRadius*2))
                 {
                     break;
                 }
@@ -146,7 +224,7 @@ namespace CooperativeMapping.ControlPolicy
                         /*List<Tuple<int, Pose>> neighp = platform.CalculateBinsInFOV(p, 2);
                         double info = neighp.Sum(x => 0.5 - Math.Abs(platform.Map.MapMatrix[x.Item2.X, x.Item2.Y] - 0.5)) / neighp.Count;*/
 
-                        RegionLimits nlimits = platform.Map.CalculateLimits(cp.X, cp.Y, 1);
+                        RegionLimits nlimits = platform.Map.CalculateLimits(cp.X, cp.Y, 0);
                         List<Pose> neighp = nlimits.GetPosesWithinLimits();
                         double info = neighp.Sum(x => 0.5 - Math.Abs(platform.Map.MapMatrix[x.X, x.Y] - 0.5)) / neighp.Count;
 
@@ -164,21 +242,24 @@ namespace CooperativeMapping.ControlPolicy
                         }
 
                         // next steps
-                        if ((distMap[p.X, p.Y] < newScore) && (platform.Map.MapMatrix[p.X, p.Y] <= platform.FreeThreshold))
+                        if ((distMap[p.X, p.Y] < newScore) && (platform.Map.MapMatrix[p.X, p.Y] <= platform.OccupiedThreshold))
                         {
                             distMap[p.X, p.Y] = newScore;
                             newCandidates.Add(p);
+
+                            if (minDistMap > newScore) minDistMap = newScore;
+                            if (maxDistMap < newScore) maxDistMap = newScore;
                         }
                     }
                 }
                 candidates = new List<Pose>(newCandidates);
             }
 
-            return bestScore;
+            return new Tuple<double, Pose>(bestScore, bestPose);
         }
         public override string ToString()
         {
-            return "Raster Path Planning Strategy Controller With Undiscovered Counts";
+            return "Maximum Information Gain";
         }
 
     }

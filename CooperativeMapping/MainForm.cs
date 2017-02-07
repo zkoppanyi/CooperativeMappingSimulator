@@ -6,6 +6,7 @@ using CooperativeMapping.ControlPolicy;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using CooperativeMapping.Communication;
+using System.Diagnostics;
 
 namespace CooperativeMapping
 {
@@ -15,6 +16,7 @@ namespace CooperativeMapping
         private Enviroment enviroment;
         private Platform selectedPlatform;
         public String currentEnviromentLocation = null;
+        private Stopwatch measureRun = new Stopwatch();
         
         public MainForm()
         {
@@ -24,7 +26,7 @@ namespace CooperativeMapping
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            robotTimer.Interval = 1;
+            robotTimer.Interval = 100;
             robotTimer.Tick += RobotTimer_Tick;
             StartUpSimulation();
         }
@@ -57,6 +59,7 @@ namespace CooperativeMapping
             }
         }
 
+        int displayIter = 0;
         private void StartUpSimulation()
         {
             //// Initializing new enviroment
@@ -155,25 +158,25 @@ namespace CooperativeMapping
             int FieldOfViewRadius = 5;
 
             // Priority map strategy
-            Platform robot1 = new Platform(enviroment, policy, commModel);
+            Platform robot1 = new Platform(enviroment, new MaxInformationGainControlPolicy(), commModel);
             robot1.Pose = new Pose(1, 2);
             robot1.FieldOfViewRadius = FieldOfViewRadius;
             robot1.Measure();
             robot1.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot2 = new Platform(enviroment, policy, commModel);
+            Platform robot2 = new Platform(enviroment, new MaxInformationGainControlPolicy(), commModel);
             robot2.Pose = new Pose(1, 4);
             robot2.Measure();
             robot2.FieldOfViewRadius = FieldOfViewRadius;
             robot2.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot3 = new Platform(enviroment, policy, commModel);
+            Platform robot3 = new Platform(enviroment, new MaxInformationGainControlPolicy(), commModel);
             robot3.Pose = new Pose(3, 2);
             robot3.Measure();
             robot3.FieldOfViewRadius = FieldOfViewRadius;
             robot3.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot4 = new Platform(enviroment, policy, commModel);
+            Platform robot4 = new Platform(enviroment, new MaxInformationGainControlPolicy(), commModel);
             robot4.Pose = new Pose(3, 4);
             robot4.Measure();
             robot4.FieldOfViewRadius = FieldOfViewRadius;
@@ -223,6 +226,7 @@ namespace CooperativeMapping
 
         private void RobotTimer_Tick(object sender, EventArgs e)
         {
+           measureRun.Restart();
            bool isMapDiscovered = true;
             foreach (Platform plt in enviroment.Platforms)
             {
@@ -256,7 +260,12 @@ namespace CooperativeMapping
 
             if (selectedPlatform != null)
             {
-                mapImageBox.BackgroundImage = enviroment.Drawer.Draw(selectedPlatform);
+                displayIter++;
+
+                if ((displayIter % 1) == 0)
+                {
+                    mapImageBox.BackgroundImage = enviroment.Drawer.Draw(selectedPlatform);
+                }
             }
 
             // Print coordinates at each step
@@ -281,8 +290,9 @@ namespace CooperativeMapping
 
             if (isMapDiscovered) textBoxConsole.Text += "Sum step: " + sumStep + System.Environment.NewLine;
             if (isMapDiscovered) textBoxConsole.Text += "Average step: " + (double)sumStep / (double)enviroment.Platforms.Count() + System.Environment.NewLine;
-            toolStripStatusLabel.Text = "SUM: " + sumStep + " AVG: " + (double)sumStep / (double)enviroment.Platforms.Count();
-
+            measureRun.Stop();
+            toolStripStatusLabel.Text = "SUM: " + sumStep + " AVG: " + (double)sumStep / (double)enviroment.Platforms.Count() + " RunTime: " + measureRun.ElapsedMilliseconds;
+             
             if (selectedPlatform != null)
             {
                 toolStripStatusLabel.Text += " Discovered Area: " + ((double)selectedPlatform.Map.NumDiscoveredBins() / (double)selectedPlatform.Map.NumBins() * 100).ToString("0.00") + "%";
