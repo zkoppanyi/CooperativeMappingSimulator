@@ -362,12 +362,23 @@ namespace CooperativeMapping.ControlPolicy
 
         private int GenerateAllocationMap(Platform platform)
         {
+            platform.SendLog("Generate allocaiton map...");
+
             allocationMap = Matrix.Create<int>(platform.Map.Rows, platform.Map.Columns, int.MaxValue);
 
-            List<Platform> platforms = new List<Platform>(platform.ObservedPlatforms);
-            platforms.Add(platform);
-            int allocatedCellNum = 0;
+            List<Platform> platforms = new List<Platform>();
+            foreach(Platform plt in platforms)
+            {
+                double d = Math.Sqrt(Math.Pow(plt.Pose.X - platform.Pose.X, 2) + Math.Pow(plt.Pose.Y - platform.Pose.Y, 2));
+                if ((d  < platform.FieldOfViewRadius*1.2) || (d < plt.FieldOfViewRadius * 1.2))
+                {
+                    platforms.Add(plt);
+                }
+            }
 
+            platforms.Add(platform);
+
+            int allocatedCellNum = 0;
             foreach (Platform plt in platforms)
             {
 

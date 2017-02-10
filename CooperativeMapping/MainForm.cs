@@ -375,6 +375,10 @@ namespace CooperativeMapping
             if (enviroment.Platforms.Count > 0)
             {
                 selectedPlatform = enviroment.Platforms[0];
+                foreach(Platform plt in enviroment.Platforms)
+                {
+                    plt.PlatformLogEvent += PlatformLogEvent;
+                }
             }
             else
             {
