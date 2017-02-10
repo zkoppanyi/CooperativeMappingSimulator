@@ -34,6 +34,7 @@
             this.limitsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.textToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadFromMATFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mapImageBox = new System.Windows.Forms.PictureBox();
             this.propertyGridEnviroment = new System.Windows.Forms.PropertyGrid();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -45,7 +46,10 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabelSelectedBinType = new System.Windows.Forms.ToolStripStatusLabel();
-            this.loadFromMATFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.changesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.changeAllPlatformToMaxInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.changeAllPolicyToCFToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.removeAllPlatformsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mapImageBox)).BeginInit();
             this.toolStrip1.SuspendLayout();
@@ -55,7 +59,8 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.parametersToolStripMenuItem});
+            this.parametersToolStripMenuItem,
+            this.changesToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(804, 24);
@@ -94,6 +99,13 @@
             this.clearMapToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.clearMapToolStripMenuItem.Text = "Clear Map";
             this.clearMapToolStripMenuItem.Click += new System.EventHandler(this.clearMapToolStripMenuItem_Click);
+            // 
+            // loadFromMATFileToolStripMenuItem
+            // 
+            this.loadFromMATFileToolStripMenuItem.Name = "loadFromMATFileToolStripMenuItem";
+            this.loadFromMATFileToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
+            this.loadFromMATFileToolStripMenuItem.Text = "Load from MAT file...";
+            this.loadFromMATFileToolStripMenuItem.Click += new System.EventHandler(this.loadFromMATFileToolStripMenuItem_Click);
             // 
             // mapImageBox
             // 
@@ -213,12 +225,36 @@
             this.toolStripStatusLabelSelectedBinType.Size = new System.Drawing.Size(53, 17);
             this.toolStripStatusLabelSelectedBinType.Text = "Bin type:";
             // 
-            // loadFromMATFileToolStripMenuItem
+            // changesToolStripMenuItem
             // 
-            this.loadFromMATFileToolStripMenuItem.Name = "loadFromMATFileToolStripMenuItem";
-            this.loadFromMATFileToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
-            this.loadFromMATFileToolStripMenuItem.Text = "Load from MAT file...";
-            this.loadFromMATFileToolStripMenuItem.Click += new System.EventHandler(this.loadFromMATFileToolStripMenuItem_Click);
+            this.changesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.changeAllPolicyToCFToolStripMenuItem,
+            this.changeAllPlatformToMaxInfoToolStripMenuItem,
+            this.removeAllPlatformsToolStripMenuItem});
+            this.changesToolStripMenuItem.Name = "changesToolStripMenuItem";
+            this.changesToolStripMenuItem.Size = new System.Drawing.Size(65, 20);
+            this.changesToolStripMenuItem.Text = "Changes";
+            // 
+            // changeAllPlatformToMaxInfoToolStripMenuItem
+            // 
+            this.changeAllPlatformToMaxInfoToolStripMenuItem.Name = "changeAllPlatformToMaxInfoToolStripMenuItem";
+            this.changeAllPlatformToMaxInfoToolStripMenuItem.Size = new System.Drawing.Size(225, 22);
+            this.changeAllPlatformToMaxInfoToolStripMenuItem.Text = "Change all policy to MaxInfo";
+            this.changeAllPlatformToMaxInfoToolStripMenuItem.Click += new System.EventHandler(this.changeAllPlatformToMaxInfoToolStripMenuItem_Click);
+            // 
+            // changeAllPolicyToCFToolStripMenuItem
+            // 
+            this.changeAllPolicyToCFToolStripMenuItem.Name = "changeAllPolicyToCFToolStripMenuItem";
+            this.changeAllPolicyToCFToolStripMenuItem.Size = new System.Drawing.Size(225, 22);
+            this.changeAllPolicyToCFToolStripMenuItem.Text = "Change all policy to CF";
+            this.changeAllPolicyToCFToolStripMenuItem.Click += new System.EventHandler(this.changeAllPolicyToCFToolStripMenuItem_Click);
+            // 
+            // removeAllPlatformsToolStripMenuItem
+            // 
+            this.removeAllPlatformsToolStripMenuItem.Name = "removeAllPlatformsToolStripMenuItem";
+            this.removeAllPlatformsToolStripMenuItem.Size = new System.Drawing.Size(225, 22);
+            this.removeAllPlatformsToolStripMenuItem.Text = "Remove all platforms";
+            this.removeAllPlatformsToolStripMenuItem.Click += new System.EventHandler(this.removeAllPlatformsToolStripMenuItem_Click);
             // 
             // CreateOrModifyEnviromentForm
             // 
@@ -265,5 +301,9 @@
         private System.Windows.Forms.ToolStripMenuItem textToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem clearMapToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem loadFromMATFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem changesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem changeAllPolicyToCFToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem changeAllPlatformToMaxInfoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem removeAllPlatformsToolStripMenuItem;
     }
 }

@@ -60,7 +60,7 @@ namespace CooperativeMapping
         [Description("Display color of the platform")]
         [Category("Bins")]
         [DisplayName("Free Threshold")]
-        public double FreeThreshold { get { return 0.1; } }
+        public double FreeThreshold { get { return 0.3; } }
 
         [Browsable(false)]
         public MapObject Map { get; set; }
@@ -80,7 +80,7 @@ namespace CooperativeMapping
         private Enviroment enviroment;
 
         [Browsable(false)]
-        public ControlPolicyAbstract Controller { get; set; }
+        public ControlPolicyAbstract ControlPolicy { get; set; }
 
         [Browsable(false)]
         public CommunicationModel CommunicationModel { get; set; }
@@ -93,16 +93,31 @@ namespace CooperativeMapping
             enviroment.Platforms.Add(this);
             this.enviroment = enviroment;
             FieldOfViewRadius = 2;
-            this.Controller = controller;
+            this.ControlPolicy = controller;
             this.CommunicationModel = commModel;
             IDs++;
             this.ID = IDs;
             this.Color = Color.Blue;
         }
 
+        public override bool Equals(object obj)
+        {
+            if (obj == null) return false;
+
+            var plt = obj as Platform;
+            if (plt == null) return false;
+
+            return plt.ID == this.ID;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.ID;
+        }
+
         public void Next()
         {
-            Controller.Next(this);
+            ControlPolicy.Next(this);
         }
 
         public void Measure()
@@ -244,9 +259,30 @@ namespace CooperativeMapping
         /// <param name="dy">Displacement along Y axis</param>
         public void Move(int dx, int dy)
         {
-            step++;
-            Pose.X = Pose.X + dx;
-            Pose.Y = Pose.Y + dy;
+            if ((this.Pose.Heading == Utililty.ConvertAngleTo360(Math.Atan2(dy, dx) / Math.PI * 180)) && (Math.Abs(dx) <= 1) && (Math.Abs(dy) <= 1))
+            //if ((Math.Abs(dx) <= 1) && (Math.Abs(dy) <= 1))
+            {
+                step++;
+                Pose.X = Pose.X + dx;
+                Pose.Y = Pose.Y + dy;
+            }
+            else
+            {
+                throw new Exception("Illegal movement.");
+            }
+        }
+
+        public void Rotate(double dalpha)
+        {
+            if (Math.Abs(dalpha) == 45)
+            {
+                step++;
+                this.Pose.Heading += dalpha;
+            }
+            else
+            {
+                throw new Exception("Illegal movement.");
+            }
         }
 
         public override string ToString()

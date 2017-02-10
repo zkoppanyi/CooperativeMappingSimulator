@@ -11,8 +11,11 @@ namespace CooperativeMapping.Communication
     {
         public override void Acquire(Platform platform, Enviroment enviroment)
         {
-            foreach(Platform plt in enviroment.Platforms)
+            platform.ObservedPlatforms.Clear();
+            foreach (Platform plt in enviroment.Platforms)
             {
+                if (plt.Equals(platform)) continue;
+
                 if (plt.CommunicationModel is NoCommunication) continue;
 
                 if (!platform.ObservedPlatforms.Exists(x => x == plt))

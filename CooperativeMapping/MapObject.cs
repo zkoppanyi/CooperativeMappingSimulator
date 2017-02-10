@@ -204,5 +204,15 @@ namespace CooperativeMapping
             return this.Rows * this.Columns;
         }
 
+        public bool IsValidPose(Pose pose)
+        {
+            if ((pose.X >= 0) && (pose.X < this.MapMatrix.Rows()) && (pose.Y >= 0) && (pose.Y < this.MapMatrix.Columns()))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
     }
 }

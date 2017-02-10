@@ -26,7 +26,7 @@ namespace CooperativeMapping
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            robotTimer.Interval = 100;
+            robotTimer.Interval = 1;
             robotTimer.Tick += RobotTimer_Tick;
             StartUpSimulation();
         }
@@ -102,85 +102,42 @@ namespace CooperativeMapping
 
 
             // Show map
-            mapImageBox.BackgroundImage = enviroment.Drawer.Draw(enviroment.Map);
-
-            // Priority maps
-            double val = 2;
-            double[,] priorityMap1 = Matrix.Create<double>(enviroment.Map.Rows, enviroment.Map.Columns, 1);
-            for (int i = 0; i<enviroment.Map.Rows/2; i++)
-            {
-                for (int j = 0; j < enviroment.Map.Columns/2; j++)
-                {
-                    priorityMap1[i, j] = val;
-                }
-
-            }
-
-            double[,] priorityMap2 = Matrix.Create<double>(enviroment.Map.Rows, enviroment.Map.Columns, 1);
-            for (int i = enviroment.Map.Rows / 2; i < enviroment.Map.Rows; i++)
-            {
-                for (int j = 0; j < enviroment.Map.Columns/2; j++)
-                {
-                    priorityMap2[i, j] = val;
-                }
-
-            }
-
-            double[,] priorityMap3 = Matrix.Create<double>(enviroment.Map.Rows, enviroment.Map.Columns, 1);
-            for (int i = enviroment.Map.Rows / 2; i < enviroment.Map.Rows; i++)
-            {
-                for (int j = enviroment.Map.Columns / 2; j < enviroment.Map.Columns; j++)
-                {
-                    priorityMap3[i, j] = val;
-                }
-
-            }
-
-            double[,] priorityMap4 = Matrix.Create<double>(enviroment.Map.Rows, enviroment.Map.Columns, 1);
-            for (int i = 0; i < enviroment.Map.Rows / 2; i++)
-            {
-                for (int j = enviroment.Map.Columns / 2; j < enviroment.Map.Columns; j++)
-                {
-                    priorityMap4[i, j] = val;
-                }
-
-            }
-
+            mapImageBox.BackgroundImage = enviroment.Drawer.Draw(enviroment.Map, enviroment.Platforms);
 
             // Initialize robot and timer
             ControlPolicy.ControlPolicyAbstract policy = new MaxInformationGainControlPolicy();
-            ControlPolicy.ControlPolicyAbstract priorityMapStrategy1 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap1);
-            ControlPolicy.ControlPolicyAbstract priorityMapStrategy2 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap2);
-            ControlPolicy.ControlPolicyAbstract priorityMapStrategy3 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap3);
-            ControlPolicy.ControlPolicyAbstract priorityMapStrategy4 = new RasterPathPlanningWithPriorityMapStrategyController(priorityMap4);
+            ControlPolicy.ControlPolicyAbstract priorityMapStrategy1 = new BidingControlPolicy();
+            ControlPolicy.ControlPolicyAbstract priorityMapStrategy2 = new BidingControlPolicy();
+            ControlPolicy.ControlPolicyAbstract priorityMapStrategy3 = new BidingControlPolicy();
+            ControlPolicy.ControlPolicyAbstract priorityMapStrategy4 = new BidingControlPolicy();
 
-            CommunicationModel commModel = new NearbyCommunicationModel();
+            CommunicationModel commModel = new GlobalCommunicationModel();
             int FieldOfViewRadius = 5;
 
             // Priority map strategy
-            Platform robot1 = new Platform(enviroment, new MaxInformationGainControlPolicy(), commModel);
+            Platform robot1 = new Platform(enviroment, new ClosestFronterierControlPolicy(), commModel);
             robot1.Pose = new Pose(1, 2);
             robot1.FieldOfViewRadius = FieldOfViewRadius;
             robot1.Measure();
             robot1.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot2 = new Platform(enviroment, new MaxInformationGainControlPolicy(), commModel);
+            /*Platform robot2 = new Platform(enviroment, new ClosestFronterierControlPolicy(), commModel);
             robot2.Pose = new Pose(1, 4);
             robot2.Measure();
             robot2.FieldOfViewRadius = FieldOfViewRadius;
             robot2.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot3 = new Platform(enviroment, new MaxInformationGainControlPolicy(), commModel);
+            Platform robot3 = new Platform(enviroment, new ClosestFronterierControlPolicy(), commModel);
             robot3.Pose = new Pose(3, 2);
             robot3.Measure();
             robot3.FieldOfViewRadius = FieldOfViewRadius;
             robot3.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot4 = new Platform(enviroment, new MaxInformationGainControlPolicy(), commModel);
+            Platform robot4 = new Platform(enviroment, new ClosestFronterierControlPolicy(), commModel);
             robot4.Pose = new Pose(3, 4);
             robot4.Measure();
             robot4.FieldOfViewRadius = FieldOfViewRadius;
-            robot4.PlatformLogEvent += PlatformLogEvent;
+            robot4.PlatformLogEvent += PlatformLogEvent;*/
 
             // Raster planning strategy
             /*Platform robot1 = new Platform(enviroment, rasterPlanningController, globComm);
@@ -381,7 +338,7 @@ namespace CooperativeMapping
             textBoxConsole.Text += System.Environment.NewLine;
             textBoxConsole.Text += "Platform #" + selectedPlatform.ID + System.Environment.NewLine;
             textBoxConsole.Text += "--------------------------------" + System.Environment.NewLine;
-            textBoxConsole.Text += "Controller: " + System.Environment.NewLine + selectedPlatform.Controller.ToString() + System.Environment.NewLine;
+            textBoxConsole.Text += "Controller: " + System.Environment.NewLine + selectedPlatform.ControlPolicy.ToString() + System.Environment.NewLine;
             textBoxConsole.Text += "Communication: " + System.Environment.NewLine + selectedPlatform.CommunicationModel.ToString() + System.Environment.NewLine;
             textBoxConsole.Text += "Steps: " + selectedPlatform.Step + System.Environment.NewLine;
             textBoxConsole.Text += "Discovered area: " + selectedPlatform.Map.NumDiscoveredBins() + System.Environment.NewLine;

@@ -38,7 +38,7 @@ namespace CooperativeMapping
 
             foreach (Platform p in Platforms)
             {
-                if ((p.Pose.X == platform.Pose.X) && (p.Pose.Y == platform.Pose.Y) && (p!=platform)) 
+                if ( p.Pose.Equals(platform.Pose) && (!p.Equals(platform))) 
                 {
                     return PlatformState.Destroy;
                 }

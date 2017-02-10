@@ -10,5 +10,6 @@ namespace CooperativeMapping.ControlPolicy
     public abstract class ControlPolicyAbstract
     {
         public abstract void Next(Platform platform);
+
     }
 }

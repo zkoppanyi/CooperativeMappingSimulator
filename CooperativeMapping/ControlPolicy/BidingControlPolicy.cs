@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace CooperativeMapping.ControlPolicy
 {
     [Serializable]
-    public class MaxInformationGainControlPolicy : ControlPolicyAbstract, IDistanceMap, IBreadCumbers
+    public class BidingControlPolicy : ControlPolicyAbstract, IDistanceMap, IBreadCumbers
     {
         private double[,] distMap;
         private double minDistMap;
@@ -30,7 +30,7 @@ namespace CooperativeMapping.ControlPolicy
 
         private const int maxDeep = 100;
 
-        public MaxInformationGainControlPolicy()
+        public BidingControlPolicy()
         {
 
         }
@@ -147,13 +147,10 @@ namespace CooperativeMapping.ControlPolicy
             {
                 platform.SendLog("No feasible solution");
             }
-
         }
 
         public void Replan(Platform platform, int searchRadius)
         {
-            //List<Pose> nextPoses = GetNextPossiblePoses(platform);
-
             // Find closest undiscovered point
             GraphNode res = FindTrack(platform.Pose, platform, searchRadius);
 
@@ -202,6 +199,7 @@ namespace CooperativeMapping.ControlPolicy
                 if ((k > searchRadius) && (searchRadius != -1)) break;
                 if (k > maxDeep) break;
 
+
                 RegionLimits limits = platform.Map.CalculateLimits(cp.Pose.X, cp.Pose.Y, 1);
                 List<Pose> poses = limits.GetPosesWithinLimits();
 
@@ -211,20 +209,6 @@ namespace CooperativeMapping.ControlPolicy
 
                     double dalpha = Math.Abs(p.GetHeadingTo(cp.Pose)) / 45.0;
                     score = score + dalpha;
-
-                    // don't override "(distMap[p.X, p.Y] > score)", speed up calculation, this is why this is an approximation algorithm
-                    // for this, a correct score/info weighting procedure is needed
-                    if (distMap[p.X, p.Y] != Double.PositiveInfinity) continue;
-
-                    /*RegionLimits nlimits = platform.Map.CalculateLimits(p.X, p.Y, 1);
-                    List<Pose> neighp = nlimits.GetPosesWithinLimits();
-                    double info = neighp.Sum(x => 0.5 - Math.Abs(platform.Map.MapMatrix[x.X, x.Y] - 0.5)) / neighp.Count;*/
-
-                    List<Tuple<int, Pose>> neighp = platform.CalculateBinsInFOV(p, 2);
-                    double info = neighp.Sum(x => (0.5 - Math.Abs(platform.Map.MapMatrix[x.Item2.X, x.Item2.Y] - 0.5)) * 2) / 9;
-                
-                    score = score - info*2;
-
 
                     // is there any other platform on this bin?
                     if (platform.ObservedPlatforms.Find(pt => pt.Pose.Equals(p)) != null)
@@ -269,7 +253,7 @@ namespace CooperativeMapping.ControlPolicy
 
         public override string ToString()
         {
-            return "Maximum Information Gain Control Policy";
+            return "Biding Control Policy";
         }
 
     }

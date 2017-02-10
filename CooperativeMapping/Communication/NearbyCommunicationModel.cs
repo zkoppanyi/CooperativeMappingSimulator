@@ -20,6 +20,8 @@ namespace CooperativeMapping.Communication
         {
             foreach (Platform plt in enviroment.Platforms)
             {
+                if (plt.Equals(platform)) continue;
+
                 if (plt.CommunicationModel is NoCommunication) continue;
 
                 double d = Math.Sqrt(Math.Pow(plt.Pose.X - platform.Pose.X, 2) + Math.Pow(plt.Pose.Y - platform.Pose.Y, 2));

@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace CooperativeMapping.ControlPolicy
 {
-    public interface IDistanceMap
+    public interface IBreadCumbers
     {
-        double[,] DistMap { get; }
-        double MinDistMap { get; }
-        double MaxDistMap { get; }
-
+        Stack<Pose> BreadCumbers { get; }
+        Pose BestFronterier { get;  }
     }
 }

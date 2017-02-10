@@ -24,13 +24,11 @@ namespace CooperativeMapping
             this.Enviroment = enviroment;
 
             comboBoxController.Items.Clear();
-            comboBoxController.Items.Add(new NaiveStrategyControlPolicy());
             comboBoxController.Items.Add(new ClosestFronterierControlPolicy());
             comboBoxController.Items.Add(new MaxInformationGainControlPolicy());
-            comboBoxController.Items.Add(new RasterPathPlanningWithPriorityMapStrategyController());
-            comboBoxController.Items.Add(new RasterPathPlanningWithPriorityDirectionStrategyController());
-            comboBoxController.Items.Add(Platform.Controller);
-            comboBoxController.SelectedItem = Platform.Controller;
+            comboBoxController.Items.Add(new BidingControlPolicy());
+            comboBoxController.Items.Add(Platform.ControlPolicy);
+            comboBoxController.SelectedItem = Platform.ControlPolicy;
 
             comboBoxCommunicationModel.Items.Clear();
             comboBoxCommunicationModel.Items.Add(new NearbyCommunicationModel());
@@ -56,7 +54,7 @@ namespace CooperativeMapping
         private void comboBoxController_SelectedIndexChanged(object sender, EventArgs e)
         {
             object sel = comboBoxController.SelectedItem;
-            Platform.Controller = sel as ControlPolicy.ControlPolicyAbstract;
+            Platform.ControlPolicy = sel as ControlPolicy.ControlPolicyAbstract;
             
         }
 
@@ -79,7 +77,7 @@ namespace CooperativeMapping
 
         private void tabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
-            propertyGridStrategy.SelectedObject = Platform.Controller;
+            propertyGridStrategy.SelectedObject = Platform.ControlPolicy;
             propertyGridCommunication.SelectedObject = Platform.CommunicationModel;
         }
     }

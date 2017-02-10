@@ -119,10 +119,11 @@ namespace CooperativeMapping
 
                     if (platform == null)
                     {
-                        ControlPolicy.ControlPolicyAbstract cnt = new MaxInformationGainControlPolicy();
-                        CommunicationModel comm = new GlobalCommunicationModel();
+                        ControlPolicy.ControlPolicyAbstract cnt = new ClosestFronterierControlPolicy();
+                        NearbyCommunicationModel comm = new NearbyCommunicationModel();
+                        comm.Radius = 50;
                         platform = new Platform(enviroment, cnt, comm);
-                        platform.FieldOfViewRadius = 5;
+                        platform.FieldOfViewRadius = 20;
                         platform.Pose = new Pose(i, j);
                     }
 
@@ -232,7 +233,7 @@ namespace CooperativeMapping
 
         private void clearMapToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            enviroment.Map.SetAllPlace(0.5);
+            enviroment.Map.SetAllPlace(0);
             updateUI();
         }
 
@@ -286,6 +287,28 @@ namespace CooperativeMapping
 
                 
             }
+        }
+
+        private void changeAllPlatformToMaxInfoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach(Platform p in enviroment.Platforms)
+            {
+                p.ControlPolicy = new MaxInformationGainControlPolicy();
+            }
+        }
+
+        private void changeAllPolicyToCFToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (Platform p in enviroment.Platforms)
+            {
+                p.ControlPolicy = new ClosestFronterierControlPolicy();
+            }
+
+        }
+
+        private void removeAllPlatformsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            enviroment.Platforms.Clear();
         }
     }
 }
