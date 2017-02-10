@@ -231,7 +231,7 @@ namespace CooperativeMapping.ControlPolicy
                     // this is an approximation here
                     RegionLimits nlimits = platform.Map.CalculateLimits(p.X, p.Y, 4);
                     List<Pose> neighp = nlimits.GetPosesWithinLimits();
-                    double info = neighp.Sum(x => 0.5 - Math.Abs(infoMap.MapMatrix[x.X, x.Y] - 0.5)) / neighp.Count;
+                    double info = neighp.Sum(x => 0.5 - Math.Abs(infoMap.MapMatrix[x.X, x.Y] - 0.5)) / 64;
 
                     /*List<Tuple<int, Pose>> neighp = platform.CalculateBinsInFOV(p, 2);
                     double info = neighp.Sum(x => (0.5 - Math.Abs(infoMap.MapMatrix[x.Item2.X, x.Item2.Y] - 0.5)) * 2) / 9;*/

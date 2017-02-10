@@ -54,7 +54,7 @@ namespace CooperativeMapping
         [Description("Display color of the platform")]
         [Category("Bins")]
         [DisplayName("Occupied Threshold")]
-        public double OccupiedThreshold { get { return 0.9; } }
+        public double OccupiedThreshold { get { return 0.8; } }
 
         [ReadOnly(false)]
         [Description("Display color of the platform")]
@@ -209,7 +209,7 @@ namespace CooperativeMapping
                         if ((p.X == cp.X) && (p.Y == cp.Y)) continue;
 
                         ret.Add(new Tuple<int, Pose>(k, p));
-                        if (enviroment.Map.GetPlace(p) < this.OccupiedThreshold)
+                        if (this.Map.GetPlace(p) < this.OccupiedThreshold)
                         {
                             if (visited.Find(ps => ((ps.X == p.X) && (ps.Y == p.Y))) == null)
                             {
