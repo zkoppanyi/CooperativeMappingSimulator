@@ -50,6 +50,7 @@
             this.changeAllPlatformToMaxInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.changeAllPolicyToCFToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.removeAllPlatformsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.changeAllToBidingPolicyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mapImageBox)).BeginInit();
             this.toolStrip1.SuspendLayout();
@@ -230,6 +231,7 @@
             this.changesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.changeAllPolicyToCFToolStripMenuItem,
             this.changeAllPlatformToMaxInfoToolStripMenuItem,
+            this.changeAllToBidingPolicyToolStripMenuItem,
             this.removeAllPlatformsToolStripMenuItem});
             this.changesToolStripMenuItem.Name = "changesToolStripMenuItem";
             this.changesToolStripMenuItem.Size = new System.Drawing.Size(65, 20);
@@ -255,6 +257,13 @@
             this.removeAllPlatformsToolStripMenuItem.Size = new System.Drawing.Size(225, 22);
             this.removeAllPlatformsToolStripMenuItem.Text = "Remove all platforms";
             this.removeAllPlatformsToolStripMenuItem.Click += new System.EventHandler(this.removeAllPlatformsToolStripMenuItem_Click);
+            // 
+            // changeAllToBidingPolicyToolStripMenuItem
+            // 
+            this.changeAllToBidingPolicyToolStripMenuItem.Name = "changeAllToBidingPolicyToolStripMenuItem";
+            this.changeAllToBidingPolicyToolStripMenuItem.Size = new System.Drawing.Size(225, 22);
+            this.changeAllToBidingPolicyToolStripMenuItem.Text = "Change all to Biding Policy";
+            this.changeAllToBidingPolicyToolStripMenuItem.Click += new System.EventHandler(this.changeAllToBidingPolicyToolStripMenuItem_Click);
             // 
             // CreateOrModifyEnviromentForm
             // 
@@ -305,5 +314,6 @@
         private System.Windows.Forms.ToolStripMenuItem changeAllPolicyToCFToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem changeAllPlatformToMaxInfoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem removeAllPlatformsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem changeAllToBidingPolicyToolStripMenuItem;
     }
 }

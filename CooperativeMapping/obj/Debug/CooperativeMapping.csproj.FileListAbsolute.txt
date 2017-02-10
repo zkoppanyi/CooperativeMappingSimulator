@@ -64,7 +64,6 @@ c:\OSU3\Repo\CooperativeMappingSimulator\CooperativeMapping\bin\Debug\Accord.Mat
 c:\OSU3\Repo\CooperativeMappingSimulator\CooperativeMapping\bin\Debug\Accord.xml
 c:\OSU3\Repo\CooperativeMappingSimulator\CooperativeMapping\bin\Debug\Accord.Math.xml
 c:\OSU3\Repo\CooperativeMappingSimulator\CooperativeMapping\bin\Debug\Accord.Math.Core.xml
-c:\OSU3\Repo\CooperativeMappingSimulator\CooperativeMapping\obj\Debug\CooperativeMapping.csprojResolveAssemblyReference.cache
 c:\OSU3\Repo\CooperativeMappingSimulator\CooperativeMapping\obj\Debug\CooperativeMapping.CreateOrModifyEnviromentForm.resources
 c:\OSU3\Repo\CooperativeMappingSimulator\CooperativeMapping\obj\Debug\CooperativeMapping.MainForm.resources
 c:\OSU3\Repo\CooperativeMappingSimulator\CooperativeMapping\obj\Debug\CooperativeMapping.PlatformSettings.resources

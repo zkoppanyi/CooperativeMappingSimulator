@@ -65,6 +65,7 @@
     <Compile Include="Communication\NearbyCommunicationModel.cs" />
     <Compile Include="Communication\NoCommunication.cs" />
     <Compile Include="ControlPolicy\GraphNode.cs" />
+    <Compile Include="ControlPolicy\IAllocationMap.cs" />
     <Compile Include="ControlPolicy\IBreadCumbers.cs" />
     <Compile Include="ControlPolicy\IDistanceMap.cs" />
     <Compile Include="ControlPolicy\MaxInformationGainControlPolicy.cs" />

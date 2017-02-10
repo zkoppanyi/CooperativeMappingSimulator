@@ -115,19 +115,19 @@ namespace CooperativeMapping
             int FieldOfViewRadius = 5;
 
             // Priority map strategy
-            Platform robot1 = new Platform(enviroment, new ClosestFronterierControlPolicy(), commModel);
+            Platform robot1 = new Platform(enviroment, new BidingControlPolicy(), commModel);
             robot1.Pose = new Pose(1, 2);
             robot1.FieldOfViewRadius = FieldOfViewRadius;
             robot1.Measure();
             robot1.PlatformLogEvent += PlatformLogEvent;
 
-            /*Platform robot2 = new Platform(enviroment, new ClosestFronterierControlPolicy(), commModel);
+            Platform robot2 = new Platform(enviroment, new BidingControlPolicy(), commModel);
             robot2.Pose = new Pose(1, 4);
             robot2.Measure();
             robot2.FieldOfViewRadius = FieldOfViewRadius;
             robot2.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot3 = new Platform(enviroment, new ClosestFronterierControlPolicy(), commModel);
+            /*Platform robot3 = new Platform(enviroment, new ClosestFronterierControlPolicy(), commModel);
             robot3.Pose = new Pose(3, 2);
             robot3.Measure();
             robot3.FieldOfViewRadius = FieldOfViewRadius;

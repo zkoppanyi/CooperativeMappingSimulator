@@ -310,5 +310,13 @@ namespace CooperativeMapping
         {
             enviroment.Platforms.Clear();
         }
+
+        private void changeAllToBidingPolicyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (Platform p in enviroment.Platforms)
+            {
+                p.ControlPolicy = new BidingControlPolicy();
+            }
+        }
     }
 }

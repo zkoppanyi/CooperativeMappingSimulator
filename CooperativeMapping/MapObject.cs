@@ -129,6 +129,13 @@ namespace CooperativeMapping
             return GetPlace(pose.X, pose.Y);
         }
 
+        public bool IsPlaceDiscovered(Pose pose, Platform platform)
+        {
+            double d = MapMatrix[pose.X, pose.Y];
+            return (d >= platform.OccupiedThreshold) || (d <= platform.FreeThreshold);
+        }
+
+
         public bool isOutOfBound(int i, int j)
         {
             if ((i < 0) || (i >= this.Rows) || (i < 0) || (i >= this.Columns))

@@ -12,6 +12,7 @@ namespace CooperativeMapping.ControlPolicy
         public GraphNode ParentNode { get; set; }
         public int Depth { get; set; }
         public double Score { get; set; }
+        public List<Pose> DiscoverCells { get; set; }
 
         public GraphNode(Pose pose, GraphNode parentNode, int depth, double score)
         {
@@ -19,6 +20,7 @@ namespace CooperativeMapping.ControlPolicy
             this.ParentNode = parentNode;
             this.Depth = depth;
             this.Score = score;
+            this.DiscoverCells = new List<Pose>();
         }
 
     }

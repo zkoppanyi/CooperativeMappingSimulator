@@ -89,6 +89,7 @@ namespace CooperativeMapping
             Graphics g = Graphics.FromImage(bitmap);
 
             Pen blackPen = new Pen(Color.Black, 1);
+            Pen platformPen = new Pen(ColorPlatform, 1);
             //Color customColor = Color.FromArgb(50, Color.Gray);
             //SolidBrush shadowBrush = new SolidBrush(customColor);
 
@@ -104,8 +105,7 @@ namespace CooperativeMapping
                     SolidBrush brush = new SolidBrush(Color.FromArgb(val, val, val));
                     g.FillRectangles(brush, new Rectangle[] { rect });
                     //g.DrawRectangle(blackPen, rect);
-
-
+                   
                     // draw distance map if it is applicable
                     if ((this.ShowDistanceMap) && (platform != null) && (platform.ControlPolicy is IDistanceMap))
                     {
@@ -165,6 +165,26 @@ namespace CooperativeMapping
             if (platform != null)
             {
                 drawPlatform(g, platform);
+            }
+
+
+            if ((platform != null) && (platform.ControlPolicy is IAllocationMap))
+            {
+                IAllocationMap policy = platform.ControlPolicy as IAllocationMap;
+                if (policy.AllocationMap != null)
+                {
+                    for (int i = 0; i < map.Rows; i++)
+                    {
+                        for (int j = 0; j < map.Columns; j++)
+                        {
+                            if (policy.AllocationMap[i, j] == platform.ID)
+                            {
+                                Rectangle rect = new Rectangle(StartX + j * BinSize, StartY + i * BinSize, BinSize, BinSize);
+                                g.DrawRectangle(platformPen, rect);
+                            }
+                        }
+                    }
+                }
             }
 
             // frame around the map to show extents
