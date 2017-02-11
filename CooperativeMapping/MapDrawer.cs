@@ -133,15 +133,24 @@ namespace CooperativeMapping
 
 
             // draw platform spcific info
-            if ((this.ShowBreadCumbers) && (platform != null) && (platform.ControlPolicy is IBreadCumbers))
+            if ((this.ShowBreadCumbers) && (platform != null) && (platform.ControlPolicy is ITrajectory))
             {
-                IBreadCumbers policy = platform.ControlPolicy as IBreadCumbers;
-                if (policy.BreadCumbers != null)
+                ITrajectory policy = platform.ControlPolicy as ITrajectory;
+                if (policy.Trajectory != null)
                 {
-                    foreach (Pose p in policy.BreadCumbers)
+                    foreach (Pose p in policy.Trajectory)
                     {
                         Rectangle rect = new Rectangle(StartX + p.Y * BinSize, StartY + p.X * BinSize, BinSize, BinSize);
                         g.FillRectangles(new SolidBrush(Color.Yellow), new Rectangle[] { rect });
+                    }
+                }
+
+                if (policy.CommandSequence != null)
+                {
+                    foreach (Pose p in policy.CommandSequence)
+                    {
+                        Rectangle rect = new Rectangle(StartX + p.Y * BinSize, StartY + p.X * BinSize, BinSize, BinSize);
+                        g.FillRectangles(new SolidBrush(Color.Orange), new Rectangle[] { rect });
                     }
                 }
 

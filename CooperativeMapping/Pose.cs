@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -62,6 +63,7 @@ namespace CooperativeMapping
             return X ^ Y;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public double GetHeadingTo(Pose goalPose)
         {
             double dxp = goalPose.X - this.X;

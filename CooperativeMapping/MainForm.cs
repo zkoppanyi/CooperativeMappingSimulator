@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using CooperativeMapping.Communication;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace CooperativeMapping
 {
@@ -26,9 +27,11 @@ namespace CooperativeMapping
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            robotTimer.Interval = 1;
+            robotTimer.Interval = 10;
             robotTimer.Tick += RobotTimer_Tick;
             StartUpSimulation();
+
+            this.textBoxConsole.Text += "Number Of Cores: " + Environment.ProcessorCount + System.Environment.NewLine;
         }
 
         private void updateUI()
@@ -183,12 +186,25 @@ namespace CooperativeMapping
 
         private void RobotTimer_Tick(object sender, EventArgs e)
         {
-           measureRun.Restart();
-           bool isMapDiscovered = true;
+            measureRun.Restart();
+
+            try
+            {
+                Parallel.ForEach(enviroment.Platforms, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (plt) =>
+                {
+                    System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
+                    plt.Next();
+                });
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Error occured: " + ex.ToString() + " " + ex.InnerException.ToString());
+            }
+
+            bool isMapDiscovered = true;
             foreach (Platform plt in enviroment.Platforms)
             {
-                //robot.Move(1, 1);
-                plt.Next();
+                isMapDiscovered &= plt.Map.IsDiscovered(plt);
 
                 // Check whether the platform is at the right position
                 PlatformState platformState = enviroment.CheckPlatformState(plt);
@@ -249,12 +265,12 @@ namespace CooperativeMapping
             if (isMapDiscovered) textBoxConsole.Text += "Average step: " + (double)sumStep / (double)enviroment.Platforms.Count() + System.Environment.NewLine;
             measureRun.Stop();
             toolStripStatusLabel.Text = "SUM: " + sumStep + " AVG: " + (double)sumStep / (double)enviroment.Platforms.Count() + " RunTime: " + measureRun.ElapsedMilliseconds;
-             
+
             if (selectedPlatform != null)
             {
                 toolStripStatusLabel.Text += " Discovered Area: " + ((double)selectedPlatform.Map.NumDiscoveredBins() / (double)selectedPlatform.Map.NumBins() * 100).ToString("0.00") + "%";
             }
-            
+
 
         }
 

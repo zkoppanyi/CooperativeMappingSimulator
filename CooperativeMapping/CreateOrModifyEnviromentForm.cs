@@ -123,7 +123,7 @@ namespace CooperativeMapping
                         NearbyCommunicationModel comm = new NearbyCommunicationModel();
                         comm.Radius = 50;
                         platform = new Platform(enviroment, cnt, comm);
-                        platform.FieldOfViewRadius = 20;
+                        platform.FieldOfViewRadius = 8;
                         platform.Pose = new Pose(i, j);
                     }
 

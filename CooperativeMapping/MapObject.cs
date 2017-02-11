@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Accord.Math;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace CooperativeMapping
 {
@@ -27,6 +28,7 @@ namespace CooperativeMapping
         public int MinLimitY { get; set; }
         public int MaxLimitY { get; set; }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public List<Pose> GetPosesWithinLimits()
         {
             List<Pose> poses = new List<Pose>();
@@ -66,7 +68,7 @@ namespace CooperativeMapping
         public void Resize(int nrow, int ncol)
         {
             MapObject nobj = new MapObject(nrow, ncol);
-            nobj.SetAllPlace(0.5);
+            nobj.SetAllPlace(0);
             int rowl = nrow > this.Rows ? this.Rows : nrow;
             int coll = ncol > this.Columns ? this.Columns : ncol;
             for (int i = 0; i < rowl; i++)
@@ -99,7 +101,8 @@ namespace CooperativeMapping
                 }
             }
         }
-                
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public object Clone()
         {
             MapObject obj = new MapObject(this.Rows, this.Columns);
@@ -116,11 +119,6 @@ namespace CooperativeMapping
 
         public double GetPlace(int i, int j)
         {
-            if (isOutOfBound(i,j))
-            {
-                return -1;
-            }
-
             return this.MapMatrix[i, j];
         }
 
@@ -136,18 +134,7 @@ namespace CooperativeMapping
         }
 
 
-        public bool isOutOfBound(int i, int j)
-        {
-            if ((i < 0) || (i >= this.Rows) || (i < 0) || (i >= this.Columns))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public RegionLimits CalculateLimits(int i, int j, int fieldOfViewRadius)
         {
             RegionLimits limits = new RegionLimits();

@@ -8,24 +8,25 @@ using System.Threading.Tasks;
 namespace CooperativeMapping.ControlPolicy
 {
     [Serializable]
-    public class ClosestFronterierControlPolicy : ControlPolicyAbstract, IDistanceMap, IBreadCumbers
+    public class ClosestFronterierControlPolicy : ControlPolicyAbstract, IDistanceMap, ITrajectory
     {
         private double[,] distMap;
         private double minDistMap;
         private double maxDistMap;
         private Pose prevPose;
-        private Stack<Pose> breadCumbers;
+        private Stack<Pose> trajectory;
         private Pose bestFronterier;
         private int lastBestDepth = 0;
         private double prevFronterierValue = 0;
 
         private Stack<Pose> commandSequence;
+        public Stack<Pose> CommandSequence { get { return commandSequence; }  }
 
         public double[,] DistMap { get { return distMap; } }
         public double MinDistMap { get { return minDistMap; } }
         public double MaxDistMap { get { return maxDistMap; } }
 
-        public Stack<Pose> BreadCumbers { get { return breadCumbers; } }
+        public Stack<Pose> Trajectory { get { return trajectory; } }
         public Pose BestFronterier { get { return bestFronterier; } }
 
         private const int maxDeep = 100;
@@ -41,9 +42,9 @@ namespace CooperativeMapping.ControlPolicy
             platform.Communicate();
 
             // init breadCumbers stack if it is null (fix serialization)
-            if (breadCumbers == null)
+            if (trajectory == null)
             {
-                breadCumbers = new Stack<Pose>(100);
+                trajectory = new Stack<Pose>();
             }
 
             // init commandSequence stack if it is null (fix serialization)
@@ -77,7 +78,7 @@ namespace CooperativeMapping.ControlPolicy
 
                 // if the goal is not changed, then keep the track
                 // this is good, if needed time to plan the way back from an abonden area
-                if (platform.Map.GetPlace(bestFronterier) != prevFronterierValue)
+                if (platform.Map.MapMatrix[bestFronterier.X, bestFronterier.Y] != prevFronterierValue)
                 {
                     isReplan = true;
                 }
@@ -116,7 +117,7 @@ namespace CooperativeMapping.ControlPolicy
                 // maintain breadcumbers
                 if (prevPose != null)
                 {
-                    breadCumbers.Push(prevPose);
+                    trajectory.Push(prevPose);
                 }
                 prevPose = new Pose(nextPose.X, nextPose.Y, nextPose.Heading);
 
@@ -132,7 +133,7 @@ namespace CooperativeMapping.ControlPolicy
 
                 if (dalpha == 0)
                 {
-                    prevFronterierValue = platform.Map.GetPlace(bestFronterier);
+                    prevFronterierValue = platform.Map.MapMatrix[bestFronterier.X, bestFronterier.Y];
                     platform.Move((int)dx, (int)dy);
                 }
                 else // rotatation is needed, let's rotate
@@ -191,7 +192,20 @@ namespace CooperativeMapping.ControlPolicy
             distMap[startPose.X, startPose.Y] = 0;
             minDistMap = 0;
             maxDistMap = 0;
-            
+
+            // calculate safe zones around platforms
+            List<Pose> safeZone = new List<Pose>();
+            foreach (Platform plt in platform.ObservedPlatforms)
+            {
+                RegionLimits limits = platform.Map.CalculateLimits(plt.Pose.X, plt.Pose.Y, 1);
+                List<Pose> poses = limits.GetPosesWithinLimits();
+                foreach(Pose p in poses)
+                {
+                    safeZone.Add(p);
+                }
+            }
+
+            //graph search
             while (candidates.Count != 0)
             {
                 GraphNode cp = candidates.Dequeue();
@@ -205,19 +219,19 @@ namespace CooperativeMapping.ControlPolicy
 
                 foreach (Pose p in poses)
                 {
+                    // is there any other platform on this bin?
+                    if (safeZone.Exists(pt => pt.Equals(p)))
+                    {
+                        continue;
+                    }
+
                     double score = cp.Score + 1;
 
                     double dalpha = Math.Abs(p.GetHeadingTo(cp.Pose)) / 45.0;
                     score = score + dalpha;
 
-                    // is there any other platform on this bin?
-                    if (platform.ObservedPlatforms.Find(pt => pt.Pose.Equals(p)) != null)
-                    {
-                        continue;
-                    }
-
                     // we found a solution if it is not discovered yet
-                    if ((platform.Map.GetPlace(p) > platform.FreeThreshold) && (platform.Map.GetPlace(p) < platform.OccupiedThreshold))
+                    if ((platform.Map.MapMatrix[p.X, p.Y] > platform.FreeThreshold) && (platform.Map.MapMatrix[p.X, p.Y] < platform.OccupiedThreshold))
                     {
                         fronterierNum++;
 
@@ -236,7 +250,7 @@ namespace CooperativeMapping.ControlPolicy
                     }
 
                     // this pose is not occupied and has a higher score than the pervious, so expend it
-                    if ((platform.Map.GetPlace(p) < platform.OccupiedThreshold) && (distMap[p.X, p.Y] > score))
+                    if ((platform.Map.MapMatrix[p.X, p.Y] < platform.OccupiedThreshold) && (distMap[p.X, p.Y] > score))
                     {
                         candidates.Enqueue(new GraphNode(p, cp, k, score));
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace CooperativeMapping.ControlPolicy
 {
     [Serializable]
-    public class BidingControlPolicy : ControlPolicyAbstract, IDistanceMap, IBreadCumbers, IAllocationMap
+    public class BidingControlPolicy : ControlPolicyAbstract, IDistanceMap, ITrajectory, IAllocationMap
     {
         private double[,] distMap;
 
@@ -19,13 +19,15 @@ namespace CooperativeMapping.ControlPolicy
         private double minDistMap;
         private double maxDistMap;
         private Pose prevPose;
-        private Stack<Pose> breadCumbers;
+        private Stack<Pose> trajectory;
         private Pose bestFronterier;
         private int lastBestDepth = 0;
         private double prevFronterierValue = 0;
         private bool isBidingMode = false;
 
         private Stack<Pose> commandSequence;
+        public Stack<Pose> CommandSequence { get { return commandSequence; } }
+
 
         public double[,] DistMap { get { return distMap; } }
         public int[,] AllocationMap { get { return allocationMap; } }
@@ -33,7 +35,7 @@ namespace CooperativeMapping.ControlPolicy
         public double MinDistMap { get { return minDistMap; } }
         public double MaxDistMap { get { return maxDistMap; } }
 
-        public Stack<Pose> BreadCumbers { get { return breadCumbers; } }
+        public Stack<Pose> Trajectory { get { return trajectory; } }
         public Pose BestFronterier { get { return bestFronterier; } }
 
         private const int maxDeep = 100;
@@ -49,9 +51,9 @@ namespace CooperativeMapping.ControlPolicy
             platform.Communicate();
 
             // init breadCumbers stack if it is null (fix serialization)
-            if (breadCumbers == null)
+            if (trajectory == null)
             {
-                breadCumbers = new Stack<Pose>(100);
+                trajectory = new Stack<Pose>(100);
             }
 
             // init commandSequence stack if it is null (fix serialization)
@@ -120,7 +122,7 @@ namespace CooperativeMapping.ControlPolicy
 
                 // if the goal is not changed, then keep the track
                 // this is good, if needed time to plan the way back from an abonden area
-                if (platform.Map.GetPlace(bestFronterier) != prevFronterierValue)
+                if (platform.Map.MapMatrix[bestFronterier.X, bestFronterier.Y] != prevFronterierValue)
                 {
                     isReplan = true;
                 }
@@ -171,7 +173,7 @@ namespace CooperativeMapping.ControlPolicy
                 // maintain breadcumbers
                 if (prevPose != null)
                 {
-                    breadCumbers.Push(prevPose);
+                    trajectory.Push(prevPose);
                 }
                 prevPose = new Pose(nextPose.X, nextPose.Y, nextPose.Heading);
 
@@ -187,7 +189,7 @@ namespace CooperativeMapping.ControlPolicy
 
                 if (dalpha == 0)
                 {
-                    prevFronterierValue = platform.Map.GetPlace(bestFronterier);
+                    prevFronterierValue = platform.Map.MapMatrix[bestFronterier.X, bestFronterier.Y];
                     platform.Move((int)dx, (int)dy);
                 }
                 else // rotatation is needed, let's rotate
@@ -261,6 +263,19 @@ namespace CooperativeMapping.ControlPolicy
             minDistMap = 0;
             maxDistMap = 0;
 
+            // calculate safe zones around platforms
+            List<Pose> safeZone = new List<Pose>();
+            foreach (Platform plt in platform.ObservedPlatforms)
+            {
+                RegionLimits limits = platform.Map.CalculateLimits(plt.Pose.X, plt.Pose.Y, 1);
+                List<Pose> poses = limits.GetPosesWithinLimits();
+                foreach (Pose p in poses)
+                {
+                    safeZone.Add(p);
+                }
+            }
+
+            //graph search
             while (candidates.Count != 0)
             {
                 GraphNode cp = candidates.Dequeue();
@@ -284,6 +299,12 @@ namespace CooperativeMapping.ControlPolicy
 
                 foreach (Pose p in poses)
                 {
+                    // is there any other platform on this bin?
+                    if (safeZone.Exists(pt => pt.Equals(p)))
+                    {
+                        continue;
+                    }
+
                     double score = cp.Score + 1;
 
                     double dalpha = Math.Abs(p.GetHeadingTo(cp.Pose)) / 45.0;
@@ -296,21 +317,22 @@ namespace CooperativeMapping.ControlPolicy
 
                     // 2. Compute info that is gained by the next step 
                     // this is an approximation here
-                    RegionLimits nlimits = platform.Map.CalculateLimits(p.X, p.Y, 4);
+                    RegionLimits nlimits = platform.Map.CalculateLimits(p.X, p.Y, 1);
                     List<Pose> neighp = nlimits.GetPosesWithinLimits();
-                    double info = neighp.Sum(x => 0.5 - Math.Abs(infoMap.MapMatrix[x.X, x.Y] - 0.5)) / 64;
+                    //double info = neighp.Sum(x => (1 - Math.Abs(infoMap.MapMatrix[x.X, x.Y] - 0.5)) * 2) / 9; // using for-loop instead, cause it's faster
+
+                    // using for-loop instead, cause it's faster
+                    double info = 0;
+                    for(int i = 0; i < neighp.Count; i++)
+                    {
+                        info += (1 - Math.Abs(infoMap.MapMatrix[neighp[i].X, neighp[i].Y] - 0.5)) * 2;
+                    }
+                    info = info / 9;
 
                     /*List<Tuple<int, Pose>> neighp = platform.CalculateBinsInFOV(p, 2);
                     double info = neighp.Sum(x => (0.5 - Math.Abs(infoMap.MapMatrix[x.Item2.X, x.Item2.Y] - 0.5)) * 2) / 9;*/
 
-                    score = score - info * 2;
-
-
-                    // is there any other platform on this bin?
-                    if (platform.ObservedPlatforms.Find(pt => pt.Pose.Equals(p)) != null)
-                    {
-                        continue;
-                    }
+                    score = score - info;
 
                     // we found a solution if it is not discovered yet
                     if (!platform.Map.IsPlaceDiscovered(p, platform))
@@ -339,7 +361,7 @@ namespace CooperativeMapping.ControlPolicy
                     }
 
                     // this pose is not occupied and has a higher score than the pervious, so expend it
-                    if ((platform.Map.GetPlace(p) < platform.OccupiedThreshold) && (distMap[p.X, p.Y] > score))
+                    if ((platform.Map.MapMatrix[p.X, p.Y] < platform.OccupiedThreshold) && (distMap[p.X, p.Y] > score))
                     {
                         GraphNode newNode = new GraphNode(p, cp, k, score);
                         newNode.DiscoverCells = new List<Pose>(cp.DiscoverCells);
@@ -362,15 +384,14 @@ namespace CooperativeMapping.ControlPolicy
 
         private int GenerateAllocationMap(Platform platform)
         {
-            platform.SendLog("Generate allocaiton map...");
-
             allocationMap = Matrix.Create<int>(platform.Map.Rows, platform.Map.Columns, int.MaxValue);
+            double[,] valuationMap = Matrix.Create<double>(platform.Map.Rows, platform.Map.Columns, Double.PositiveInfinity);
 
             List<Platform> platforms = new List<Platform>();
-            foreach(Platform plt in platforms)
+            foreach(Platform plt in platform.ObservedPlatforms)
             {
                 double d = Math.Sqrt(Math.Pow(plt.Pose.X - platform.Pose.X, 2) + Math.Pow(plt.Pose.Y - platform.Pose.Y, 2));
-                if ((d  < platform.FieldOfViewRadius*1.2) || (d < plt.FieldOfViewRadius * 1.2))
+                if ((d  < platform.FieldOfViewRadius * 1.5) || (d < plt.FieldOfViewRadius * 1.5))
                 {
                     platforms.Add(plt);
                 }
@@ -378,17 +399,20 @@ namespace CooperativeMapping.ControlPolicy
 
             platforms.Add(platform);
 
+            platform.SendLog("Generate allocaiton map (" + platforms.Count + ") ...");
+
+
             int allocatedCellNum = 0;
             foreach (Platform plt in platforms)
             {
 
-                List<Tuple<int, Pose>> cells = platform.CalculateBinsInFOV(plt.Pose, (int)(plt.FieldOfViewRadius * 1.2));
+                List<Tuple<int, Pose>> cells = platform.CalculateBinsInFOV(plt.Pose, plt.Map, (int)(plt.FieldOfViewRadius * 2));
                 //RegionLimits nlimits = platform.Map.CalculateLimits(plt.Pose.X, plt.Pose.Y, platform.FieldOfViewRadius*2);
                 //List<Pose> cells = nlimits.GetPosesWithinLimits();
 
                 foreach (Tuple<int, Pose> p in cells)
                 {
-                    if ((!platform.Map.IsPlaceDiscovered(p.Item2, platform)) && (allocationMap[p.Item2.X, p.Item2.Y] > plt.ID))
+                    if ((!platform.Map.IsPlaceDiscovered(p.Item2, platform)) && (valuationMap[p.Item2.X, p.Item2.Y] > p.Item1))
                     {
                         if (plt.ID == platform.ID)
                         {
@@ -401,6 +425,7 @@ namespace CooperativeMapping.ControlPolicy
                         }
 
                         allocationMap[p.Item2.X, p.Item2.Y] = plt.ID;
+                        valuationMap[p.Item2.X, p.Item2.Y] = p.Item1;
 
                     }
                 }
@@ -410,61 +435,6 @@ namespace CooperativeMapping.ControlPolicy
         }
 
 
-        /*private void GenerateAllocationMap(Platform platform)
-        {
-             allocationMap = Matrix.Create<int>(platform.Map.Rows, platform.Map.Columns, int.MaxValue);
-
-             List<Platform> platforms = new List<Platform>(platform.ObservedPlatforms);
-             platforms.Add(platform);
-
-             foreach (Platform plt in platforms)
-             {
-                 // graph search
-                 Queue<GraphNode> candidates = new Queue<GraphNode>();
-                 candidates.Enqueue(new GraphNode(plt.Pose, null, 0, 0));
-                 int[,] vistitedMap = Matrix.Create<int>(platform.Map.Rows, platform.Map.Columns, int.MaxValue);
-
-                 while (candidates.Count != 0)
-                 {
-                     GraphNode cp = candidates.Dequeue();
-                     int k = cp.Depth + 1;
-                     if (k > maxDeep) break;                   
-
-                     vistitedMap[cp.Pose.X, cp.Pose.Y] = k;
-
-                     RegionLimits nlimits = platform.Map.CalculateLimits(cp.Pose.X, cp.Pose.Y, 1);
-                     List<Pose> neighp = nlimits.GetPosesWithinLimits();
-
-                     foreach (Pose p in neighp)
-                     {
-                         if (vistitedMap[p.X, p.Y] != int.MaxValue) continue;
-
-                         double avalue = allocationMap[p.X, p.Y];
-                         if (platform.Map.GetPlace(p) < platform.OccupiedThreshold)
-                         {
-                             candidates.Enqueue(new GraphNode(p, cp, k, k));
-
-                             if ((!platform.Map.IsPlaceDiscovered(p, platform)) && (allocationMap[p.X, p.Y] > plt.ID))
-                             {
-                                 List< Tuple < int, Pose >> cells = platform.CalculateBinsInFOV(p, plt.FieldOfViewRadius*2);
-
-                                 foreach (Tuple<int, Pose> npa in cells)
-                                 {
-                                     if (allocationMap[npa.Item2.X, npa.Item2.Y] > plt.ID)
-                                     {
-                                         allocationMap[npa.Item2.X, npa.Item2.Y] = plt.ID;
-                                     }
-                                 }
-
-                                 candidates.Clear(); // ok, jump out from the while and go to the next platform
-                                 break;
-                             }
-                         }
-                     }
-
-                 }
-             }
-         }*/
 
         public override string ToString()
         {

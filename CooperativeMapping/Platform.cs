@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -54,13 +55,13 @@ namespace CooperativeMapping
         [Description("Display color of the platform")]
         [Category("Bins")]
         [DisplayName("Occupied Threshold")]
-        public double OccupiedThreshold { get { return 0.8; } }
+        public double OccupiedThreshold { get { return 0.9; } }
 
         [ReadOnly(false)]
         [Description("Display color of the platform")]
         [Category("Bins")]
         [DisplayName("Free Threshold")]
-        public double FreeThreshold { get { return 0.3; } }
+        public double FreeThreshold { get { return 0.1; } }
 
         [Browsable(false)]
         public MapObject Map { get; set; }
@@ -127,7 +128,7 @@ namespace CooperativeMapping
             ObservedPlatforms.Clear();
             candidates.Add(this.Pose);
 
-            List<Tuple<int, Pose>> bins = this.CalculateBinsInFOV(this.Pose);
+            List<Tuple<int, Pose>> bins = this.CalculateBinsInFOV(this.Pose, enviroment.Map);
 
             foreach (Tuple<int, Pose> tp in bins)
             {
@@ -141,12 +142,12 @@ namespace CooperativeMapping
 
                 if (val_env == 0)
                 {
-                    val_cand = 0.5 * ((double)k / (double)FieldOfViewRadius);
+                    val_cand = 0.5 * ((double)k / (double)FieldOfViewRadius) / 2;
                     //val_cand = 0;
                 }
                 else if (val_env == 1)
                 {
-                    val_cand = 1 - 0.5 * ((double)k / (double)FieldOfViewRadius);
+                    val_cand = 1 - 0.5 * ((double)k / (double)FieldOfViewRadius) / 2;
                     //val_cand = 1;
 
                 }
@@ -161,6 +162,8 @@ namespace CooperativeMapping
 
                 foreach (Platform pe in enviroment.Platforms)
                 {
+                    if (pe.Equals(this)) continue;
+
                     if ((pe.Pose.X == p.X) && (pe.Pose.Y == p.Y))
                     {
                         if (!ObservedPlatforms.Exists(x => x == pe))
@@ -176,7 +179,8 @@ namespace CooperativeMapping
         /// Graph search for the bins that is within the FOV limits
         /// </summary>
         /// <returns></returns>
-        public List<Tuple<int, Pose>> CalculateBinsInFOV(Pose pcent, double FOV = -1)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public List<Tuple<int, Pose>> CalculateBinsInFOV(Pose pcent, MapObject map, double FOV = -1)
         {
             if (FOV < 0)
             {
@@ -184,62 +188,35 @@ namespace CooperativeMapping
             }
 
             List<Pose> candidates = new List<Pose>();
-            List<Pose> visited = new List<Pose>();
+            List<Tuple<int, Pose>> visited = new List<Tuple<int, Pose>>();
             List<Pose> newCandidates = new List<Pose>();
-            List< Tuple<int, Pose> > ret = new List<Tuple<int, Pose>>();
 
             candidates.Add(pcent);
-            ret.Add(new Tuple<int, Pose>(0, pcent));
 
             for (int k = 0; k < FOV; k++)
             {
                 newCandidates.Clear();
                 foreach (Pose cp in candidates)
                 {
-                    if (visited.Find(p => (p.X == cp.X) && (p.Y == cp.Y)) != null)
-                    {
-                        continue;
-                    }
-
                     RegionLimits limits = this.Map.CalculateLimits(cp.X, cp.Y, 1);
                     List<Pose> poses = limits.GetPosesWithinLimits();
 
                     foreach (Pose p in poses)
                     {
+                        if (visited.Exists(ps => ps.Item2.Equals(p))) continue;
                         if ((p.X == cp.X) && (p.Y == cp.Y)) continue;
 
-                        ret.Add(new Tuple<int, Pose>(k, p));
-                        if (this.Map.GetPlace(p) < this.OccupiedThreshold)
+                        visited.Add(new Tuple<int, Pose>(k, p));
+                        if (map.MapMatrix[p.X, p.Y] < this.OccupiedThreshold)
                         {
-                            if (visited.Find(ps => ((ps.X == p.X) && (ps.Y == p.Y))) == null)
-                            {
-                                visited.Add(cp);
-                                newCandidates.Add(p);
-                            }
+                            newCandidates.Add(p);
                         }
                     }
                 }
                 candidates = new List<Pose>(newCandidates);
             }
 
-            return ret;
-        }
-
-        /// <summary>
-        /// LOS calculation to select bins that is within the FOV limits
-        /// </summary>
-        /// <returns></returns>
-        public List<Tuple<int, Pose>> CalculateBinsInFOVWithLOS(Pose pcent, double FOV = -1)
-        {
-            if (FOV < 0)
-            {
-                FOV = this.FieldOfViewRadius;
-            }
-
-            List<Tuple<int, Pose>> ret = new List<Tuple<int, Pose>>();
-                        
-
-            return ret;
+            return visited;
         }
 
         public void Communicate()
@@ -249,7 +226,7 @@ namespace CooperativeMapping
 
         public void SendLog(String message)
         {
-            PlatformLogEvent?.Invoke(this, new PlatformLogEventArgs(message));
+            //PlatformLogEvent?.Invoke(this, new PlatformLogEventArgs(message));
         }
 
         /// <summary>
