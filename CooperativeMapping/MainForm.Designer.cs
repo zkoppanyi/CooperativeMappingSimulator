@@ -31,8 +31,6 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.startToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.createEnviromentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.modifyEnviromentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadEnviromentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -47,6 +45,11 @@
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
             this.toolStripComboBoxMaps = new System.Windows.Forms.ToolStripComboBox();
+            this.savePlayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.commandsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.startToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mapImageBox)).BeginInit();
@@ -57,7 +60,8 @@
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.vizulaizationToolStripMenuItem});
+            this.vizulaizationToolStripMenuItem,
+            this.commandsToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(844, 24);
@@ -68,27 +72,15 @@
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.startToolStripMenuItem,
-            this.settingsToolStripMenuItem,
+            this.loadEnviromentToolStripMenuItem,
             this.createEnviromentToolStripMenuItem,
             this.modifyEnviromentToolStripMenuItem,
-            this.loadEnviromentToolStripMenuItem});
+            this.toolStripSeparator2,
+            this.savePlayToolStripMenuItem,
+            this.loadToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
-            // 
-            // startToolStripMenuItem
-            // 
-            this.startToolStripMenuItem.Name = "startToolStripMenuItem";
-            this.startToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
-            this.startToolStripMenuItem.Text = "Start";
-            this.startToolStripMenuItem.Click += new System.EventHandler(this.startToolStripMenuItem_Click);
-            // 
-            // settingsToolStripMenuItem
-            // 
-            this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
-            this.settingsToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
-            this.settingsToolStripMenuItem.Text = "Set Up...";
             // 
             // createEnviromentToolStripMenuItem
             // 
@@ -108,7 +100,7 @@
             // 
             this.loadEnviromentToolStripMenuItem.Name = "loadEnviromentToolStripMenuItem";
             this.loadEnviromentToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
-            this.loadEnviromentToolStripMenuItem.Text = "Load Enviroment...";
+            this.loadEnviromentToolStripMenuItem.Text = "Open Enviroment...";
             this.loadEnviromentToolStripMenuItem.Click += new System.EventHandler(this.loadEnviromentToolStripMenuItem_Click);
             // 
             // vizulaizationToolStripMenuItem
@@ -116,8 +108,8 @@
             this.vizulaizationToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.mapToolStripMenuItem});
             this.vizulaizationToolStripMenuItem.Name = "vizulaizationToolStripMenuItem";
-            this.vizulaizationToolStripMenuItem.Size = new System.Drawing.Size(85, 20);
-            this.vizulaizationToolStripMenuItem.Text = "Vizulaisation";
+            this.vizulaizationToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.vizulaizationToolStripMenuItem.Text = "View";
             // 
             // mapToolStripMenuItem
             // 
@@ -223,6 +215,40 @@
             this.toolStripComboBoxMaps.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBoxMaps_SelectedIndexChanged);
             this.toolStripComboBoxMaps.Click += new System.EventHandler(this.toolStripComboBoxMaps_Click);
             // 
+            // savePlayToolStripMenuItem
+            // 
+            this.savePlayToolStripMenuItem.Name = "savePlayToolStripMenuItem";
+            this.savePlayToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.savePlayToolStripMenuItem.Text = "Save Play...";
+            this.savePlayToolStripMenuItem.Click += new System.EventHandler(this.savePlayToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(182, 6);
+            // 
+            // commandsToolStripMenuItem
+            // 
+            this.commandsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.startToolStripMenuItem});
+            this.commandsToolStripMenuItem.Name = "commandsToolStripMenuItem";
+            this.commandsToolStripMenuItem.Size = new System.Drawing.Size(81, 20);
+            this.commandsToolStripMenuItem.Text = "Commands";
+            // 
+            // startToolStripMenuItem
+            // 
+            this.startToolStripMenuItem.Name = "startToolStripMenuItem";
+            this.startToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.startToolStripMenuItem.Text = "Start";
+            this.startToolStripMenuItem.Click += new System.EventHandler(this.startToolStripMenuItem_Click_1);
+            // 
+            // loadToolStripMenuItem
+            // 
+            this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
+            this.loadToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.loadToolStripMenuItem.Text = "Load Play...";
+            this.loadToolStripMenuItem.Click += new System.EventHandler(this.loadToolStripMenuItem_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -256,19 +282,22 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.PictureBox mapImageBox;
         private System.Windows.Forms.TextBox textBoxConsole;
-        private System.Windows.Forms.ToolStripMenuItem startToolStripMenuItem;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripButton toolStripButton2;
         private System.Windows.Forms.ToolStripButton toolStripButton3;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
-        private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem createEnviromentToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem vizulaizationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem mapToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem modifyEnviromentToolStripMenuItem;
         private System.Windows.Forms.ToolStripComboBox toolStripComboBoxMaps;
         private System.Windows.Forms.ToolStripMenuItem loadEnviromentToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem savePlayToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem commandsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem startToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem;
     }
 }
 

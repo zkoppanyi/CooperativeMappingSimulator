@@ -133,9 +133,9 @@ namespace CooperativeMapping
 
 
             // draw platform spcific info
-            if ((this.ShowBreadCumbers) && (platform != null) && (platform.ControlPolicy is ITrajectory))
+            if ((this.ShowBreadCumbers) && (platform != null))
             {
-                ITrajectory policy = platform.ControlPolicy as ITrajectory;
+                ControlPolicyAbstract policy = platform.ControlPolicy;
                 if (policy.Trajectory != null)
                 {
                     foreach (Pose p in policy.Trajectory)

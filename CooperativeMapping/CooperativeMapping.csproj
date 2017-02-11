@@ -66,7 +66,6 @@
     <Compile Include="Communication\NoCommunication.cs" />
     <Compile Include="ControlPolicy\GraphNode.cs" />
     <Compile Include="ControlPolicy\IAllocationMap.cs" />
-    <Compile Include="ControlPolicy\IBreadCumbers.cs" />
     <Compile Include="ControlPolicy\IDistanceMap.cs" />
     <Compile Include="ControlPolicy\MaxInformationGainControlPolicy.cs" />
     <Compile Include="CreateOrModifyEnviromentForm.cs">
@@ -97,6 +96,7 @@
     <Compile Include="ControlPolicy\ControlPolicyAbstract.cs" />
     <Compile Include="ControlPolicy\ClosestFronterierControlPolicy.cs" />
     <Compile Include="ControlPolicy\BidingControlPolicy.cs" />
+    <Compile Include="ReplayObject.cs" />
     <Compile Include="SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -8,31 +8,22 @@ using System.Threading.Tasks;
 namespace CooperativeMapping.ControlPolicy
 {
     [Serializable]
-    public class MaxInformationGainControlPolicy : ControlPolicyAbstract, IDistanceMap, ITrajectory
+    public class MaxInformationGainControlPolicy : ControlPolicyAbstract, IDistanceMap
     {
         private double[,] distMap;
         private double minDistMap;
         private double maxDistMap;
         private Pose prevPose;
-        private Stack<Pose> trajectory;
-        private Pose bestFronterier;
         private int lastBestDepth = 0;
         private double prevFronterierValue = 0;
-
-        private Stack<Pose> commandSequence;
-        public Stack<Pose> CommandSequence { get { return commandSequence; } }
-
 
         public double[,] DistMap { get { return distMap; } }
         public double MinDistMap { get { return minDistMap; } }
         public double MaxDistMap { get { return maxDistMap; } }
 
-        public Stack<Pose> Trajectory { get { return trajectory; } }
-        public Pose BestFronterier { get { return bestFronterier; } }
-
         private const int maxDeep = 100;
 
-        public MaxInformationGainControlPolicy()
+        public MaxInformationGainControlPolicy() : base()
         {
 
         }
@@ -79,7 +70,7 @@ namespace CooperativeMapping.ControlPolicy
 
                 // if the goal is not changed, then keep the track
                 // this is good, if needed time to plan the way back from an abonden area
-                if (platform.Map.MapMatrix[bestFronterier.X, bestFronterier.Y] != prevFronterierValue)
+                if ((bestFronterier != null) && (platform.Map.MapMatrix[bestFronterier.X, bestFronterier.Y] != prevFronterierValue))
                 {
                     isReplan = true;
                 }
@@ -115,11 +106,6 @@ namespace CooperativeMapping.ControlPolicy
 
             if (nextPose != null)
             {
-                // maintain breadcumbers
-                if (prevPose != null)
-                {
-                    trajectory.Push(prevPose);
-                }
                 prevPose = new Pose(nextPose.X, nextPose.Y, nextPose.Heading);
 
                 // do action
@@ -134,7 +120,8 @@ namespace CooperativeMapping.ControlPolicy
 
                 if (dalpha == 0)
                 {
-                    prevFronterierValue = platform.Map.MapMatrix[bestFronterier.X, bestFronterier.Y];
+                    trajectory.Push(nextPose);
+                    if (bestFronterier != null) prevFronterierValue = platform.Map.MapMatrix[bestFronterier.X, bestFronterier.Y];
                     platform.Move((int)dx, (int)dy);
                 }
                 else // rotatation is needed, let's rotate

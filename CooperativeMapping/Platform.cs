@@ -237,7 +237,6 @@ namespace CooperativeMapping
         public void Move(int dx, int dy)
         {
             if ((this.Pose.Heading == Utililty.ConvertAngleTo360(Math.Atan2(dy, dx) / Math.PI * 180)) && (Math.Abs(dx) <= 1) && (Math.Abs(dy) <= 1))
-            //if ((Math.Abs(dx) <= 1) && (Math.Abs(dy) <= 1))
             {
                 step++;
                 Pose.X = Pose.X + dx;

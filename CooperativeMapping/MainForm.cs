@@ -190,7 +190,7 @@ namespace CooperativeMapping
 
             try
             {
-                Parallel.ForEach(enviroment.Platforms, new ParallelOptions { MaxDegreeOfParallelism = 8 }, (plt) =>
+                Parallel.ForEach(enviroment.Platforms, new ParallelOptions { MaxDegreeOfParallelism = 7 }, (plt) =>
                 {
                     System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
                     plt.Next();
@@ -199,6 +199,7 @@ namespace CooperativeMapping
             catch(Exception ex)
             {
                 MessageBox.Show("Error occured: " + ex.ToString() + " " + ex.InnerException.ToString());
+                robotTimer.Stop();
             }
 
             bool isMapDiscovered = true;
@@ -286,7 +287,7 @@ namespace CooperativeMapping
 
         private void startToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            robotTimer.Start();
+            
 
         }
 
@@ -404,6 +405,70 @@ namespace CooperativeMapping
             textBoxConsole.Text += System.Environment.NewLine + "Enviroment Loaded: " + currentEnviromentLocation + System.Environment.NewLine;
             stream.Close();
             updateUI();
+        }
+
+        private void settingsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void startToolStripMenuItem_Click_1(object sender, EventArgs e)
+        {
+            robotTimer.Start();
+        }
+
+        private void savePlayToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Stream stream;
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+
+            saveFileDialog.Filter = "pla files (*.pla)|*.pla|All files (*.*)|*.*";
+            saveFileDialog.FilterIndex = 1;
+            saveFileDialog.RestoreDirectory = true;
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                if ((stream = saveFileDialog.OpenFile()) != null)
+                {
+                    ReplayObject obj = new ReplayObject();
+                    obj.EnviromentPath = currentEnviromentLocation;
+                    obj.FinalPlatforms = enviroment.Platforms;
+
+                    var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                    binaryFormatter.Serialize(stream, obj);
+                    stream.Close();
+                }
+            }
+        }
+
+        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "pla files (*.pla)|*.pla|All files (*.*)|*.*";
+            openFileDialog.FilterIndex = 1;
+            openFileDialog.RestoreDirectory = true;
+
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                String location = openFileDialog.FileName;
+                FileStream stream = new FileStream(location, FileMode.Open);
+                BinaryFormatter formatter = new BinaryFormatter();
+                ReplayObject replayObject = (ReplayObject)formatter.Deserialize(stream);
+                LoadEnviroment(replayObject.EnviromentPath);
+
+                foreach (Platform plt in replayObject.FinalPlatforms)
+                {
+                    Platform envPlatform = enviroment.Platforms.Find(p => p.Equals(plt));
+                    //envPlatform = plt;
+
+                    while (plt.ControlPolicy.Trajectory.Count > 0)
+                    {
+                        Pose p = plt.ControlPolicy.Trajectory.Pop();
+                        envPlatform.ControlPolicy.CommandSequence.Push(p);
+                    }
+                }
+
+            }
         }
     }
 }
