@@ -1,4 +1,5 @@
 ﻿using Accord.Math;
+using EpPathFinding.cs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -89,8 +90,9 @@ namespace CooperativeMapping.ControlPolicy
                 // this is the search radius around the platform
                 // if it is -1, then look for the first fronterier and don't worry about the manuevers
                 //int[] searchRadiusList = new int[] { (int)((double)lastBestDepth * 1.5), (int)((double)platform.FieldOfViewRadius * 1.2), -1 };
-                int rad = Math.Min((int)((double)lastBestDepth * 1.5), (int)((double)platform.FieldOfViewRadius * 1.5));
-                int[] searchRadiusList = new int[] { rad, -1 };
+                //int rad = Math.Min((int)((double)lastBestDepth * 1.5), (int)((double)platform.FieldOfViewRadius * 1.5));
+                int rad = (int)((double)platform.FieldOfViewRadius * 1.2);
+                int[] searchRadiusList = new int[] { rad };
                 foreach (int searchRadius in searchRadiusList)
                 {
                     Replan(platform, searchRadius);
@@ -102,6 +104,100 @@ namespace CooperativeMapping.ControlPolicy
                         break;
                     }
                 }
+            }
+
+            if (nextPose == null)
+            {
+                BaseGrid searchGrid = new StaticGrid(platform.Map.Rows, platform.Map.Columns);
+                List<GridPos> searchPoses = new List<GridPos>();
+                for (int i = 0; i < platform.Map.Rows; i++)
+                {
+                    for (int j = 0; j < platform.Map.Columns; j++)
+                    {
+                        if (platform.Map.MapMatrix[i, j] < platform.OccupiedThreshold)
+                        {
+                            searchGrid.SetWalkableAt(i, j, true);
+                        }
+
+                        if ((platform.Map.MapMatrix[i, j] > platform.FreeThreshold) && (platform.Map.MapMatrix[i, j] < platform.OccupiedThreshold))
+                        {
+                            RegionLimits limits = platform.Map.CalculateLimits(i, j, 1);
+                            List<Pose> posesl = limits.GetPosesWithinLimits();
+                            foreach (Pose p in posesl)
+                            {
+                                if (platform.Map.MapMatrix[p.X, p.Y] < platform.FreeThreshold)
+                                {
+                                    searchPoses.Add(new GridPos(i, j));
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // init search
+                GridPos startPos = new GridPos(platform.Pose.X, platform.Pose.Y);
+                /*GridPos endPos = new GridPos(20, 10);
+                JumpPointParam jpParam = new JumpPointParam(searchGrid, startPos, endPos, false, true, false);*/
+
+                List<Pose> poses = platform.Map.CalculateLimits(platform.Pose.X, platform.Pose.Y, 1).GetPosesWithinLimits();
+
+                // find the best path
+                int bestPathScore = int.MaxValue;
+                List<GridPos> bestPath = null;
+                //Pose bestNext = null;
+                foreach (Pose pn in poses)
+                {
+                    foreach (GridPos p in searchPoses)
+                    {
+                        //jpParam.Reset(startPos, p);
+                        JumpPointParam jpParam = new JumpPointParam(searchGrid, new GridPos(pn.X, pn.Y), p, false, false, false);
+                        List<GridPos> resultPathList = JumpPointFinder.FindPath(jpParam);
+                        if ((resultPathList.Count != 0) && (resultPathList.Count < bestPathScore))
+                        {
+                            bestPathScore = resultPathList.Count;
+                            bestPath = resultPathList;
+                            nextPose = pn;
+
+                            int dx = resultPathList[2].x - resultPathList[1].x;
+                            int dy = resultPathList[2].y - resultPathList[1].y;
+                            double dalpha = Math.Atan2(dy, dx);
+                            nextPose.Heading = dalpha;
+                        }
+                    }
+                }
+
+
+                /*if ((bestPath!=null) && (bestPath.Count > 1))
+                {
+                    List<Pose> bestPathConv = new List<Pose>();
+                    bestPathConv.Add(platform.Pose);
+                    //bestPath.RemoveAt(0);
+
+                    for (int i=1; i<bestPath.Count; i++)
+                    {
+                        Pose prevPose = bestPathConv[i - 1];
+                        Pose goalPose = new Pose(bestPath[i].x, bestPath[i].y);
+
+                        int dxl = Math.Sign(goalPose.X - prevPose.X);
+                        int dyl = Math.Sign(goalPose.Y - prevPose.Y);
+
+                        while (!prevPose.Equals(goalPose))
+                        {
+                            Pose newPose = new Pose(prevPose.X + dxl, prevPose.Y + dyl);
+                            prevPose = newPose;
+                            bestPathConv.Add(newPose);
+                        }
+                    }
+
+                    int dx = bestPathConv[2].X - bestPathConv[1].X;
+                    int dy = bestPathConv[2].Y - bestPathConv[1].Y;
+                    double dalpha = Math.Atan2(dy, dx);
+
+                    nextPose = new Pose(bestPath[1].x, bestPath[1].y, dalpha);
+                }*/
+
+
             }
 
             if (nextPose != null)
