@@ -8,17 +8,24 @@ using System.Runtime.Serialization.Formatters.Binary;
 using CooperativeMapping.Communication;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace CooperativeMapping
 {
     public partial class MainForm : Form
     {
+        private String currentEnviromentLocation = null;
+
         private Timer robotTimer = new Timer();
         private Enviroment enviroment;
         private Platform selectedPlatform;
-        public String currentEnviromentLocation = null;
         private Stopwatch measureRun = new Stopwatch();
-        
+
+        private bool isBatchProcessing = false;
+        private int batchProcessingFile;
+        private string[] batchProcessingFiles;
+
+
         public MainForm()
         {
             InitializeComponent();
@@ -118,11 +125,11 @@ namespace CooperativeMapping
             robot1.Measure();
             robot1.PlatformLogEvent += PlatformLogEvent;
 
-            /*Platform robot2 = new Platform(enviroment, new ClosestFronterierControlPolicy(), commModel);
+            Platform robot2 = new Platform(enviroment, new BidingControlPolicy(), commModel);
             robot2.Pose = new Pose(1, 4);
             robot2.Measure();
             robot2.FieldOfViewRadius = FieldOfViewRadius;
-            robot2.PlatformLogEvent += PlatformLogEvent;*/
+            robot2.PlatformLogEvent += PlatformLogEvent;
 
             /*Platform robot3 = new Platform(enviroment, new ClosestFronterierControlPolicy(), commModel);
             robot3.Pose = new Pose(3, 2);
@@ -182,6 +189,11 @@ namespace CooperativeMapping
         {
             measureRun.Restart();
 
+            if ((!Logger.IsOpen) && (currentEnviromentLocation != null) && (currentEnviromentLocation != ""))
+            {
+                Logger.Open(currentEnviromentLocation);
+            }
+
             try
             {
                 Parallel.ForEach(enviroment.Platforms, new ParallelOptions { MaxDegreeOfParallelism = 7 }, (plt) =>
@@ -223,6 +235,7 @@ namespace CooperativeMapping
                         }
 
                         robotTimer.Stop();
+                        nextBatchProcessing();
                         return;
                     }
                 }
@@ -234,7 +247,7 @@ namespace CooperativeMapping
             {
                 displayIter++;
 
-                if ((displayIter % 50) == 0)
+                if ((displayIter % 1) == 0)
                 {
                     mapImageBox.BackgroundImage.Dispose();
                     mapImageBox.BackgroundImage = enviroment.Drawer.Draw(selectedPlatform);
@@ -244,6 +257,7 @@ namespace CooperativeMapping
             if (isMapDiscovered)
             {
                 robotTimer.Stop();
+                nextBatchProcessing();
             }
 
             int sumStep = 0;
@@ -271,9 +285,42 @@ namespace CooperativeMapping
                 {
                     double discoveredArea = ((double)plt.Map.NumDiscoveredBins() / (double)plt.Map.NumBins() * 100);
                     textBoxConsole.Text +=  "ID #" + plt.ID + " Step: " + plt.Step + " Area: " + discoveredArea.ToString("0.00") + System.Environment.NewLine;
+                    Logger.Log(sumStep + "," + plt.ID + "," + plt.Step + "," + discoveredArea.ToString("0.00"));
                 }
             }
 
+        }
+
+        private void nextBatchProcessing()
+        {
+            if(isBatchProcessing)
+            {
+                if (batchProcessingFile < batchProcessingFiles.Count())
+                {
+                    String fileLocation = batchProcessingFiles[batchProcessingFile];
+                    textBoxConsole.Text += "SWITCH TO FILE: " + fileLocation;
+
+                    if (batchProcessingFile > 0)
+                    {
+                        String prevFile = batchProcessingFiles[batchProcessingFile-1];
+                        String path = Path.GetDirectoryName(prevFile);
+                        String name = Path.GetFileNameWithoutExtension(prevFile);
+                        String playFile = path + "\\" + name + ".pla";
+                        SavePlay(playFile);
+                    }
+
+                    LoadEnviroment(fileLocation);
+                    robotTimer.Start();
+                    batchProcessingFile++;
+                    robotTimer.Start();
+                }
+                else
+                {
+                    batchProcessingFile = 0;
+                    isBatchProcessing = false;
+                    textBoxConsole.Text += "BATCH PROCESSING IS DONE";
+                }
+            }
         }
 
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -380,8 +427,6 @@ namespace CooperativeMapping
             {                
                 currentEnviromentLocation = openFileDialog.FileName;
                 LoadEnviroment(currentEnviromentLocation);
-
-
             }
         }
 
@@ -403,6 +448,8 @@ namespace CooperativeMapping
                 selectedPlatform = null;
             }
 
+            Logger.Close();
+            currentEnviromentLocation = fileName;
             textBoxConsole.Text += System.Environment.NewLine + "Enviroment Loaded: " + currentEnviromentLocation + System.Environment.NewLine;
             stream.Close();
             updateUI();
@@ -420,7 +467,6 @@ namespace CooperativeMapping
 
         private void savePlayToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Stream stream;
             SaveFileDialog saveFileDialog = new SaveFileDialog();
 
             saveFileDialog.Filter = "pla files (*.pla)|*.pla|All files (*.*)|*.*";
@@ -429,16 +475,23 @@ namespace CooperativeMapping
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                if ((stream = saveFileDialog.OpenFile()) != null)
-                {
-                    ReplayObject obj = new ReplayObject();
-                    obj.EnviromentPath = currentEnviromentLocation;
-                    obj.FinalPlatforms = enviroment.Platforms;
+                SavePlay(saveFileDialog.FileName);
+            }
+        }
 
-                    var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                    binaryFormatter.Serialize(stream, obj);
-                    stream.Close();
-                }
+        private void SavePlay(String filename)
+        {
+            Stream stream = new FileStream(filename, FileMode.OpenOrCreate);
+
+            if (stream != null)
+            {
+                ReplayObject obj = new ReplayObject();
+                obj.EnviromentPath = currentEnviromentLocation;
+                obj.FinalPlatforms = enviroment.Platforms;
+
+                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+                binaryFormatter.Serialize(stream, obj);
+                stream.Close();
             }
         }
 
@@ -469,6 +522,8 @@ namespace CooperativeMapping
                         Pose p = plt.ControlPolicy.Trajectory.Pop();
                         envPlatform.ControlPolicy.CommandSequence.Push(p);
                     }
+
+                    Logger.Close();
                 }
 
             }
@@ -515,6 +570,32 @@ namespace CooperativeMapping
             robotTimer.Interval = 1000;
             UncheckTimerInterval();
             toolStripMenuItem6.Checked = true;
+        }
+
+        private void batchProcessingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var fbd = new FolderBrowserDialog())
+            {
+                DialogResult result = fbd.ShowDialog();
+
+                if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+                {
+                    string[] files = Directory.GetFiles(fbd.SelectedPath, "*.bin");
+
+                    textBoxConsole.Text += "BATCH PROCESSING" + System.Environment.NewLine;
+                    textBoxConsole.Text += "The following files will be processed." + System.Environment.NewLine;
+                    foreach (String file in files)
+                    {
+                        textBoxConsole.Text += "* " + file + System.Environment.NewLine + System.Environment.NewLine;
+                    }
+
+                    batchProcessingFiles = files;
+                    isBatchProcessing = true;
+                    batchProcessingFile = 0;
+
+                    nextBatchProcessing();
+                }
+            }
         }
     }
 }

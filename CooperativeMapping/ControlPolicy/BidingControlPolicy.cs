@@ -26,10 +26,6 @@ namespace CooperativeMapping.ControlPolicy
         public double MinDistMap { get { return minDistMap; } }
         public double MaxDistMap { get { return maxDistMap; } }
 
-        
-
-        
-
         private const int maxDeep = 100;
 
         public BidingControlPolicy() : base()
@@ -65,11 +61,11 @@ namespace CooperativeMapping.ControlPolicy
                     }
                 }
 
-                if ((!foundUndiscovered) || (solutionType == SolutionType.GlobalPlanner))
+                if (!foundUndiscovered)
                 {
                     if (GenerateAllocationMap(platform) != 0)
                     {
-                        commandSequence.Clear();
+                        //commandSequence.Clear();
                         //ReplanLocal(platform, platform.FieldOfViewRadius * 2);
                     }
                 }
@@ -105,6 +101,17 @@ namespace CooperativeMapping.ControlPolicy
                     ptr = ptr.ParentNode;
                 }
             }
+        }
+
+        public override void ReplanGlobal(Platform platform)
+        {
+            base.ReplanGlobal(platform);
+
+            if (GenerateAllocationMap(platform) != 0)
+            {
+
+            }
+
         }
 
         private GraphNode FindTrack(Pose startPose, Platform platform, int searchRadius)
@@ -246,7 +253,7 @@ namespace CooperativeMapping.ControlPolicy
             allocationMap = Matrix.Create<int>(platform.Map.Rows, platform.Map.Columns, int.MaxValue);
             double[,] valuationMap = Matrix.Create<double>(platform.Map.Rows, platform.Map.Columns, Double.PositiveInfinity);
 
-            List<Platform> platforms = new List<Platform>();
+            /*List<Platform> platforms = new List<Platform>();
             foreach(Platform plt in platform.ObservedPlatforms)
             {
                 double d = Math.Sqrt(Math.Pow(plt.Pose.X - platform.Pose.X, 2) + Math.Pow(plt.Pose.Y - platform.Pose.Y, 2));
@@ -254,17 +261,18 @@ namespace CooperativeMapping.ControlPolicy
                 {
                     platforms.Add(plt);
                 }
-            }
+            }*/
+
+            List<Platform> platforms = platform.ObservedPlatforms;
 
             platforms.Add(platform);
-
             platform.SendLog("Generate allocaiton map (" + platforms.Count + ") ...");
-
 
             int allocatedCellNum = 0;
             foreach (Platform plt in platforms)
             {
 
+                Pose aroundPose = platform.ControlPolicy.BestFronterier;
                 List<Tuple<int, Pose>> cells = platform.CalculateBinsInFOV(plt.Pose, plt.Map, (int)(plt.FieldOfViewRadius * 2));
                 //RegionLimits nlimits = platform.Map.CalculateLimits(plt.Pose.X, plt.Pose.Y, platform.FieldOfViewRadius*2);
                 //List<Pose> cells = nlimits.GetPosesWithinLimits();

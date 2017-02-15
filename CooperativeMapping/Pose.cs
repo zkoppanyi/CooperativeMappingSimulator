@@ -71,12 +71,5 @@ namespace CooperativeMapping
             return Math.Atan2(dyp, dxp) / Math.PI * 180.0;
         }
 
-        public Pose MoveOne()
-        {
-            double dx = Math.Cos(this.Heading / 180.0 * Math.PI);
-            double dy = Math.Sin(this.Heading / 180.0 * Math.PI);
-            return new Pose(this.X + (int)dx, this.Y + (int)dy, this.Heading);
-        }
-
     }
 }

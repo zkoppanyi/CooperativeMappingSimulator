@@ -190,7 +190,7 @@ namespace CooperativeMapping.ControlPolicy
         {
             // create searchGrid data structure for the EpPathFinding
             BaseGrid searchGrid = new StaticGrid(platform.Map.Rows, platform.Map.Columns);
-            List<Tuple<double, GridPos>> searchPoses = new List<Tuple<double, GridPos>> ();
+            List<Tuple<double, GridPos>> searchPoses = new List<Tuple<double, GridPos>> (); // possible search poses
             for (int i = 0; i < platform.Map.Rows; i++)
             {
                 for (int j = 0; j < platform.Map.Columns; j++)
@@ -217,6 +217,7 @@ namespace CooperativeMapping.ControlPolicy
                 }
             }
 
+            // set unaccessable for those places where are platforms and their enviroment within 1 step radius
             foreach (Platform plt in platform.ObservedPlatforms)
             {
                 if (plt.Equals(platform)) continue;
@@ -229,6 +230,7 @@ namespace CooperativeMapping.ControlPolicy
             }
 
             // bound the search to avoid large computation
+            // select the first closest 50 candidates based on L2 distance
             int maxNumOfSearchPoses = 50;
             searchPoses.Sort((t1, t2) => t1.Item1.CompareTo(t2.Item1));
             if (searchPoses.Count > maxNumOfSearchPoses)

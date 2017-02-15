@@ -80,6 +80,7 @@
       <DependentUpon>CreateOrModifyEnviromentForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Enviroment.cs" />
+    <Compile Include="Logger.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
