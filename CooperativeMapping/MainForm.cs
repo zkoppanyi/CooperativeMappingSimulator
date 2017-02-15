@@ -27,11 +27,11 @@ namespace CooperativeMapping
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            robotTimer.Interval = 10;
+            robotTimer.Interval = 50;
             robotTimer.Tick += RobotTimer_Tick;
             StartUpSimulation();
 
-            this.textBoxConsole.Text += "Number Of Cores: " + Environment.ProcessorCount + System.Environment.NewLine;
+            this.textBoxConsole.Text += System.Environment.NewLine + "*** Number Of Cores: " + Environment.ProcessorCount + System.Environment.NewLine;
         }
 
         private void updateUI()
@@ -108,12 +108,6 @@ namespace CooperativeMapping
             mapImageBox.BackgroundImage = enviroment.Drawer.Draw(enviroment.Map, enviroment.Platforms);
 
             // Initialize robot and timer
-            ControlPolicy.ControlPolicyAbstract policy = new MaxInformationGainControlPolicy();
-            ControlPolicy.ControlPolicyAbstract priorityMapStrategy1 = new BidingControlPolicy();
-            ControlPolicy.ControlPolicyAbstract priorityMapStrategy2 = new BidingControlPolicy();
-            ControlPolicy.ControlPolicyAbstract priorityMapStrategy3 = new BidingControlPolicy();
-            ControlPolicy.ControlPolicyAbstract priorityMapStrategy4 = new BidingControlPolicy();
-
             CommunicationModel commModel = new GlobalCommunicationModel();
             int FieldOfViewRadius = 5;
 
@@ -124,11 +118,11 @@ namespace CooperativeMapping
             robot1.Measure();
             robot1.PlatformLogEvent += PlatformLogEvent;
 
-            Platform robot2 = new Platform(enviroment, new BidingControlPolicy(), commModel);
+            /*Platform robot2 = new Platform(enviroment, new ClosestFronterierControlPolicy(), commModel);
             robot2.Pose = new Pose(1, 4);
             robot2.Measure();
             robot2.FieldOfViewRadius = FieldOfViewRadius;
-            robot2.PlatformLogEvent += PlatformLogEvent;
+            robot2.PlatformLogEvent += PlatformLogEvent;*/
 
             /*Platform robot3 = new Platform(enviroment, new ClosestFronterierControlPolicy(), commModel);
             robot3.Pose = new Pose(3, 2);
@@ -205,49 +199,47 @@ namespace CooperativeMapping
             bool isMapDiscovered = true;
             foreach (Platform plt in enviroment.Platforms)
             {
-                isMapDiscovered &= plt.Map.IsDiscovered(plt);
-
-                // Check whether the platform is at the right position
-                PlatformState platformState = enviroment.CheckPlatformState(plt);
-                if (platformState != PlatformState.Healthy)
+                if (!(plt.ControlPolicy is ReplayPolicy))
                 {
-                    textBoxConsole.Text += System.Environment.NewLine + "Robot destroyed! Cause: ";
 
-                    if (platformState == PlatformState.OutOfBounderies)
+                    // Check whether the platform is at the right position
+                    PlatformState platformState = enviroment.CheckPlatformState(plt);
+                    if (platformState != PlatformState.Healthy)
                     {
-                        textBoxConsole.Text += "Out of bounds!";
-                    }
+                        textBoxConsole.Text += System.Environment.NewLine + "Robot destroyed!" + System.Environment.NewLine;
+                        textBoxConsole.Text += "ID: " + plt.ID + System.Environment.NewLine;
+                        textBoxConsole.Text += "Solution mode: " + plt.ControlPolicy.SolutionType + System.Environment.NewLine;
+                        textBoxConsole.Text += "Command sequence length: " + plt.ControlPolicy.CommandSequence.Count + System.Environment.NewLine;
 
-                    if (platformState == PlatformState.Destroy)
-                    {
-                        textBoxConsole.Text += System.Environment.NewLine + "Collision with obstacle or other platform";
-                        mapImageBox.BackgroundImage = enviroment.Drawer.Draw(plt);
-                    }
+                        if (platformState == PlatformState.OutOfBounderies)
+                        {
+                            textBoxConsole.Text += "Out of bounds!";
+                        }
 
-                    robotTimer.Stop();
-                    return;
+                        if (platformState == PlatformState.Destroy)
+                        {
+                            textBoxConsole.Text += System.Environment.NewLine + "Collision with obstacle or other platform";
+                            mapImageBox.BackgroundImage = enviroment.Drawer.Draw(plt);
+                        }
+
+                        robotTimer.Stop();
+                        return;
+                    }
                 }
 
-                bool val = plt.Map.IsDiscovered(plt);
-                isMapDiscovered &= plt.Map.IsDiscovered(plt);
+                isMapDiscovered &= (plt.Map.IsDiscovered(plt) || (!plt.ControlPolicy.HasFeasablePath) || (plt.IsStopped));
             }
 
             if (selectedPlatform != null)
             {
                 displayIter++;
 
-                if ((displayIter % 1) == 0)
+                if ((displayIter % 50) == 0)
                 {
+                    mapImageBox.BackgroundImage.Dispose();
                     mapImageBox.BackgroundImage = enviroment.Drawer.Draw(selectedPlatform);
                 }
             }
-
-            // Print coordinates at each step
-            /*textBoxConsole.Text += System.Environment.NewLine;
-            foreach (Platform plt in enviroment.Platforms)
-            {
-                textBoxConsole.Text += "ID: " + plt.ID + " X = " + plt.Pose.X + " Y = " + plt.Pose.Y + System.Environment.NewLine;
-            }*/
 
             if (isMapDiscovered)
             {
@@ -272,6 +264,15 @@ namespace CooperativeMapping
                 toolStripStatusLabel.Text += " Discovered Area: " + ((double)selectedPlatform.Map.NumDiscoveredBins() / (double)selectedPlatform.Map.NumBins() * 100).ToString("0.00") + "%";
             }
 
+            double val = sumStep % 100;
+            if ((val == 0) || (isMapDiscovered))
+            {
+                foreach (Platform plt in enviroment.Platforms)
+                {
+                    double discoveredArea = ((double)plt.Map.NumDiscoveredBins() / (double)plt.Map.NumBins() * 100);
+                    textBoxConsole.Text +=  "ID #" + plt.ID + " Step: " + plt.Step + " Area: " + discoveredArea.ToString("0.00") + System.Environment.NewLine;
+                }
+            }
 
         }
 
@@ -456,9 +457,11 @@ namespace CooperativeMapping
                 ReplayObject replayObject = (ReplayObject)formatter.Deserialize(stream);
                 LoadEnviroment(replayObject.EnviromentPath);
 
-                foreach (Platform plt in replayObject.FinalPlatforms)
+                for(int i = 0; i < replayObject.FinalPlatforms.Count; i++)
                 {
+                    Platform plt = replayObject.FinalPlatforms[i];
                     Platform envPlatform = enviroment.Platforms.Find(p => p.Equals(plt));
+                    envPlatform.ControlPolicy = new ReplayPolicy();
                     //envPlatform = plt;
 
                     while (plt.ControlPolicy.Trajectory.Count > 0)
@@ -469,6 +472,49 @@ namespace CooperativeMapping
                 }
 
             }
+        }
+
+        private void UncheckTimerInterval()
+        {
+            toolStripMenuItem2.Checked = false;
+            toolStripMenuItem3.Checked = false;
+            toolStripMenuItem4.Checked = false;
+            toolStripMenuItem5.Checked = false;
+            toolStripMenuItem6.Checked = false;
+        }
+        private void toolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            robotTimer.Interval = 1;
+            UncheckTimerInterval();
+            toolStripMenuItem2.Checked = true;
+        }
+
+        private void toolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            robotTimer.Interval = 10;
+            UncheckTimerInterval();
+            toolStripMenuItem3.Checked = true;
+        }
+
+        private void toolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+            robotTimer.Interval = 100;
+            UncheckTimerInterval();
+            toolStripMenuItem4.Checked = true;
+        }
+
+        private void toolStripMenuItem5_Click(object sender, EventArgs e)
+        {
+            robotTimer.Interval = 200;
+            UncheckTimerInterval();
+            toolStripMenuItem5.Checked = true;
+        }
+
+        private void toolStripMenuItem6_Click(object sender, EventArgs e)
+        {
+            robotTimer.Interval = 1000;
+            UncheckTimerInterval();
+            toolStripMenuItem6.Checked = true;
         }
     }
 }

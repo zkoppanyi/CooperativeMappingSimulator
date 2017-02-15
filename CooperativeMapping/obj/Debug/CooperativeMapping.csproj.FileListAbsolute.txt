@@ -71,3 +71,5 @@ c:\OSU3\Repo\CooperativeMappingSimulator\CooperativeMapping\obj\Debug\Cooperativ
 c:\OSU3\Repo\CooperativeMappingSimulator\CooperativeMapping\obj\Debug\CooperativeMapping.SettingsForm.resources
 c:\OSU3\Repo\CooperativeMappingSimulator\CooperativeMapping\obj\Debug\CooperativeMapping.csproj.GenerateResource.Cache
 C:\OSU3\CooperativeMapping\CooperativeMapping\bin\Debug\EpPathFinding.cs.dll
+C:\OSU3\Repo\CooperativeMappingSimulator\CooperativeMapping\bin\Debug\EpPathFinding.cs.dll
+C:\OSU3\Repo\CooperativeMappingSimulator\CooperativeMapping\obj\Debug\CooperativeMapping.csprojResolveAssemblyReference.cache

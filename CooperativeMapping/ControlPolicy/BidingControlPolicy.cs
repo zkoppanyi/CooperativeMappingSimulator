@@ -18,13 +18,8 @@ namespace CooperativeMapping.ControlPolicy
 
         private double minDistMap;
         private double maxDistMap;
-        private Pose prevPose;
-
         
         private int lastBestDepth = 0;
-        private double prevFronterierValue = 0;
-        private bool isBidingMode = false;
-
         public double[,] DistMap { get { return distMap; } }
         public int[,] AllocationMap { get { return allocationMap; } }
 
@@ -42,38 +37,27 @@ namespace CooperativeMapping.ControlPolicy
 
         }
 
-        public override void Next(Platform platform)
+        public override void NextInit(Platform platform)
         {
-            platform.Measure();
-            platform.Communicate();
-
-            // init breadCumbers stack if it is null (fix serialization)
-            if (trajectory == null)
-            {
-                trajectory = new Stack<Pose>();
-            }
-
-            // init commandSequence stack if it is null (fix serialization)
-            if (commandSequence == null)
-            {
-                commandSequence = new Stack<Pose>();
-            }
 
             // init commandSequence stack if it is null (fix serialization)
             if (allocationMap == null)
             {
-                //allocationMap = Matrix.Create<int>(platform.Map.Rows, platform.Map.Columns, int.MinValue);
-                GenerateAllocationMap(platform);
+                if (GenerateAllocationMap(platform) != 0)
+                {
+                    commandSequence.Clear();
+                    //ReplanLocal(platform, platform.FieldOfViewRadius * 2);
+                }
             }
             else
             {
                 bool foundUndiscovered = false;
-                for(int i = 0; i < allocationMap.Rows(); i++)
+                for (int i = 0; i < allocationMap.Rows(); i++)
                 {
                     for (int j = 0; j < allocationMap.Columns(); j++)
                     {
                         Pose p = new Pose(i, j);
-                        if ((allocationMap[i,j] == platform.ID) && (!platform.Map.IsPlaceDiscovered(p, platform)))
+                        if ((allocationMap[i, j] == platform.ID) && (!platform.Map.IsPlaceDiscovered(p, platform)))
                         {
                             foundUndiscovered = true;
                             break;
@@ -81,136 +65,18 @@ namespace CooperativeMapping.ControlPolicy
                     }
                 }
 
-                if ((!foundUndiscovered) || (isBidingMode == false))
+                if ((!foundUndiscovered) || (solutionType == SolutionType.GlobalPlanner))
                 {
-                    if (GenerateAllocationMap(platform) == 0)
+                    if (GenerateAllocationMap(platform) != 0)
                     {
-                        isBidingMode = false;
-                    }
-                    else
-                    {
-                        isBidingMode = true;
+                        commandSequence.Clear();
+                        //ReplanLocal(platform, platform.FieldOfViewRadius * 2);
                     }
                 }
             }
-
-            // if the map is discovered we are done
-            if (platform.Map.IsDiscovered(platform)) return;
-
-            // get the next pose
-            Pose nextPose = null;
-            bool isReplan = false;
-
-            if ((commandSequence != null) && (commandSequence.Count > 0))
-            {
-                nextPose = commandSequence.Pop();
-
-                // ok, on the next step, there is another guy, plan the track again
-                if (platform.ObservedPlatforms.Find(pt => nextPose.Equals(pt.Pose)) != null)
-                {
-                    isReplan = true;
-                }
-
-                // ok, next step would be a wall, let's plan the track again
-                if (platform.Map.MapMatrix[nextPose.X, nextPose.Y] >= platform.OccupiedThreshold)
-                {
-                    isReplan = true;
-                }
-
-                // if the goal is not changed, then keep the track
-                // this is good, if needed time to plan the way back from an abonden area
-                if ((bestFronterier != null) && (platform.Map.MapMatrix[bestFronterier.X, bestFronterier.Y] != prevFronterierValue))
-                {
-                    isReplan = true;
-                }
-
-            }
-            else
-            {
-                isReplan = true;
-            }
-
-            //isReplan = true;
-
-            // need to replan
-            if (isReplan)
-            {
-                // this is the search radius around the platform
-                // if it is -1, then look for the first fronterier and don't worry about the manuevers
-                //int[] searchRadiusList = new int[] { (int)((double)lastBestDepth * 1.5), (int)((double)platform.FieldOfViewRadius * 1.2), -1 };
-                int rad = (int)((double)platform.FieldOfViewRadius * 1.2);
-                int[] searchRadiusList = new int[] { rad, -1 };
-                foreach (int searchRadius in searchRadiusList)
-                {
-                    Replan(platform, searchRadius);
-
-                    // get the next pose
-                    if (commandSequence.Count > 0)
-                    {
-                        nextPose = commandSequence.Pop();
-                        break;
-                    }
-                    else
-                    {
-                        nextPose = null;
-                        if (GenerateAllocationMap(platform) == 0)
-                        {
-                            isBidingMode = false;
-                        }
-                        else
-                        {
-                            isBidingMode = true;
-                        }
-                    }
-                }
-            }
-
-            if (nextPose != null)
-            {
-                prevPose = new Pose(nextPose.X, nextPose.Y, nextPose.Heading);
-
-                // do action
-                double dx = nextPose.X - platform.Pose.X;
-                double dy = nextPose.Y - platform.Pose.Y;
-                double goalAlpha = Utililty.ConvertAngleTo360(Math.Atan2(dy, dx) / Math.PI * 180);
-
-                // choose the angle that is closer to the target heading
-                double dalpha1 = Utililty.ConvertAngleTo360(goalAlpha - platform.Pose.Heading);
-                double dalpha2 = Utililty.ConvertAngleTo360((platform.Pose.Heading - goalAlpha) + 360.0);
-                double dalpha = Math.Abs(dalpha1) < Math.Abs(dalpha2) ? dalpha1 : -dalpha2;
-
-                if (dalpha == 0)
-                {
-                    trajectory.Push(nextPose);
-
-                    if (bestFronterier != null) prevFronterierValue = platform.Map.MapMatrix[bestFronterier.X, bestFronterier.Y];
-                    platform.Move((int)dx, (int)dy);
-                }
-                else // rotatation is needed, let's rotate
-                {
-
-                    double rot = Math.Sign(dalpha) * 45;
-                    platform.Rotate(rot);
-                    commandSequence.Push(nextPose);
-                }
-            }
-            else
-            {
-                if (GenerateAllocationMap(platform) == 0)
-                {
-                    isBidingMode = false;
-                }
-                else
-                {
-                    isBidingMode = true;
-                }
-
-                platform.SendLog("No feasible solution");
-            }
-
         }
 
-        public void Replan(Platform platform, int searchRadius)
+        public override void ReplanLocal(Platform platform, int searchRadius)
         {
             commandSequence.Clear();
 
@@ -233,7 +99,6 @@ namespace CooperativeMapping.ControlPolicy
             if (ptr != null) // if no solution this is null
             {
                 commandSequence = new Stack<Pose>();
-                //trajectory.Push(ptr.Pose);
                 while (ptr.ParentNode != null)
                 {
                     commandSequence.Push(ptr.Pose);
@@ -329,11 +194,11 @@ namespace CooperativeMapping.ControlPolicy
                     score = score - info;
 
                     // we found a solution if it is not discovered yet
-                    if (!platform.Map.IsPlaceDiscovered(p, platform))
+                    if ((platform.Map.MapMatrix[p.X, p.Y] > platform.FreeThreshold) && (platform.Map.MapMatrix[p.X, p.Y] < platform.OccupiedThreshold))
                     {
                         fronterierNum++;
 
-                        if (((bestFronterierScore > score) && ((allocationMap[p.X, p.Y] == platform.ID) || (!isBidingMode))))
+                        if (((bestFronterierScore > score) && ((allocationMap[p.X, p.Y] == platform.ID))))
                         {
                             bestFronterier = new GraphNode(p, cp, k, score);
                             bestFronterierScore = score;

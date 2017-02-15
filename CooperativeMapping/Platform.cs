@@ -67,6 +67,10 @@ namespace CooperativeMapping
         public MapObject Map { get; set; }
 
         [Browsable(false)]
+        public bool IsStopped { get { return isStopped;  } }
+        private bool isStopped = false;
+
+        [Browsable(false)]
         public List<Platform> ObservedPlatforms = new List<Platform>();
 
         [field: NonSerialized]
@@ -78,7 +82,7 @@ namespace CooperativeMapping
 
         private static int IDs = 0;
 
-        private Enviroment enviroment;
+        public Enviroment enviroment;
 
         [Browsable(false)]
         public ControlPolicyAbstract ControlPolicy { get; set; }
@@ -101,6 +105,12 @@ namespace CooperativeMapping
             this.Color = Color.Blue;
         }
 
+        public void Stop()
+        {
+            isStopped = true;
+        }
+      
+
         public override bool Equals(object obj)
         {
             if (obj == null) return false;
@@ -118,57 +128,63 @@ namespace CooperativeMapping
 
         public void Next()
         {
-            ControlPolicy.Next(this);
+            if (this.IsStopped == false)
+            {
+                ControlPolicy.Next(this);
+            }
         }
 
         public void Measure()
         {
-            List<Pose> candidates = new List<Pose>();
-            List<Pose> newCandidates = new List<Pose>();
-            ObservedPlatforms.Clear();
-            candidates.Add(this.Pose);
-
-            List<Tuple<int, Pose>> bins = this.CalculateBinsInFOV(this.Pose, enviroment.Map);
-
-            foreach (Tuple<int, Pose> tp in bins)
+            if (this.IsStopped == false)
             {
-                int k = tp.Item1;
-                Pose p = tp.Item2;
+                List<Pose> candidates = new List<Pose>();
+                List<Pose> newCandidates = new List<Pose>();
+                ObservedPlatforms.Clear();
+                candidates.Add(this.Pose);
 
-                double val_env = enviroment.Map.MapMatrix[p.X, p.Y];
-                double val_curr = Map.MapMatrix[p.X, p.Y];
-                double val_new = val_curr;
-                double val_cand = val_env;
+                List<Tuple<int, Pose>> bins = this.CalculateBinsInFOV(this.Pose, enviroment.Map);
 
-                if (val_env == 0)
+                foreach (Tuple<int, Pose> tp in bins)
                 {
-                    val_cand = 0.5 * ((double)k / (double)FieldOfViewRadius) / 2;
-                    //val_cand = 0;
-                }
-                else if (val_env == 1)
-                {
-                    val_cand = 1 - 0.5 * ((double)k / (double)FieldOfViewRadius) / 2;
-                    //val_cand = 1;
+                    int k = tp.Item1;
+                    Pose p = tp.Item2;
 
-                }
+                    double val_env = enviroment.Map.MapMatrix[p.X, p.Y];
+                    double val_curr = Map.MapMatrix[p.X, p.Y];
+                    double val_new = val_curr;
+                    double val_cand = val_env;
 
-                if (Math.Abs(0.5 - val_cand) > Math.Abs(0.5 - val_curr)) // avoid overwrite the better solution
-                {
-                    val_new = val_cand;
-                }
-
-                //double d = Math.Sqrt(Math.Pow(p.X - this.Pose.X, 2) + Math.Pow(p.Y - this.Pose.Y, 2));
-                Map.MapMatrix[p.X, p.Y] = val_new;
-
-                foreach (Platform pe in enviroment.Platforms)
-                {
-                    if (pe.Equals(this)) continue;
-
-                    if ((pe.Pose.X == p.X) && (pe.Pose.Y == p.Y))
+                    if (val_env == 0)
                     {
-                        if (!ObservedPlatforms.Exists(x => x == pe))
+                        val_cand = 0.5 * ((double)k / (double)FieldOfViewRadius) / 2;
+                        //val_cand = 0;
+                    }
+                    else if (val_env == 1)
+                    {
+                        val_cand = 1 - 0.5 * ((double)k / (double)FieldOfViewRadius) / 2;
+                        //val_cand = 1;
+
+                    }
+
+                    if (Math.Abs(0.5 - val_cand) > Math.Abs(0.5 - val_curr)) // avoid overwrite the better solution
+                    {
+                        val_new = val_cand;
+                    }
+
+                    //double d = Math.Sqrt(Math.Pow(p.X - this.Pose.X, 2) + Math.Pow(p.Y - this.Pose.Y, 2));
+                    Map.MapMatrix[p.X, p.Y] = val_new;
+
+                    foreach (Platform pe in enviroment.Platforms)
+                    {
+                        if (pe.Equals(this)) continue;
+
+                        if ((pe.Pose.X == p.X) && (pe.Pose.Y == p.Y))
                         {
-                            ObservedPlatforms.Add(pe);
+                            if (!ObservedPlatforms.Exists(x => x == pe))
+                            {
+                                ObservedPlatforms.Add(pe);
+                            }
                         }
                     }
                 }
@@ -236,7 +252,7 @@ namespace CooperativeMapping
         /// <param name="dy">Displacement along Y axis</param>
         public void Move(int dx, int dy)
         {
-            if ((this.Pose.Heading == Utililty.ConvertAngleTo360(Math.Atan2(dy, dx) / Math.PI * 180)) && (Math.Abs(dx) <= 1) && (Math.Abs(dy) <= 1))
+            if ((this.ControlPolicy is ReplayPolicy) || ((this.Pose.Heading == Utililty.ConvertAngleTo360(Math.Atan2(dy, dx) / Math.PI * 180)) && (Math.Abs(dx) <= 1) && (Math.Abs(dy) <= 1)))
             {
                 step++;
                 Pose.X = Pose.X + dx;
@@ -250,7 +266,7 @@ namespace CooperativeMapping
 
         public void Rotate(double dalpha)
         {
-            if (Math.Abs(dalpha) == 45)
+            if ((this.ControlPolicy is ReplayPolicy) || (Math.Abs(dalpha) == 45))
             {
                 step++;
                 this.Pose.Heading += dalpha;

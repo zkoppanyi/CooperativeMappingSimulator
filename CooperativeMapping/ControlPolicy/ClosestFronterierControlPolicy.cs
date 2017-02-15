@@ -14,9 +14,8 @@ namespace CooperativeMapping.ControlPolicy
         private double[,] distMap;
         private double minDistMap;
         private double maxDistMap;
-        private Pose prevPose;
+
         private int lastBestDepth = 0;
-        private double prevFronterierValue = 0;
 
         public double[,] DistMap { get { return distMap; } }
         public double MinDistMap { get { return minDistMap; } }
@@ -29,217 +28,17 @@ namespace CooperativeMapping.ControlPolicy
 
         }
 
-        public override void Next(Platform platform)
+        public override void NextInit(Platform platform)
         {
-            platform.Measure();
-            platform.Communicate();
-
-            // init breadCumbers stack if it is null (fix serialization)
-            if (trajectory == null)
-            {
-                trajectory = new Stack<Pose>();
-            }
-
-            // init commandSequence stack if it is null (fix serialization)
-            if (commandSequence == null)
-            {
-                commandSequence = new Stack<Pose>();
-            }
-
-            // if the map is discovered we are done
-            if (platform.Map.IsDiscovered(platform)) return;
-
-            // get the next pose
-            Pose nextPose = null;
-            bool isReplan = false;
-
-            if ((commandSequence!= null) && (commandSequence.Count > 0))
-            {
-                nextPose = commandSequence.Pop();
-
-                // ok, on the next step, there is another guy, plan the track again
-                if (platform.ObservedPlatforms.Find(pt => nextPose.Equals(pt.Pose) ) != null)
-                {
-                    isReplan = true;
-                }
-
-                // ok, next step would be a wall, let's plan the track again
-                if (platform.Map.MapMatrix[nextPose.X, nextPose.Y] >= platform.OccupiedThreshold)
-                {
-                    isReplan = true;
-                }
-
-                // if the goal is not changed, then keep the track
-                // this is good, if needed time to plan the way back from an abonden area
-                if ((bestFronterier != null) && (platform.Map.MapMatrix[bestFronterier.X, bestFronterier.Y] != prevFronterierValue))
-                {
-                    isReplan = true;
-                }
-                
-            }
-            else
-            {
-                isReplan = true;
-            }
-
-            //isReplan = true;
-
-            // need to replan
-            if (isReplan)
-            {
-                // this is the search radius around the platform
-                // if it is -1, then look for the first fronterier and don't worry about the manuevers
-                //int[] searchRadiusList = new int[] { (int)((double)lastBestDepth * 1.5), (int)((double)platform.FieldOfViewRadius * 1.2), -1 };
-                //int rad = Math.Min((int)((double)lastBestDepth * 1.5), (int)((double)platform.FieldOfViewRadius * 1.5));
-                int rad = (int)((double)platform.FieldOfViewRadius * 1.2);
-                int[] searchRadiusList = new int[] { rad };
-                foreach (int searchRadius in searchRadiusList)
-                {
-                    Replan(platform, searchRadius);
-
-                    // get the next pose
-                    if (commandSequence.Count > 0)
-                    {
-                        nextPose = commandSequence.Pop();
-                        break;
-                    }
-                }
-            }
-
-            if (nextPose == null)
-            {
-                BaseGrid searchGrid = new StaticGrid(platform.Map.Rows, platform.Map.Columns);
-                List<GridPos> searchPoses = new List<GridPos>();
-                for (int i = 0; i < platform.Map.Rows; i++)
-                {
-                    for (int j = 0; j < platform.Map.Columns; j++)
-                    {
-                        if (platform.Map.MapMatrix[i, j] < platform.OccupiedThreshold)
-                        {
-                            searchGrid.SetWalkableAt(i, j, true);
-                        }
-
-                        if ((platform.Map.MapMatrix[i, j] > platform.FreeThreshold) && (platform.Map.MapMatrix[i, j] < platform.OccupiedThreshold))
-                        {
-                            RegionLimits limits = platform.Map.CalculateLimits(i, j, 1);
-                            List<Pose> posesl = limits.GetPosesWithinLimits();
-                            foreach (Pose p in posesl)
-                            {
-                                if (platform.Map.MapMatrix[p.X, p.Y] < platform.FreeThreshold)
-                                {
-                                    searchPoses.Add(new GridPos(i, j));
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // init search
-                GridPos startPos = new GridPos(platform.Pose.X, platform.Pose.Y);
-                /*GridPos endPos = new GridPos(20, 10);
-                JumpPointParam jpParam = new JumpPointParam(searchGrid, startPos, endPos, false, true, false);*/
-
-                List<Pose> poses = platform.Map.CalculateLimits(platform.Pose.X, platform.Pose.Y, 1).GetPosesWithinLimits();
-
-                // find the best path
-                int bestPathScore = int.MaxValue;
-                List<GridPos> bestPath = null;
-                //Pose bestNext = null;
-                foreach (Pose pn in poses)
-                {
-                    foreach (GridPos p in searchPoses)
-                    {
-                        //jpParam.Reset(startPos, p);
-                        JumpPointParam jpParam = new JumpPointParam(searchGrid, new GridPos(pn.X, pn.Y), p, false, false, false);
-                        List<GridPos> resultPathList = JumpPointFinder.FindPath(jpParam);
-                        if ((resultPathList.Count != 0) && (resultPathList.Count < bestPathScore))
-                        {
-                            bestPathScore = resultPathList.Count;
-                            bestPath = resultPathList;
-                            nextPose = pn;
-
-                            int dx = resultPathList[2].x - resultPathList[1].x;
-                            int dy = resultPathList[2].y - resultPathList[1].y;
-                            double dalpha = Math.Atan2(dy, dx);
-                            nextPose.Heading = dalpha;
-                        }
-                    }
-                }
-
-
-                /*if ((bestPath!=null) && (bestPath.Count > 1))
-                {
-                    List<Pose> bestPathConv = new List<Pose>();
-                    bestPathConv.Add(platform.Pose);
-                    //bestPath.RemoveAt(0);
-
-                    for (int i=1; i<bestPath.Count; i++)
-                    {
-                        Pose prevPose = bestPathConv[i - 1];
-                        Pose goalPose = new Pose(bestPath[i].x, bestPath[i].y);
-
-                        int dxl = Math.Sign(goalPose.X - prevPose.X);
-                        int dyl = Math.Sign(goalPose.Y - prevPose.Y);
-
-                        while (!prevPose.Equals(goalPose))
-                        {
-                            Pose newPose = new Pose(prevPose.X + dxl, prevPose.Y + dyl);
-                            prevPose = newPose;
-                            bestPathConv.Add(newPose);
-                        }
-                    }
-
-                    int dx = bestPathConv[2].X - bestPathConv[1].X;
-                    int dy = bestPathConv[2].Y - bestPathConv[1].Y;
-                    double dalpha = Math.Atan2(dy, dx);
-
-                    nextPose = new Pose(bestPath[1].x, bestPath[1].y, dalpha);
-                }*/
-
-
-            }
-
-            if (nextPose != null)
-            {
-                // maintain breadcumbers
-                if (prevPose != null)
-                {
-                }
-                prevPose = new Pose(nextPose.X, nextPose.Y, nextPose.Heading);
-
-                // do action
-                double dx = nextPose.X - platform.Pose.X;
-                double dy = nextPose.Y - platform.Pose.Y;
-                double goalAlpha = Utililty.ConvertAngleTo360(Math.Atan2(dy, dx) / Math.PI * 180);
-
-                // choose the angle that is closer to the target heading
-                double dalpha1 = Utililty.ConvertAngleTo360(goalAlpha  - platform.Pose.Heading);
-                double dalpha2 = Utililty.ConvertAngleTo360((platform.Pose.Heading - goalAlpha) + 360.0);
-                double dalpha = Math.Abs(dalpha1) < Math.Abs(dalpha2) ? dalpha1 : -dalpha2;
-
-                if (dalpha == 0)
-                {
-                    trajectory.Push(nextPose);
-                    if (bestFronterier != null) prevFronterierValue = platform.Map.MapMatrix[bestFronterier.X, bestFronterier.Y];
-                    platform.Move((int)dx, (int)dy);
-                }
-                else // rotatation is needed, let's rotate
-                {
-
-                    double rot = Math.Sign(dalpha) * 45;
-                    platform.Rotate(rot);
-                    commandSequence.Push(nextPose);
-                }
-            }
-            else
-            {
-                platform.SendLog("No feasible solution");
-            }
 
         }
 
-        public void Replan(Platform platform, int searchRadius)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="platform">Platform object</param>
+        /// <param name="searchRadius">Serach radius of the local path planner, if it is -1 then don't worry about the manuever constraints</param>
+        public override void ReplanLocal(Platform platform, int searchRadius)
         {
             // Find closest undiscovered point
             GraphNode res = FindTrack(platform.Pose, platform, searchRadius);
@@ -357,6 +156,5 @@ namespace CooperativeMapping.ControlPolicy
         {
             return "Closest Fronterier Control Policy";
         }
-
     }
 }

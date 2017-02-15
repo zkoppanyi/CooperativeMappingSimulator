@@ -16,7 +16,7 @@ namespace CooperativeMapping
             return dalpha;
         }
 
-        public static double ConvertAngleTo360(double value)
+        public static int ConvertAngleTo360(double value)
         {
             double heading = value;
 
@@ -30,7 +30,7 @@ namespace CooperativeMapping
                 heading = value - 360.0 * (int)(Math.Abs(value) / 360.0);
             }
 
-            return heading;
+            return (int)heading;
         }
     }
 }
