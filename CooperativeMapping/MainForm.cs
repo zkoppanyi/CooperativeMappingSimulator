@@ -187,106 +187,118 @@ namespace CooperativeMapping
 
         private void RobotTimer_Tick(object sender, EventArgs e)
         {
-            measureRun.Restart();
-
-            if ((!Logger.IsOpen) && (currentEnviromentLocation != null) && (currentEnviromentLocation != ""))
-            {
-                Logger.Open(currentEnviromentLocation);
-            }
-
             try
             {
-                Parallel.ForEach(enviroment.Platforms, new ParallelOptions { MaxDegreeOfParallelism = 7 }, (plt) =>
-                {
-                    System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
-                    plt.Next();
-                });
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show("Error occured: " + ex.ToString() + " " + ex.InnerException.ToString());
-                robotTimer.Stop();
-            }
+                measureRun.Restart();
 
-            bool isMapDiscovered = true;
-            foreach (Platform plt in enviroment.Platforms)
-            {
-                if (!(plt.ControlPolicy is ReplayPolicy))
+                if ((!Logger.IsOpen) && (currentEnviromentLocation != null) && (currentEnviromentLocation != ""))
                 {
+                    Logger.Open(currentEnviromentLocation);
+                }
 
-                    // Check whether the platform is at the right position
-                    PlatformState platformState = enviroment.CheckPlatformState(plt);
-                    if (platformState != PlatformState.Healthy)
+                try
+                {
+                    Parallel.ForEach(enviroment.Platforms, new ParallelOptions { MaxDegreeOfParallelism = 7 }, (plt) =>
                     {
-                        textBoxConsole.Text += System.Environment.NewLine + "Robot destroyed!" + System.Environment.NewLine;
-                        textBoxConsole.Text += "ID: " + plt.ID + System.Environment.NewLine;
-                        textBoxConsole.Text += "Solution mode: " + plt.ControlPolicy.SolutionType + System.Environment.NewLine;
-                        textBoxConsole.Text += "Command sequence length: " + plt.ControlPolicy.CommandSequence.Count + System.Environment.NewLine;
+                        System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
+                        plt.Next();
+                    });
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error occured: " + ex.ToString() + " " + ex.InnerException.ToString());
+                    robotTimer.Stop();
+                }
 
-                        if (platformState == PlatformState.OutOfBounderies)
+                bool isMapDiscovered = true;
+                foreach (Platform plt in enviroment.Platforms)
+                {
+                    if (!(plt.ControlPolicy is ReplayPolicy))
+                    {
+
+                        // Check whether the platform is at the right position
+                        PlatformState platformState = enviroment.CheckPlatformState(plt);
+                        if (platformState != PlatformState.Healthy)
                         {
-                            textBoxConsole.Text += "Out of bounds!";
-                        }
+                            textBoxConsole.Text += System.Environment.NewLine + "Robot destroyed!" + System.Environment.NewLine;
+                            textBoxConsole.Text += "ID: " + plt.ID + System.Environment.NewLine;
+                            textBoxConsole.Text += "Solution mode: " + plt.ControlPolicy.SolutionType + System.Environment.NewLine;
+                            textBoxConsole.Text += "Command sequence length: " + plt.ControlPolicy.CommandSequence.Count + System.Environment.NewLine;
 
-                        if (platformState == PlatformState.Destroy)
-                        {
-                            textBoxConsole.Text += System.Environment.NewLine + "Collision with obstacle or other platform";
-                            mapImageBox.BackgroundImage = enviroment.Drawer.Draw(plt);
-                        }
+                            if (platformState == PlatformState.OutOfBounderies)
+                            {
+                                textBoxConsole.Text += "Out of bounds!";
+                            }
 
-                        robotTimer.Stop();
-                        nextBatchProcessing();
-                        return;
+                            if (platformState == PlatformState.Destroy)
+                            {
+                                textBoxConsole.Text += System.Environment.NewLine + "Collision with obstacle or other platform";
+                                mapImageBox.BackgroundImage = enviroment.Drawer.Draw(plt);
+                            }
+
+                            robotTimer.Stop();
+                            nextBatchProcessing();
+                            return;
+                        }
+                    }
+
+                    isMapDiscovered &= (plt.Map.IsDiscovered(plt) || (!plt.ControlPolicy.HasFeasablePath) || (plt.IsStopped));
+                }
+
+                if (selectedPlatform != null)
+                {
+                    displayIter++;
+
+                    if ((displayIter % 50) == 0)
+                    {
+                        mapImageBox.BackgroundImage.Dispose();
+                        mapImageBox.BackgroundImage = enviroment.Drawer.Draw(selectedPlatform);
                     }
                 }
 
-                isMapDiscovered &= (plt.Map.IsDiscovered(plt) || (!plt.ControlPolicy.HasFeasablePath) || (plt.IsStopped));
-            }
-
-            if (selectedPlatform != null)
-            {
-                displayIter++;
-
-                if ((displayIter % 1) == 0)
+                if (isMapDiscovered)
                 {
-                    mapImageBox.BackgroundImage.Dispose();
-                    mapImageBox.BackgroundImage = enviroment.Drawer.Draw(selectedPlatform);
+                    robotTimer.Stop();
+                    nextBatchProcessing();
                 }
-            }
 
-            if (isMapDiscovered)
-            {
-                robotTimer.Stop();
-                nextBatchProcessing();
-            }
-
-            int sumStep = 0;
-            if (isMapDiscovered) textBoxConsole.Text += System.Environment.NewLine + System.Environment.NewLine;
-            foreach (Platform plt in enviroment.Platforms)
-            {
-                if (isMapDiscovered) textBoxConsole.Text += "Step #" + plt.ID + ": " + plt.Step + System.Environment.NewLine;
-                sumStep += plt.Step;
-            }
-
-            if (isMapDiscovered) textBoxConsole.Text += "Sum step: " + sumStep + System.Environment.NewLine;
-            if (isMapDiscovered) textBoxConsole.Text += "Average step: " + (double)sumStep / (double)enviroment.Platforms.Count() + System.Environment.NewLine;
-            measureRun.Stop();
-            toolStripStatusLabel.Text = "SUM: " + sumStep + " AVG: " + (double)sumStep / (double)enviroment.Platforms.Count() + " RunTime: " + measureRun.ElapsedMilliseconds;
-
-            if (selectedPlatform != null)
-            {
-                toolStripStatusLabel.Text += " Discovered Area: " + ((double)selectedPlatform.Map.NumDiscoveredBins() / (double)selectedPlatform.Map.NumBins() * 100).ToString("0.00") + "%";
-            }
-
-            double val = sumStep % 100;
-            if ((val == 0) || (isMapDiscovered))
-            {
+                int sumStep = 0;
+                if (isMapDiscovered) textBoxConsole.Text += System.Environment.NewLine + System.Environment.NewLine;
                 foreach (Platform plt in enviroment.Platforms)
                 {
-                    double discoveredArea = ((double)plt.Map.NumDiscoveredBins() / (double)plt.Map.NumBins() * 100);
-                    textBoxConsole.Text +=  "ID #" + plt.ID + " Step: " + plt.Step + " Area: " + discoveredArea.ToString("0.00") + System.Environment.NewLine;
-                    Logger.Log(sumStep + "," + plt.ID + "," + plt.Step + "," + discoveredArea.ToString("0.00"));
+                    if (isMapDiscovered) textBoxConsole.Text += "Step #" + plt.ID + ": " + plt.Step + System.Environment.NewLine;
+                    sumStep += plt.Step;
                 }
+
+                if (isMapDiscovered) textBoxConsole.Text += "Sum step: " + sumStep + System.Environment.NewLine;
+                if (isMapDiscovered) textBoxConsole.Text += "Average step: " + (double)sumStep / (double)enviroment.Platforms.Count() + System.Environment.NewLine;
+                measureRun.Stop();
+                toolStripStatusLabel.Text = "SUM: " + sumStep + " AVG: " + (double)sumStep / (double)enviroment.Platforms.Count() + " RunTime: " + measureRun.ElapsedMilliseconds;
+
+                if (selectedPlatform != null)
+                {
+                    toolStripStatusLabel.Text += " Discovered Area: " + ((double)selectedPlatform.Map.NumDiscoveredBins() / (double)selectedPlatform.Map.NumBins() * 100).ToString("0.00") + "%";
+                }
+
+                double val = sumStep % 100;
+                if ((val == 0) || (isMapDiscovered))
+                {
+                    foreach (Platform plt in enviroment.Platforms)
+                    {
+                        double discoveredArea = ((double)plt.Map.NumDiscoveredBins() / (double)plt.Map.NumBins() * 100);
+                        textBoxConsole.Text += "ID #" + plt.ID + " Step: " + plt.Step + " Area: " + discoveredArea.ToString("0.00") + System.Environment.NewLine;
+                        Logger.Log(sumStep + "," + plt.ID + "," + plt.Step + "," + discoveredArea.ToString("0.00"));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                textBoxConsole.Text += ex.ToString();
+                if (Logger.IsOpen)
+                {
+                    Logger.Log(ex.ToString());
+                }
+                nextBatchProcessing();
             }
 
         }

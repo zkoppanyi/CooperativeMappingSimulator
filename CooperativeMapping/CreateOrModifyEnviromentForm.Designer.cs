@@ -35,6 +35,13 @@
             this.textToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.clearMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadFromMATFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.changesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.changeAllPolicyToCFToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.changeAllPlatformToMaxInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.changeAllToBidingPolicyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.removeAllPlatformsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.allToGlobalCommunicationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.allToNearbyCommunicationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mapImageBox = new System.Windows.Forms.PictureBox();
             this.propertyGridEnviroment = new System.Windows.Forms.PropertyGrid();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
@@ -46,11 +53,6 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabelSelectedBinType = new System.Windows.Forms.ToolStripStatusLabel();
-            this.changesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.changeAllPlatformToMaxInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.changeAllPolicyToCFToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.removeAllPlatformsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.changeAllToBidingPolicyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mapImageBox)).BeginInit();
             this.toolStrip1.SuspendLayout();
@@ -107,6 +109,61 @@
             this.loadFromMATFileToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.loadFromMATFileToolStripMenuItem.Text = "Load from MAT file...";
             this.loadFromMATFileToolStripMenuItem.Click += new System.EventHandler(this.loadFromMATFileToolStripMenuItem_Click);
+            // 
+            // changesToolStripMenuItem
+            // 
+            this.changesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.changeAllPolicyToCFToolStripMenuItem,
+            this.changeAllPlatformToMaxInfoToolStripMenuItem,
+            this.changeAllToBidingPolicyToolStripMenuItem,
+            this.removeAllPlatformsToolStripMenuItem,
+            this.allToGlobalCommunicationToolStripMenuItem,
+            this.allToNearbyCommunicationToolStripMenuItem});
+            this.changesToolStripMenuItem.Name = "changesToolStripMenuItem";
+            this.changesToolStripMenuItem.Size = new System.Drawing.Size(65, 20);
+            this.changesToolStripMenuItem.Text = "Changes";
+            // 
+            // changeAllPolicyToCFToolStripMenuItem
+            // 
+            this.changeAllPolicyToCFToolStripMenuItem.Name = "changeAllPolicyToCFToolStripMenuItem";
+            this.changeAllPolicyToCFToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.changeAllPolicyToCFToolStripMenuItem.Text = "Change all policy to CF";
+            this.changeAllPolicyToCFToolStripMenuItem.Click += new System.EventHandler(this.changeAllPolicyToCFToolStripMenuItem_Click);
+            // 
+            // changeAllPlatformToMaxInfoToolStripMenuItem
+            // 
+            this.changeAllPlatformToMaxInfoToolStripMenuItem.Name = "changeAllPlatformToMaxInfoToolStripMenuItem";
+            this.changeAllPlatformToMaxInfoToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.changeAllPlatformToMaxInfoToolStripMenuItem.Text = "Change all policy to MaxInfo";
+            this.changeAllPlatformToMaxInfoToolStripMenuItem.Click += new System.EventHandler(this.changeAllPlatformToMaxInfoToolStripMenuItem_Click);
+            // 
+            // changeAllToBidingPolicyToolStripMenuItem
+            // 
+            this.changeAllToBidingPolicyToolStripMenuItem.Name = "changeAllToBidingPolicyToolStripMenuItem";
+            this.changeAllToBidingPolicyToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.changeAllToBidingPolicyToolStripMenuItem.Text = "Change all to Biding Policy";
+            this.changeAllToBidingPolicyToolStripMenuItem.Click += new System.EventHandler(this.changeAllToBidingPolicyToolStripMenuItem_Click);
+            // 
+            // removeAllPlatformsToolStripMenuItem
+            // 
+            this.removeAllPlatformsToolStripMenuItem.Name = "removeAllPlatformsToolStripMenuItem";
+            this.removeAllPlatformsToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.removeAllPlatformsToolStripMenuItem.Text = "Remove all platforms";
+            this.removeAllPlatformsToolStripMenuItem.Click += new System.EventHandler(this.removeAllPlatformsToolStripMenuItem_Click);
+            // 
+            // allToGlobalCommunicationToolStripMenuItem
+            // 
+            this.allToGlobalCommunicationToolStripMenuItem.Name = "allToGlobalCommunicationToolStripMenuItem";
+            this.allToGlobalCommunicationToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.allToGlobalCommunicationToolStripMenuItem.Text = "All to Global Communication";
+            this.allToGlobalCommunicationToolStripMenuItem.Click += new System.EventHandler(this.allToGlobalCommunicationToolStripMenuItem_Click);
+            // 
+            // allToNearbyCommunicationToolStripMenuItem
+            // 
+            this.allToNearbyCommunicationToolStripMenuItem.Name = "allToNearbyCommunicationToolStripMenuItem";
+            this.allToNearbyCommunicationToolStripMenuItem.Size = new System.Drawing.Size(233, 22);
+            this.allToNearbyCommunicationToolStripMenuItem.Text = "All to Nearby Communication";
+            this.allToNearbyCommunicationToolStripMenuItem.Click += new System.EventHandler(this.allToNearbyCommunicationToolStripMenuItem_Click);
             // 
             // mapImageBox
             // 
@@ -226,45 +283,6 @@
             this.toolStripStatusLabelSelectedBinType.Size = new System.Drawing.Size(53, 17);
             this.toolStripStatusLabelSelectedBinType.Text = "Bin type:";
             // 
-            // changesToolStripMenuItem
-            // 
-            this.changesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.changeAllPolicyToCFToolStripMenuItem,
-            this.changeAllPlatformToMaxInfoToolStripMenuItem,
-            this.changeAllToBidingPolicyToolStripMenuItem,
-            this.removeAllPlatformsToolStripMenuItem});
-            this.changesToolStripMenuItem.Name = "changesToolStripMenuItem";
-            this.changesToolStripMenuItem.Size = new System.Drawing.Size(65, 20);
-            this.changesToolStripMenuItem.Text = "Changes";
-            // 
-            // changeAllPlatformToMaxInfoToolStripMenuItem
-            // 
-            this.changeAllPlatformToMaxInfoToolStripMenuItem.Name = "changeAllPlatformToMaxInfoToolStripMenuItem";
-            this.changeAllPlatformToMaxInfoToolStripMenuItem.Size = new System.Drawing.Size(225, 22);
-            this.changeAllPlatformToMaxInfoToolStripMenuItem.Text = "Change all policy to MaxInfo";
-            this.changeAllPlatformToMaxInfoToolStripMenuItem.Click += new System.EventHandler(this.changeAllPlatformToMaxInfoToolStripMenuItem_Click);
-            // 
-            // changeAllPolicyToCFToolStripMenuItem
-            // 
-            this.changeAllPolicyToCFToolStripMenuItem.Name = "changeAllPolicyToCFToolStripMenuItem";
-            this.changeAllPolicyToCFToolStripMenuItem.Size = new System.Drawing.Size(225, 22);
-            this.changeAllPolicyToCFToolStripMenuItem.Text = "Change all policy to CF";
-            this.changeAllPolicyToCFToolStripMenuItem.Click += new System.EventHandler(this.changeAllPolicyToCFToolStripMenuItem_Click);
-            // 
-            // removeAllPlatformsToolStripMenuItem
-            // 
-            this.removeAllPlatformsToolStripMenuItem.Name = "removeAllPlatformsToolStripMenuItem";
-            this.removeAllPlatformsToolStripMenuItem.Size = new System.Drawing.Size(225, 22);
-            this.removeAllPlatformsToolStripMenuItem.Text = "Remove all platforms";
-            this.removeAllPlatformsToolStripMenuItem.Click += new System.EventHandler(this.removeAllPlatformsToolStripMenuItem_Click);
-            // 
-            // changeAllToBidingPolicyToolStripMenuItem
-            // 
-            this.changeAllToBidingPolicyToolStripMenuItem.Name = "changeAllToBidingPolicyToolStripMenuItem";
-            this.changeAllToBidingPolicyToolStripMenuItem.Size = new System.Drawing.Size(225, 22);
-            this.changeAllToBidingPolicyToolStripMenuItem.Text = "Change all to Biding Policy";
-            this.changeAllToBidingPolicyToolStripMenuItem.Click += new System.EventHandler(this.changeAllToBidingPolicyToolStripMenuItem_Click);
-            // 
             // CreateOrModifyEnviromentForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -315,5 +333,7 @@
         private System.Windows.Forms.ToolStripMenuItem changeAllPlatformToMaxInfoToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem removeAllPlatformsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem changeAllToBidingPolicyToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem allToGlobalCommunicationToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem allToNearbyCommunicationToolStripMenuItem;
     }
 }

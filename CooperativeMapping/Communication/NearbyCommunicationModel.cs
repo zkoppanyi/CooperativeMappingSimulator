@@ -13,7 +13,7 @@ namespace CooperativeMapping.Communication
 
         public NearbyCommunicationModel()
         {
-            Radius = 5;
+            Radius = 50;
         }
 
         public override void Acquire(Platform platform, Enviroment enviroment)
