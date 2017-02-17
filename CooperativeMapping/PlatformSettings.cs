@@ -27,7 +27,7 @@ namespace CooperativeMapping
             comboBoxController.Items.Add(new ClosestFronterierControlPolicy());
             comboBoxController.Items.Add(new MaxInformationGainControlPolicy());
             comboBoxController.Items.Add(new BidingControlPolicy());
-            comboBoxController.Items.Add(Platform.ControlPolicy);
+            comboBoxController.Items.Add((object)Platform.ControlPolicy);
             comboBoxController.SelectedItem = Platform.ControlPolicy;
 
             comboBoxCommunicationModel.Items.Clear();

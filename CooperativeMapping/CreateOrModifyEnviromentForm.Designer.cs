@@ -53,6 +53,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabelSelectedBinType = new System.Windows.Forms.ToolStripStatusLabel();
+            this.saveWithGeneratingCasesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mapImageBox)).BeginInit();
             this.toolStrip1.SuspendLayout();
@@ -75,6 +76,7 @@
             // 
             this.parametersToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.limitsToolStripMenuItem,
+            this.saveWithGeneratingCasesToolStripMenuItem,
             this.textToolStripMenuItem,
             this.clearMapToolStripMenuItem,
             this.loadFromMATFileToolStripMenuItem});
@@ -283,6 +285,13 @@
             this.toolStripStatusLabelSelectedBinType.Size = new System.Drawing.Size(53, 17);
             this.toolStripStatusLabelSelectedBinType.Text = "Bin type:";
             // 
+            // saveWithGeneratingCasesToolStripMenuItem
+            // 
+            this.saveWithGeneratingCasesToolStripMenuItem.Name = "saveWithGeneratingCasesToolStripMenuItem";
+            this.saveWithGeneratingCasesToolStripMenuItem.Size = new System.Drawing.Size(224, 22);
+            this.saveWithGeneratingCasesToolStripMenuItem.Text = "Save with generating cases...";
+            this.saveWithGeneratingCasesToolStripMenuItem.Click += new System.EventHandler(this.saveWithGeneratingCasesToolStripMenuItem_Click);
+            // 
             // CreateOrModifyEnviromentForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -335,5 +344,6 @@
         private System.Windows.Forms.ToolStripMenuItem changeAllToBidingPolicyToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem allToGlobalCommunicationToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem allToNearbyCommunicationToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveWithGeneratingCasesToolStripMenuItem;
     }
 }

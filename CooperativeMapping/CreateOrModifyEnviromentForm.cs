@@ -9,6 +9,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -333,5 +334,79 @@ namespace CooperativeMapping
                 p.CommunicationModel = new NearbyCommunicationModel();
             }
         }
+
+        private void saveWithGeneratingCasesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+
+            saveFileDialog.Filter = "bin files (*.bin)|*.bin|All files (*.*)|*.*";
+            saveFileDialog.FilterIndex = 1;
+            saveFileDialog.RestoreDirectory = true;
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                String fullPath = saveFileDialog.FileName;
+                String path = Path.GetDirectoryName(fullPath);
+                String file = Path.GetFileName(fullPath);
+                String fileWithoutExtension = Path.GetFileNameWithoutExtension(fullPath);
+
+                setAllPlatformsAndSave(new ClosestFronterierControlPolicy(), new NearbyCommunicationModel(), path, fileWithoutExtension);
+                setAllPlatformsAndSave(new MaxInformationGainControlPolicy(), new NearbyCommunicationModel(), path, fileWithoutExtension);
+                setAllPlatformsAndSave(new BidingControlPolicy(), new NearbyCommunicationModel(), path, fileWithoutExtension);
+                setAllPlatformsAndSave(new ClosestFronterierControlPolicy(), new GlobalCommunicationModel(), path, fileWithoutExtension);
+                setAllPlatformsAndSave(new MaxInformationGainControlPolicy(), new GlobalCommunicationModel(), path, fileWithoutExtension);
+                setAllPlatformsAndSave(new BidingControlPolicy(), new GlobalCommunicationModel(), path, fileWithoutExtension);
+            }
+        }
+
+        private void setAllPlatformsAndSave(ControlPolicy.ControlPolicyAbstract policy, CommunicationModel comm, String path, String fileWithoutExtension)
+        {
+            String cpPrefix = "";
+            foreach (Platform plt in enviroment.Platforms)
+            {
+                if (policy is ClosestFronterierControlPolicy)
+                {
+                    plt.ControlPolicy = new ClosestFronterierControlPolicy();
+                    cpPrefix = "cf";
+                }
+
+                if (policy is MaxInformationGainControlPolicy)
+                {
+                    plt.ControlPolicy = new MaxInformationGainControlPolicy();
+                    cpPrefix = "mi";
+                }
+
+                if (policy is BidingControlPolicy)
+                {
+                    plt.ControlPolicy = new BidingControlPolicy();
+                    cpPrefix = "bf";
+                }
+            }
+
+            String commPrefix = "";
+            foreach (Platform plt in enviroment.Platforms)
+            {
+                if (comm is NearbyCommunicationModel)
+                {
+                    plt.CommunicationModel = new NearbyCommunicationModel();
+                    commPrefix = "nc";
+                }
+
+                if (comm is GlobalCommunicationModel)
+                {
+                    plt.CommunicationModel = new GlobalCommunicationModel();
+                    commPrefix = "gc";
+                }
+            }
+
+
+            String newEnviromentPath = path + "//" + fileWithoutExtension + "_" + commPrefix + "_" + cpPrefix + ".bin";
+            Stream stream = new FileStream(newEnviromentPath, FileMode.Create, FileAccess.Write, FileShare.None);
+            BinaryFormatter binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+            binaryFormatter.Serialize(stream, this.enviroment);
+            stream.Close();
+
+        }
+
     }
 }
