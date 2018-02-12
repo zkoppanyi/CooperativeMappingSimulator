@@ -81,7 +81,7 @@ namespace CooperativeMapping
 
             this.ShowBreadCumbers = true;
             this.ShowDistanceMap = true;
-    }
+        }
 
         public Bitmap Draw(MapObject map, List<Platform> platforms, Platform platform = null)
         {
@@ -202,6 +202,79 @@ namespace CooperativeMapping
 
             return bitmap;
         }
+
+        public Bitmap DrawResult(Enviroment env)
+        {
+            MapObject map = env.Map;
+            Bitmap bitmap = new Bitmap(map.Columns * BinSize, map.Rows * BinSize);
+            Graphics g = Graphics.FromImage(bitmap);
+
+            Pen blackPen = new Pen(Color.Black, 1);
+            Pen platformPen = new Pen(ColorPlatform, 1);
+            //Color customColor = Color.FromArgb(50, Color.Gray);
+            //SolidBrush shadowBrush = new SolidBrush(customColor);
+
+            // draw map structure
+            for (int i = 0; i < map.Rows; i++)
+            {
+                for (int j = 0; j < map.Columns; j++)
+                {
+                    Rectangle rect = new Rectangle(StartX + j * BinSize, StartY + i * BinSize, BinSize, BinSize);
+
+                    // frame for boxes
+                    int val = 255 - (int)(map.MapMatrix[i, j] * 255);
+                    SolidBrush brush = new SolidBrush(Color.FromArgb(val, val, val));
+                    g.FillRectangles(brush, new Rectangle[] { rect });
+                    //g.DrawRectangle(blackPen, rect);
+                }
+            }
+
+            // Print trajectory
+            List<Color> colors = new List<Color>();
+            colors.Add(Color.Red);
+            colors.Add(Color.Purple);
+            colors.Add(Color.Green);
+            colors.Add(Color.Yellow);
+            colors.Add(Color.Magenta);
+            colors.Add(Color.Maroon);
+            colors.Add(Color.MediumAquamarine);
+            colors.Add(Color.Black);
+            colors.Add(Color.Blue);
+            colors.Add(Color.Orange);
+            colors.Add(Color.Beige);
+            colors.Add(Color.Gray);
+
+            int k = 0;
+            foreach (Platform plt in env.Platforms)
+            {
+                if (plt.ControlPolicy.Trajectory != null)
+                {
+                    int colori = k % 11;
+                    k++;
+                    Color color = colors[colori];
+
+                    foreach (Pose p in plt.ControlPolicy.CommandSequence)
+                    {
+                        Rectangle rect = new Rectangle(StartX + p.Y * BinSize, StartY + p.X * BinSize, BinSize, BinSize);
+                        g.FillRectangles(new SolidBrush(color), new Rectangle[] { rect });
+                    }
+
+                    foreach (Pose p in plt.ControlPolicy.Trajectory)
+                    {
+                        Rectangle rect = new Rectangle(StartX + p.Y * BinSize, StartY + p.X * BinSize, BinSize, BinSize);
+                        g.FillRectangles(new SolidBrush(color), new Rectangle[] { rect });
+                    }
+                }
+            }
+           
+
+            // frame around the map to show extents
+            blackPen = new Pen(Color.Black, 2);
+            g.DrawRectangle(blackPen, StartX, StartY, map.Columns * BinSize, map.Rows * BinSize);
+
+            return bitmap;
+        }
+
 
         private void drawPlatform(Graphics g, Platform p)
         {

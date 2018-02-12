@@ -249,7 +249,7 @@ namespace CooperativeMapping
                 {
                     displayIter++;
 
-                    if ((displayIter % 50) == 0)
+                    if ((displayIter % 1) == 0)
                     {
                         mapImageBox.BackgroundImage.Dispose();
                         mapImageBox.BackgroundImage = enviroment.Drawer.Draw(selectedPlatform);
@@ -520,6 +520,12 @@ namespace CooperativeMapping
                 FileStream stream = new FileStream(location, FileMode.Open);
                 BinaryFormatter formatter = new BinaryFormatter();
                 ReplayObject replayObject = (ReplayObject)formatter.Deserialize(stream);
+
+                if (!File.Exists(replayObject.EnviromentPath))
+                {
+                    replayObject.EnviromentPath = Path.GetDirectoryName(location) + "\\" + Path.GetFileName(replayObject.EnviromentPath);
+                }
+
                 LoadEnviroment(replayObject.EnviromentPath);
 
                 for(int i = 0; i < replayObject.FinalPlatforms.Count; i++)
@@ -608,6 +614,12 @@ namespace CooperativeMapping
                     nextBatchProcessing();
                 }
             }
+        }
+
+        private void showResultToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            mapImageBox.BackgroundImage.Dispose();
+            mapImageBox.BackgroundImage = enviroment.Drawer.DrawResult(enviroment);
         }
     }
 }

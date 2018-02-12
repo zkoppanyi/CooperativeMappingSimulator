@@ -34,9 +34,11 @@
             this.loadEnviromentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.createEnviromentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.modifyEnviromentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.savePlayToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.batchProcessingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.vizulaizationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.commandsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -57,8 +59,7 @@
             this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
             this.toolStripComboBoxMaps = new System.Windows.Forms.ToolStripComboBox();
-            this.batchProcessingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.showResultToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mapImageBox)).BeginInit();
@@ -115,10 +116,10 @@
             this.modifyEnviromentToolStripMenuItem.Text = "Modify Enviroment...";
             this.modifyEnviromentToolStripMenuItem.Click += new System.EventHandler(this.modifyEnviromentToolStripMenuItem_Click);
             // 
-            // toolStripSeparator2
+            // toolStripSeparator1
             // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(182, 6);
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(182, 6);
             // 
             // savePlayToolStripMenuItem
             // 
@@ -134,10 +135,23 @@
             this.loadToolStripMenuItem.Text = "Load Play...";
             this.loadToolStripMenuItem.Click += new System.EventHandler(this.loadToolStripMenuItem_Click);
             // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(182, 6);
+            // 
+            // batchProcessingToolStripMenuItem
+            // 
+            this.batchProcessingToolStripMenuItem.Name = "batchProcessingToolStripMenuItem";
+            this.batchProcessingToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
+            this.batchProcessingToolStripMenuItem.Text = "Batch Processing";
+            this.batchProcessingToolStripMenuItem.Click += new System.EventHandler(this.batchProcessingToolStripMenuItem_Click);
+            // 
             // vizulaizationToolStripMenuItem
             // 
             this.vizulaizationToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mapToolStripMenuItem});
+            this.mapToolStripMenuItem,
+            this.showResultToolStripMenuItem});
             this.vizulaizationToolStripMenuItem.Name = "vizulaizationToolStripMenuItem";
             this.vizulaizationToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.vizulaizationToolStripMenuItem.Text = "View";
@@ -145,7 +159,7 @@
             // mapToolStripMenuItem
             // 
             this.mapToolStripMenuItem.Name = "mapToolStripMenuItem";
-            this.mapToolStripMenuItem.Size = new System.Drawing.Size(98, 22);
+            this.mapToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.mapToolStripMenuItem.Text = "Map";
             this.mapToolStripMenuItem.Click += new System.EventHandler(this.mapToolStripMenuItem_Click);
             // 
@@ -318,17 +332,12 @@
             this.toolStripComboBoxMaps.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBoxMaps_SelectedIndexChanged);
             this.toolStripComboBoxMaps.Click += new System.EventHandler(this.toolStripComboBoxMaps_Click);
             // 
-            // batchProcessingToolStripMenuItem
+            // showResultToolStripMenuItem
             // 
-            this.batchProcessingToolStripMenuItem.Name = "batchProcessingToolStripMenuItem";
-            this.batchProcessingToolStripMenuItem.Size = new System.Drawing.Size(185, 22);
-            this.batchProcessingToolStripMenuItem.Text = "Batch Processing";
-            this.batchProcessingToolStripMenuItem.Click += new System.EventHandler(this.batchProcessingToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(182, 6);
+            this.showResultToolStripMenuItem.Name = "showResultToolStripMenuItem";
+            this.showResultToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.showResultToolStripMenuItem.Text = "Show Result";
+            this.showResultToolStripMenuItem.Click += new System.EventHandler(this.showResultToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -388,6 +397,7 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem6;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem batchProcessingToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem showResultToolStripMenuItem;
     }
 }
 
